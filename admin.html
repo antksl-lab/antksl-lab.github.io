@@ -1,0 +1,94 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ANTKSL · Статистика сайта</title>
+<style>
+:root{--bg:#0f1115;--card:#171a21;--line:#262b36;--ink:#e8eaed;--mut:#8b93a3;--acc:#6ea8fe}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 system-ui,Segoe UI,Roboto,sans-serif;padding:24px}
+h1{font-size:20px;margin:0 0 4px}.sub{color:var(--mut);font-size:13px;margin-bottom:20px}
+.gate{max-width:420px;margin:60px auto;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:24px}
+.gate input{width:100%;padding:10px;margin:8px 0;background:#0d0f14;border:1px solid var(--line);border-radius:8px;color:var(--ink)}
+.gate button,.bar button{background:var(--acc);color:#06101f;border:0;padding:10px 16px;border-radius:8px;font-weight:600;cursor:pointer}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px}
+.card h2{font-size:13px;text-transform:uppercase;letter-spacing:.05em;color:var(--mut);margin:0 0 12px}
+.kpi{display:flex;gap:20px;flex-wrap:wrap;margin-bottom:18px}
+.kpi .b{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 18px;min-width:120px}
+.kpi .n{font-size:26px;font-weight:700}.kpi .l{color:var(--mut);font-size:12px}
+.row{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--line)}
+.row:last-child{border:0}.row .v{color:var(--acc);font-weight:600}
+.barline{height:6px;background:#0d0f14;border-radius:4px;margin-top:4px;overflow:hidden}.barline i{display:block;height:100%;background:var(--acc)}
+.bar{display:flex;gap:10px;align-items:center;margin-bottom:18px}.bar select{background:#0d0f14;border:1px solid var(--line);color:var(--ink);padding:8px;border-radius:8px}
+.empty{color:var(--mut);text-align:center;padding:20px}
+</style></head><body>
+<div id="gate" class="gate">
+  <h1>Статистика ANTKSL</h1>
+  <div class="sub">Вставь service_role-ключ (Settings → API). Он хранится только в этой вкладке, никуда не уходит.</div>
+  <input id="svc" type="password" placeholder="service_role key (secret)">
+  <button onclick="enter()">Войти</button>
+</div>
+<div id="app" style="display:none">
+  <div class="bar">
+    <h1 style="margin:0;flex:1">Статистика ANTKSL <span class="sub" style="display:inline">за</span></h1>
+    <select id="period" onchange="load()">
+      <option value="1">сегодня</option><option value="7" selected>7 дней</option>
+      <option value="30">30 дней</option><option value="9999">всё время</option>
+    </select>
+    <button onclick="load()">⟳ Обновить</button>
+  </div>
+  <div class="kpi" id="kpi"></div>
+  <div class="grid">
+    <div class="card"><h2>Топ релизов по кликам</h2><div id="releases"></div></div>
+    <div class="card"><h2>Откуда приходят</h2><div id="sources"></div></div>
+    <div class="card"><h2>География</h2><div id="geo"></div></div>
+    <div class="card"><h2>Устройства и язык</h2><div id="device"></div></div>
+  </div>
+</div>
+<script>
+var SB="https://qhxhdzwtcjzdinbicjxl.supabase.co", KEY="";
+function enter(){KEY=document.getElementById('svc').value.trim();if(!KEY){alert('Вставь ключ');return;}
+  document.getElementById('gate').style.display='none';document.getElementById('app').style.display='block';load();}
+function q(path){return fetch(SB.replace(/\/$/,'')+"/rest/v1/"+path,
+  {headers:{apikey:KEY,Authorization:"Bearer "+KEY}}).then(function(r){if(!r.ok)throw new Error(r.status);return r.json();});}
+function since(){var d=parseInt(document.getElementById('period').value,10);
+  var t=new Date(Date.now()-d*864e5).toISOString();return t;}
+function rows(el,data,labelKey,valKey){
+  var box=document.getElementById(el);
+  if(!data||!data.length){box.innerHTML='<div class="empty">пока нет данных</div>';return;}
+  var max=Math.max.apply(null,data.map(function(r){return +r[valKey]||0}));
+  box.innerHTML=data.slice(0,12).map(function(r){
+    var w=max?Math.round((+r[valKey]||0)/max*100):0;
+    return '<div class="row"><span>'+(r[labelKey]||'—')+'</span><span class="v">'+r[valKey]+'</span></div>'+
+           '<div class="barline"><i style="width:'+w+'%"></i></div>';}).join('');
+}
+function load(){
+  var t=since();
+  // KPI: всего просмотров и кликов за период
+  q("events?select=type&ts=gte."+t).then(function(d){
+    var pv=d.filter(function(e){return e.type==='pageview'}).length;
+    var ck=d.filter(function(e){return e.type==='click_release'}).length;
+    var nav=d.filter(function(e){return e.type==='click_nav'}).length;
+    document.getElementById('kpi').innerHTML=
+      kpi(pv,'просмотров')+kpi(ck,'кликов по релизам')+kpi(nav,'кликов по меню')+
+      kpi(pv?Math.round(ck/pv*100)+'%':'0%','конверсия в клик');
+  }).catch(err);
+  // Топ релизов
+  q("events?select=release&type=eq.click_release&ts=gte."+t).then(function(d){
+    rows('releases',agg(d,'release'),'k','n');}).catch(err);
+  // Источники
+  q("events?select=source&type=eq.pageview&ts=gte."+t).then(function(d){
+    rows('sources',agg(d,'source',' (прямой переход)'),'k','n');}).catch(err);
+  // Гео
+  q("events?select=country&type=eq.pageview&ts=gte."+t).then(function(d){
+    rows('geo',agg(d,'country','(неизвестно)'),'k','n');}).catch(err);
+  // Устройства+язык
+  q("events?select=device,lang&type=eq.pageview&ts=gte."+t).then(function(d){
+    var dev=agg(d,'device');var lng=agg(d,'lang');
+    document.getElementById('device').innerHTML=
+      dev.concat(lng).map(function(r){return '<div class="row"><span>'+r.k+'</span><span class="v">'+r.n+'</span></div>';}).join('')||'<div class="empty">нет данных</div>';
+  }).catch(err);
+}
+function agg(d,key,fallback){var m={};(d||[]).forEach(function(e){var k=e[key]||fallback||'—';m[k]=(m[k]||0)+1;});
+  return Object.keys(m).map(function(k){return{k:k,n:m[k]};}).sort(function(a,b){return b.n-a.n;});}
+function kpi(n,l){return '<div class="b"><div class="n">'+n+'</div><div class="l">'+l+'</div></div>';}
+function err(e){console.warn(e);}
+</script></body></html>
