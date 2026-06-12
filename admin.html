@@ -21,7 +21,7 @@ h1{font-size:20px;margin:0 0 4px}.sub{color:var(--mut);font-size:13px;margin-bot
 .empty{color:var(--mut);text-align:center;padding:20px}
 </style></head><body>
 <div id="gate" class="gate">
-  <h1>Статистика ANTKSL</h1>
+  <h1>Статистика ANTKSL</h1><div class="sub" id="admin-ver" style="color:#6ea8fe">сборка v2 · 12.06 · с диагностикой ошибок</div>
   <div class="sub">Вставь service_role-ключ (Settings → API). Он хранится только в этой вкладке, никуда не уходит.</div>
   <input id="svc" type="password" placeholder="service_role key (secret)">
   <button onclick="enter()">Войти</button>
@@ -47,6 +47,7 @@ h1{font-size:20px;margin:0 0 4px}.sub{color:var(--mut);font-size:13px;margin-bot
 <script>
 var SB="https://qhxhdzwtcjzdinbicjxl.supabase.co", KEY="";
 function enter(){KEY=document.getElementById('svc').value.trim();if(!KEY){alert('Вставь ключ');return;}
+  console.log('ANTKSL admin v2: вход выполнен, ключ длиной',KEY.length);
   document.getElementById('gate').style.display='none';document.getElementById('app').style.display='block';load();}
 function q(path){return fetch(SB.replace(/\/$/,'')+"/rest/v1/"+path,
   {headers:{apikey:KEY,Authorization:"Bearer "+KEY}}).then(function(r){
