@@ -332,42 +332,56 @@ html[data-hero="cd"] .hero-obj[data-obj="cd"]{animation:spin 8s linear infinite}
 .heropanel button[aria-pressed="true"]::after{content:"✓";margin-left:auto;color:var(--amber);font-weight:700}
 .heropanel .hi{font-size:16px;width:20px;text-align:center}
 
+
+/* Три кнопки-переключателя одинаковой ширины */
+.skintoggle,.modetoggle,.herotoggle{width:128px;justify-content:flex-start}
+
+
+/* === ОБЪЕДИНЁННЫЙ переключатель вида (одна кнопка, три раздела) === */
+.skinbar,.modebar,.herobar{position:static!important;display:contents!important}
+.skintoggle,.modetoggle,.herotoggle{display:none!important}
+.viewbar{position:fixed;right:16px;top:16px;z-index:60;display:flex;flex-direction:column;align-items:flex-end;gap:8px;font-family:var(--body)}
+.viewbtn{display:flex;align-items:center;gap:8px;width:128px;justify-content:flex-start;background:var(--ink);color:var(--paper);border:2px solid var(--paper);border-radius:24px;padding:9px 16px;cursor:pointer;font-size:13px;font-weight:600;box-shadow:0 4px 24px rgba(0,0,0,.45)}
+.viewmenu{display:none;flex-direction:column;gap:14px;background:var(--paper);border:1px solid var(--line-2);border-radius:16px;padding:14px;box-shadow:0 12px 40px rgba(0,0,0,.4);min-width:210px;max-height:78vh;overflow:auto}
+.viewmenu.open{display:flex}
+.viewmenu .vsec-title{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin:0 0 2px 4px;font-weight:700}
+/* существующие панели показываем как секции внутри общего меню */
+.viewmenu .skinpanel,.viewmenu .modepanel,.viewmenu .heropanel{display:flex!important;position:static!important;box-shadow:none!important;border:0!important;background:transparent!important;padding:0!important;min-width:0!important;margin:0!important}
+
 </style>
 </head>
 <body>
-<div class="skinfx"><b></b><b></b><b></b></div><div class="skingrain"></div>
-<div class="herobar">
-<button class="herotoggle" id="herotoggle" aria-expanded="false" aria-controls="heropanel"><span>◉</span><span data-i18n-hero="label">Герой</span></button>
-<div class="heropanel" id="heropanel" role="listbox" aria-label="Главный предмет">
-<button data-hero="vinyl" role="option"><span class="hi">⬤</span><span data-i18n-hero="vinyl">Пластинка</span></button>
-<button data-hero="cd" role="option"><span class="hi">◎</span><span data-i18n-hero="cd">CD-диск</span></button>
-<button data-hero="amp" role="option"><span class="hi">▭</span><span data-i18n-hero="amp">Усилитель</span></button>
-<button data-hero="speaker" role="option"><span class="hi">◍</span><span data-i18n-hero="speaker">Колонка</span></button>
-<button data-hero="drum" role="option"><span class="hi">▦</span><span data-i18n-hero="drum">Драм-машина</span></button>
-</div>
-</div>
-<div class="modebar">
-<button class="modetoggle" id="modetoggle" aria-expanded="false" aria-controls="modepanel"><span>✦</span><span data-i18n-mode="label">Подача</span></button>
-<div class="modepanel" id="modepanel" role="listbox" aria-label="Режим подачи">
-<button data-mode="reveal_scroll" role="option"><span class="mi">↑</span><span data-i18n-mode="reveal_scroll">Проявление при скролле</span></button>
-<button data-mode="kinetic_hero" role="option"><span class="mi">✶</span><span data-i18n-mode="kinetic_hero">Кинетический герой</span></button>
-<button data-mode="magnetic_cards" role="option"><span class="mi">◈</span><span data-i18n-mode="magnetic_cards">Живые карточки</span></button>
-<button data-mode="ambient_motion" role="option"><span class="mi">≈</span><span data-i18n-mode="ambient_motion">Живой фон</span></button>
-<button data-mode="classic" role="option"><span class="mi">●</span><span data-i18n-mode="classic">Классика</span></button>
-</div>
-</div>
-<div class="skinbar">
-<button class="skintoggle" id="skintoggle" aria-expanded="false" aria-controls="skinpanel"><span class="dot"></span><span data-i18n-skin="label">Облик</span></button>
-<div class="skinpanel" id="skinpanel" role="listbox" aria-label="Выбор облика сайта">
+<div class="viewbar">
+<button class="viewbtn" id="viewbtn" aria-expanded="false" aria-controls="viewmenu"><span>✦</span><span data-i18n-view="label">Вид</span></button>
+<div class="viewmenu" id="viewmenu" role="menu">
+<div><div class="vsec-title" data-i18n-view="skin">Облик</div><div class="skinpanel" id="skinpanel" role="listbox" aria-label="Выбор облика сайта">
 <button data-skin="aurora_soul" role="option"><span class="sw" style="background:#7a4dff"></span><span data-i18n-skin="aurora">Северное сияние</span></button>
 <button data-skin="grain_warmth" role="option"><span class="sw" style="background:#e0a458"></span><span data-i18n-skin="grain">Тёплое зерно</span></button>
 <button data-skin="glass_depth" role="option"><span class="sw" style="background:#6ea8fe"></span><span data-i18n-skin="glass">Матовое стекло</span></button>
 <button data-skin="editorial_mono" role="option"><span class="sw" style="background:#b89b7a"></span><span data-i18n-skin="editorial">Светлый минимал</span></button>
 <button data-skin="bento_showcase" role="option"><span class="sw" style="background:#a8ff60"></span><span data-i18n-skin="bento">Бенто-витрина</span></button>
 <button data-skin="tactile_brutalism" role="option"><span class="sw" style="background:#ff3b30"></span><span data-i18n-skin="brutal">Брутал</span></button>
+</div></div>
+<div><div class="vsec-title" data-i18n-view="mode">Подача</div><div class="modepanel" id="modepanel" role="listbox" aria-label="Режим подачи">
+<button data-mode="reveal_scroll" role="option"><span class="mi">↑</span><span data-i18n-mode="reveal_scroll">Проявление при скролле</span></button>
+<button data-mode="kinetic_hero" role="option"><span class="mi">✶</span><span data-i18n-mode="kinetic_hero">Кинетический герой</span></button>
+<button data-mode="magnetic_cards" role="option"><span class="mi">◈</span><span data-i18n-mode="magnetic_cards">Живые карточки</span></button>
+<button data-mode="ambient_motion" role="option"><span class="mi">≈</span><span data-i18n-mode="ambient_motion">Живой фон</span></button>
+<button data-mode="classic" role="option"><span class="mi">●</span><span data-i18n-mode="classic">Классика</span></button>
+</div></div>
+<div><div class="vsec-title" data-i18n-view="hero">Герой</div><div class="heropanel" id="heropanel" role="listbox" aria-label="Главный предмет">
+<button data-hero="vinyl" role="option"><span class="hi">⬤</span><span data-i18n-hero="vinyl">Пластинка</span></button>
+<button data-hero="cd" role="option"><span class="hi">◎</span><span data-i18n-hero="cd">CD-диск</span></button>
+<button data-hero="amp" role="option"><span class="hi">▭</span><span data-i18n-hero="amp">Усилитель</span></button>
+<button data-hero="speaker" role="option"><span class="hi">◍</span><span data-i18n-hero="speaker">Колонка</span></button>
+<button data-hero="drum" role="option"><span class="hi">▦</span><span data-i18n-hero="drum">Драм-машина</span></button>
+</div></div>
 </div>
+</div>
+<div class="skinfx"><b></b><b></b><b></b></div><div class="skingrain"></div>
 
-</div>
+
+
 <script>(function(){
   var I18N={ru:{label:"Облик",aurora:"Северное сияние",grain:"Тёплое зерно",glass:"Матовое стекло",editorial:"Светлый минимал",bento:"Бенто-витрина",brutal:"Брутал"},
             en:{label:"Theme",aurora:"Aurora",grain:"Warm grain",glass:"Frosted glass",editorial:"Light minimal",bento:"Bento",brutal:"Brutal"}};
@@ -377,8 +391,8 @@ html[data-hero="cd"] .hero-obj[data-obj="cd"]{animation:spin 8s linear infinite}
   function applyLang(){try{var l=(document.documentElement.lang||'ru').slice(0,2);var t=I18N[l]||I18N.ru;
     document.querySelectorAll('[data-i18n-skin]').forEach(function(n){var k=n.getAttribute('data-i18n-skin');if(t[k])n.textContent=t[k];});}catch(e){}}
   var panel=document.getElementById('skinpanel'),tog=document.getElementById('skintoggle');
-  tog.addEventListener('click',function(){var o=panel.classList.toggle('open');tog.setAttribute('aria-expanded',o);});
-  document.addEventListener('click',function(e){if(!e.target.closest('.skinbar')){panel.classList.remove('open');tog.setAttribute('aria-expanded','false');}});
+  if(tog){tog.addEventListener('click',function(){var o=panel.classList.toggle('open');tog&&tog.setAttribute('aria-expanded',o);});}
+  document.addEventListener('click',function(e){if(!e.target.closest('.skinbar')){panel.classList.remove('open');if(tog)tog.setAttribute('aria-expanded','false');}});
   document.querySelectorAll('.skinpanel button').forEach(function(b){b.addEventListener('click',function(){setSkin(b.getAttribute('data-skin'));applyLang();});});
   mark();applyLang();
   // переобновить подписи при смене языка сайта
@@ -903,8 +917,8 @@ document.querySelectorAll('.lp-opt').forEach(btn=>{
 
   // переключатель
   var panel=document.getElementById('modepanel'),tog=document.getElementById('modetoggle');
-  tog.addEventListener('click',function(){var o=panel.classList.toggle('open');tog.setAttribute('aria-expanded',o);});
-  document.addEventListener('click',function(e){if(!e.target.closest('.modebar')){panel.classList.remove('open');tog.setAttribute('aria-expanded','false');}});
+  if(tog){tog.addEventListener('click',function(){var o=panel.classList.toggle('open');tog&&tog.setAttribute('aria-expanded',o);});}
+  document.addEventListener('click',function(e){if(!e.target.closest('.modebar')){panel.classList.remove('open');if(tog)tog.setAttribute('aria-expanded','false');}});
   document.querySelectorAll('.modepanel button').forEach(function(b){b.addEventListener('click',function(){setMode(b.getAttribute('data-mode'));lang();});});
   new MutationObserver(lang).observe(document.documentElement,{attributes:true,attributeFilter:['lang']});
   mark();lang();
@@ -920,11 +934,21 @@ document.querySelectorAll('.lp-opt').forEach(btn=>{
     document.querySelectorAll('[data-i18n-hero]').forEach(function(n){var k=n.getAttribute('data-i18n-hero');if(t[k])n.textContent=t[k];});}catch(e){}}
   function setHero(x){document.documentElement.setAttribute('data-hero',x);try{localStorage.setItem('antksl_hero',x);}catch(e){}mark();}
   var panel=document.getElementById('heropanel'),tog=document.getElementById('herotoggle');
-  tog.addEventListener('click',function(){var o=panel.classList.toggle('open');tog.setAttribute('aria-expanded',o);});
-  document.addEventListener('click',function(e){if(!e.target.closest('.herobar')){panel.classList.remove('open');tog.setAttribute('aria-expanded','false');}});
+  if(tog){tog.addEventListener('click',function(){var o=panel.classList.toggle('open');tog&&tog.setAttribute('aria-expanded',o);});}
+  document.addEventListener('click',function(e){if(!e.target.closest('.herobar')){panel.classList.remove('open');if(tog)tog.setAttribute('aria-expanded','false');}});
   document.querySelectorAll('.heropanel button').forEach(function(b){b.addEventListener('click',function(){setHero(b.getAttribute('data-hero'));lang();});});
   new MutationObserver(lang).observe(document.documentElement,{attributes:true,attributeFilter:['lang']});
   mark();lang();
+})();</script>
+<script>(function(){
+  var V={ru:{label:"Вид",skin:"Облик",mode:"Подача",hero:"Герой"},en:{label:"View",skin:"Theme",mode:"Motion",hero:"Object"}};
+  function lang(){try{var l=(document.documentElement.lang||'ru').slice(0,2);var t=V[l]||V.ru;
+    document.querySelectorAll('[data-i18n-view]').forEach(function(n){var k=n.getAttribute('data-i18n-view');if(t[k])n.textContent=t[k];});}catch(e){}}
+  var btn=document.getElementById('viewbtn'),menu=document.getElementById('viewmenu');
+  btn.addEventListener('click',function(){var o=menu.classList.toggle('open');btn.setAttribute('aria-expanded',o);});
+  document.addEventListener('click',function(e){if(!e.target.closest('.viewbar')){menu.classList.remove('open');btn.setAttribute('aria-expanded','false');}});
+  new MutationObserver(lang).observe(document.documentElement,{attributes:true,attributeFilter:['lang']});
+  lang();
 })();</script>
 </body>
 </html>
