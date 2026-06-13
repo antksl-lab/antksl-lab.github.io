@@ -348,6 +348,30 @@ html[data-hero="cd"] .hero-obj[data-obj="cd"]{animation:spin 8s linear infinite}
 /* существующие панели показываем как секции внутри общего меню */
 .viewmenu .skinpanel,.viewmenu .modepanel,.viewmenu .heropanel{display:flex!important;position:static!important;box-shadow:none!important;border:0!important;background:transparent!important;padding:0!important;min-width:0!important;margin:0!important}
 
+
+/* ===== Раздел Видео ===== */
+.videos{max-width:var(--maxw);margin:0 auto;padding:64px 24px}
+.videos h2{font-family:var(--display);font-size:clamp(28px,4vw,42px);color:var(--ink);margin:0 0 8px;text-align:center}
+.videos .vsub{color:var(--ink-soft);text-align:center;margin:0 auto 32px;font-family:var(--body);max-width:520px}
+.video-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:22px}
+.video-card{background:var(--card);border:1px solid var(--line);border-radius:16px;overflow:hidden;transition:transform .18s,box-shadow .18s}
+.video-card:hover{transform:translateY(-3px);box-shadow:0 12px 36px rgba(0,0,0,.28)}
+html[data-skin="tactile_brutalism"] .video-card{border-radius:0;border:2px solid var(--line-2)}
+.video-frame{position:relative;width:100%;aspect-ratio:16/9;background:var(--vinyl)}
+.video-frame iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+.video-poster{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;cursor:pointer;background:linear-gradient(135deg,var(--amber),var(--amber-2));overflow:hidden}
+.video-poster .play{width:64px;height:64px;border-radius:50%;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;transition:transform .15s}
+.video-poster:hover .play{transform:scale(1.12)}
+.video-poster .play::after{content:"";display:block;width:0;height:0;border-style:solid;border-width:13px 0 13px 22px;border-color:transparent transparent transparent #fff;margin-left:5px}
+.video-meta{padding:14px 16px}
+.video-meta .vt{font-family:var(--display);font-size:18px;color:var(--ink);margin:0 0 8px}
+.video-src{display:flex;gap:8px}
+.video-src button{flex:1;padding:7px 10px;border-radius:8px;border:1px solid var(--line-2);background:transparent;color:var(--ink-soft);cursor:pointer;font-size:12px;font-family:var(--body);transition:all .12s}
+.video-src button:hover{border-color:var(--amber);color:var(--ink)}
+.video-src button[aria-pressed="true"]{background:var(--amber);color:#10100c;border-color:var(--amber)}
+html[data-skin="tactile_brutalism"] .video-src button[aria-pressed="true"]{color:#fff}
+html[data-skin="tactile_brutalism"] .video-src button{border-radius:0}
+
 </style>
 </head>
 <body>
@@ -559,6 +583,50 @@ html[data-hero="cd"] .hero-obj[data-obj="cd"]{animation:spin 8s linear infinite}
     <p id="aboutPara"><span class="drop">К</span>онстантин Захаров — российский автор-исполнитель. Городской романс и лирический поп — о любви, утрате и внутренней силе. Превращаю стихи в песни, а песни — в маленькие фильмы: музыка, клипы, визуальные истории.</p>
   </div>
 </section>
+
+<section id="videos" class="videos">
+  <h2 data-i18n-videos="title">Видеоклипы</h2>
+  <p class="vsub" data-i18n-videos="sub">Маленькие фильмы к песням. Выбери площадку и смотри прямо здесь.</p>
+  <div class="video-grid">
+  <div class="video-card" data-clip="0" data-yt="3FLJU-kOQog" data-vk-oid="239543600" data-vk-id="456239017">
+    <div class="video-frame">
+      <div class="video-poster" role="button" tabindex="0" aria-label="Смотреть «Осень плакса»"><span class="play"></span></div>
+    </div>
+    <div class="video-meta">
+      <h3 class="vt">Осень плакса</h3>
+      <div class="video-src">
+        <button data-src="vk" aria-pressed="true">VK Видео</button>
+        <button data-src="yt" aria-pressed="false">YouTube</button>
+      </div>
+    </div>
+  </div>
+  <div class="video-card" data-clip="1" data-yt="tDTLzhXXNAw" data-vk-oid="239543600" data-vk-id="456239018">
+    <div class="video-frame">
+      <div class="video-poster" role="button" tabindex="0" aria-label="Смотреть «И часто вспоминается Есенин»"><span class="play"></span></div>
+    </div>
+    <div class="video-meta">
+      <h3 class="vt">И часто вспоминается Есенин</h3>
+      <div class="video-src">
+        <button data-src="vk" aria-pressed="true">VK Видео</button>
+        <button data-src="yt" aria-pressed="false">YouTube</button>
+      </div>
+    </div>
+  </div>
+  <div class="video-card" data-clip="2" data-yt="IiDo6Gnc1G0" data-vk-oid="239543600" data-vk-id="456239019">
+    <div class="video-frame">
+      <div class="video-poster" role="button" tabindex="0" aria-label="Смотреть «Переживи девятый вал»"><span class="play"></span></div>
+    </div>
+    <div class="video-meta">
+      <h3 class="vt">Переживи девятый вал</h3>
+      <div class="video-src">
+        <button data-src="vk" aria-pressed="true">VK Видео</button>
+        <button data-src="yt" aria-pressed="false">YouTube</button>
+      </div>
+    </div>
+  </div>
+  </div>
+</section>
+
 
 <section id="support" class="support">
   <h2 data-i18n-support="title">Поддержать артиста</h2>
@@ -947,6 +1015,40 @@ document.querySelectorAll('.lp-opt').forEach(btn=>{
   var btn=document.getElementById('viewbtn'),menu=document.getElementById('viewmenu');
   btn.addEventListener('click',function(){var o=menu.classList.toggle('open');btn.setAttribute('aria-expanded',o);});
   document.addEventListener('click',function(e){if(!e.target.closest('.viewbar')){menu.classList.remove('open');btn.setAttribute('aria-expanded','false');}});
+  new MutationObserver(lang).observe(document.documentElement,{attributes:true,attributeFilter:['lang']});
+  lang();
+})();</script>
+<script>(function(){
+  var T={ru:{title:"Видеоклипы",sub:"Маленькие фильмы к песням. Выбери площадку и смотри прямо здесь."},
+        en:{title:"Music videos",sub:"Little films for the songs. Pick a platform and watch right here."}};
+  function lang(){try{var l=(document.documentElement.lang||'ru').slice(0,2);var t=T[l]||T.ru;
+    document.querySelectorAll('[data-i18n-videos]').forEach(function(n){var k=n.getAttribute('data-i18n-videos');if(t[k])n.textContent=t[k];});}catch(e){}}
+  function track(title,src){try{var SB="https://qhxhdzwtcjzdinbicjxl.supabase.co",K="sb_publishable_6giNbAp4HJTGo_FQCLV6AA_WtwMQlFP";
+    if(typeof fetch==="function")fetch(SB+"/rest/v1/events",{method:"POST",keepalive:true,
+      headers:{"Content-Type":"application/json","apikey":K,"Authorization":"Bearer "+K,"Prefer":"return=minimal"},
+      body:JSON.stringify({type:"click_video",release:title,detail:src,path:location.pathname})}).catch(function(){});}catch(e){}}
+  function srcOf(card){return card.querySelector('.video-src button[aria-pressed="true"]').getAttribute('data-src');}
+  function play(card){
+    var src=srcOf(card), frame=card.querySelector('.video-frame');
+    var url = src==='yt'
+      ? 'https://www.youtube.com/embed/'+card.getAttribute('data-yt')+'?autoplay=1&rel=0'
+      : 'https://vkvideo.ru/video_ext.php?oid=-'+card.getAttribute('data-vk-oid')+'&id='+card.getAttribute('data-vk-id')+'&hd=2&autoplay=1';
+    frame.innerHTML='<iframe src="'+url+'" allow="autoplay; encrypted-media; fullscreen; picture-in-picture" allowfullscreen></iframe>';
+    track(card.querySelector('.vt').textContent, src);
+  }
+  document.querySelectorAll('.video-card').forEach(function(card){
+    var poster=card.querySelector('.video-poster');
+    poster.addEventListener('click',function(){play(card);});
+    poster.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();play(card);}});
+    card.querySelectorAll('.video-src button').forEach(function(b){
+      b.addEventListener('click',function(e){e.stopPropagation();
+        card.querySelectorAll('.video-src button').forEach(function(x){x.setAttribute('aria-pressed','false');});
+        b.setAttribute('aria-pressed','true');
+        // если плеер уже открыт — переключить площадку сразу
+        if(card.querySelector('iframe'))play(card);
+      });
+    });
+  });
   new MutationObserver(lang).observe(document.documentElement,{attributes:true,attributeFilter:['lang']});
   lang();
 })();</script>
