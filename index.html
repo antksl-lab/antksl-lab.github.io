@@ -372,6 +372,10 @@ html[data-skin="tactile_brutalism"] .video-card{border-radius:0;border:2px solid
 html[data-skin="tactile_brutalism"] .video-src button[aria-pressed="true"]{color:#fff}
 html[data-skin="tactile_brutalism"] .video-src button{border-radius:0}
 
+
+/* Кнопки поддержки одинаковой ширины */
+.support-btn{min-width:230px;justify-content:center}
+
 </style>
 </head>
 <body>
@@ -408,7 +412,7 @@ html[data-skin="tactile_brutalism"] .video-src button{border-radius:0}
 
 <script>(function(){
   var I18N={ru:{label:"Облик",aurora:"Северное сияние",grain:"Тёплое зерно",glass:"Матовое стекло",editorial:"Светлый минимал",bento:"Бенто-витрина",brutal:"Брутал"},
-            en:{label:"Theme",aurora:"Aurora",grain:"Warm grain",glass:"Frosted glass",editorial:"Light minimal",bento:"Bento",brutal:"Brutal"}};
+            en:{label:"Theme",aurora:"Aurora",grain:"Warm grain",glass:"Frosted glass",editorial:"Light minimal",bento:"Bento",brutal:"Brutal"},de:{label:"Erscheinungsbild",aurora:"Nordlicht",grain:"Warmes Korn",glass:"Mattglas",editorial:"Hell minimal",bento:"Bento",brutal:"Brutal"}};
   function cur(){return document.documentElement.getAttribute('data-skin')||'aurora_soul';}
   function mark(){document.querySelectorAll('.skinpanel button').forEach(function(b){b.setAttribute('aria-pressed',b.getAttribute('data-skin')===cur());});}
   function setSkin(s){document.documentElement.setAttribute('data-skin',s);try{localStorage.setItem('antksl_skin',s);}catch(e){}mark();}
@@ -468,6 +472,7 @@ html[data-skin="tactile_brutalism"] .video-src button{border-radius:0}
       <div class="nav-panel" id="langPanel">
         <button class="lp-opt" data-lang="ru">🇷🇺 Русский</button>
         <button class="lp-opt" data-lang="en">🇬🇧 English</button>
+        <button class="lp-opt" data-lang="de">🇩🇪 Deutsch</button>
         <button class="lp-opt" data-lang="ja">🇯🇵 日本語</button>
         <button class="lp-opt" data-lang="zh">🇨🇳 中文</button>
       </div>
@@ -580,7 +585,7 @@ html[data-skin="tactile_brutalism"] .video-src button{border-radius:0}
   <div class="sec-head"><span class="sec-num">03</span><h2 class="sec-title" data-i18n="about">О себе</h2><span class="sec-line"></span></div>
   <div class="about">
     <img class="av-img about-portrait" alt="Константин Захаров">
-    <p id="aboutPara"><span class="drop">К</span>онстантин Захаров — российский автор-исполнитель. Городской романс и лирический поп — о любви, утрате и внутренней силе. Превращаю стихи в песни, а песни — в маленькие фильмы: музыка, клипы, визуальные истории.</p>
+    <p id="aboutPara"><span class="drop">К</span>онстантин Захаров — автор-исполнитель. Городской романс и лирический поп — о любви, утрате и внутренней силе. Превращаю стихи в песни, а песни — в маленькие фильмы: музыка, клипы, визуальные истории.</p>
   </div>
 </section>
 
@@ -670,7 +675,7 @@ html[data-skin="tactile_brutalism"] .video-src button{border-radius:0}
     allPlatforms:"Все площадки \u00b7 BandLink",
     emailLabel:"Написать нам",copyBtn:"Скопировать",copied:"Скопировано!",
     outBadge:"Вышел",soonBadge:"Скоро",langLabel:"РУ",
-    aboutPara:'<span class="drop">\u041a</span>онстантин Захаров \u2014 российский автор-исполнитель. Городской романс и лирический поп \u2014 о любви, утрате и внутренней силе. Превращаю стихи в песни, а песни \u2014 в маленькие фильмы: музыка, клипы, визуальные истории.'
+    aboutPara:'<span class="drop">\u041a</span>онстантин Захаров \u2014 автор-исполнитель. Городской романс и лирический поп \u2014 о любви, утрате и внутренней силе. Превращаю стихи в песни, а песни \u2014 в маленькие фильмы: музыка, клипы, визуальные истории.'
   },
   en:{
     eyebrow:"Urban Romance \u00b7 Lyric Pop \u00b7 R&B",
@@ -680,7 +685,7 @@ html[data-skin="tactile_brutalism"] .video-src button{border-radius:0}
     allPlatforms:"All Platforms \u00b7 BandLink",
     emailLabel:"Contact us",copyBtn:"Copy",copied:"Copied!",
     outBadge:"Out Now",soonBadge:"Coming",langLabel:"EN",
-    aboutPara:'<span class="drop">K</span>onstantin Zakharov is a Russian singer-songwriter. Urban romance and lyric pop \u2014 about love, loss and inner strength. Turning poems into songs, and songs into short films: music, videos, visual stories.'
+    aboutPara:'<span class="drop">K</span>onstantin Zakharov is a singer-songwriter. Urban romance and lyric pop \u2014 about love, loss and inner strength. Turning poems into songs, and songs into short films: music, videos, visual stories.'
   },
   ja:{
     eyebrow:"\u30a2\u30fc\u30d0\u30f3\u30fb\u30ed\u30de\u30f3\u30b9 \u00b7 \u30ea\u30ea\u30c3\u30af\u30fb\u30dd\u30c3\u30d7 \u00b7 R&B",
@@ -690,7 +695,7 @@ html[data-skin="tactile_brutalism"] .video-src button{border-radius:0}
     allPlatforms:"\u5168\u30d7\u30e9\u30c3\u30c8\u30d5\u30a9\u30fc\u30e0 \u00b7 BandLink",
     emailLabel:"\u304a\u554f\u3044\u5408\u308f\u305b",copyBtn:"\u30b3\u30d4\u30fc",copied:"\u30b3\u30d4\u30fc\u3057\u307e\u3057\u305f\uff01",
     outBadge:"\u914d\u4fe1\u4e2d",soonBadge:"\u8fd1\u65e5\u516c\u958b",langLabel:"JA",
-    aboutPara:'<span class="drop">\u30b3</span>\u30f3\u30b9\u30bf\u30f3\u30c1\u30f3\u30fb\u30b6\u30cf\u30ed\u30d5\u306f\u30ed\u30b7\u30a2\u51fa\u8eab\u306e\u30b7\u30f3\u30ac\u30fc\u30bd\u30f3\u30b0\u30e9\u30a4\u30bf\u30fc\u3002\u611b\u3001\u55aa\u5931\u3001\u305d\u3057\u3066\u5185\u306a\u308b\u5f37\u3055\u3092\u30c6\u30fc\u30de\u306b\u3057\u305f\u30a2\u30fc\u30d0\u30f3\u30fb\u30ed\u30de\u30f3\u30b9\u3068\u30ea\u30ea\u30c3\u30af\u30fb\u30dd\u30c3\u30d7\u3002\u8a69\u3092\u6b4c\u306b\u3001\u6b4c\u3092\u5c0f\u3055\u306a\u6620\u753b\u3078\u2014\u2014\u97f3\u697d\u3001\u6620\u50cf\u3001\u30d3\u30b8\u30e5\u30a2\u30eb\u30fb\u30b9\u30c8\u30fc\u30ea\u30fc\u3002'
+    aboutPara:'<span class="drop">\u30b3</span>\u30f3\u30b9\u30bf\u30f3\u30c1\u30f3\u30fb\u30b6\u30cf\u30ed\u30d5\u306f\u30b7\u30f3\u30ac\u30fc\u30bd\u30f3\u30b0\u30e9\u30a4\u30bf\u30fc\u3002\u611b\u3001\u55aa\u5931\u3001\u305d\u3057\u3066\u5185\u306a\u308b\u5f37\u3055\u3092\u30c6\u30fc\u30de\u306b\u3057\u305f\u30a2\u30fc\u30d0\u30f3\u30fb\u30ed\u30de\u30f3\u30b9\u3068\u30ea\u30ea\u30c3\u30af\u30fb\u30dd\u30c3\u30d7\u3002\u8a69\u3092\u6b4c\u306b\u3001\u6b4c\u3092\u5c0f\u3055\u306a\u6620\u753b\u3078\u2014\u2014\u97f3\u697d\u3001\u6620\u50cf\u3001\u30d3\u30b8\u30e5\u30a2\u30eb\u30fb\u30b9\u30c8\u30fc\u30ea\u30fc\u3002'
   },
   zh:{
     eyebrow:"\u90fd\u5e02\u6d6a\u6f2b \u00b7 \u6292\u60c5\u6d41\u884c \u00b7 R&B",
@@ -700,7 +705,16 @@ html[data-skin="tactile_brutalism"] .video-src button{border-radius:0}
     allPlatforms:"\u5168\u5e73\u53f0 \u00b7 BandLink",
     emailLabel:"\u8054\u7cfb\u6211\u4eec",copyBtn:"\u590d\u5236",copied:"\u5df2\u590d\u5236\uff01",
     outBadge:"\u5df2\u53d1\u5e03",soonBadge:"\u5373\u5c06",langLabel:"ZH",
-    aboutPara:'<span class="drop">\u5eb7</span>\u65af\u5766\u4e01\u00b7\u624e\u54c8\u7f57\u592b\u662f\u4fc4\u7f57\u65af\u521b\u4f5c\u6b4c\u624b\u3002\u90fd\u5e02\u6d6a\u6f2b\u4e0e\u6292\u60c5\u6d41\u884c\u2014\u2014\u5173\u4e8e\u7231\u3001\u5931\u53bb\u4e0e\u5185\u5728\u529b\u91cf\u3002\u5c06\u8bd7\u6b4c\u53d8\u6210\u6b4c\u66f2\uff0c\u5c06\u6b4c\u66f2\u53d8\u6210\u5c0f\u7535\u5f71\uff1a\u97f3\u4e50\u3001\u89c6\u9891\u4e0e\u89c6\u89c9\u6545\u4e8b\u3002'
+    aboutPara:'<span class="drop">\u5eb7</span>\u65af\u5766\u4e01\u00b7\u624e\u54c8\u7f57\u592b\u662f\u521b\u4f5c\u6b4c\u624b\u3002\u90fd\u5e02\u6d6a\u6f2b\u4e0e\u6292\u60c5\u6d41\u884c\u2014\u2014\u5173\u4e8e\u7231\u3001\u5931\u53bb\u4e0e\u5185\u5728\u529b\u91cf\u3002\u5c06\u8bd7\u6b4c\u53d8\u6210\u6b4c\u66f2\uff0c\u5c06\u6b4c\u66f2\u53d8\u6210\u5c0f\u7535\u5f71\uff1a\u97f3\u4e50\u3001\u89c6\u9891\u4e0e\u89c6\u89c9\u6545\u4e8b\u3002'
+  },de:{
+    eyebrow:"Urban Romance \u00b7 Lyric Pop \u00b7 R&B",
+    heroTag:"Ich verwandle Gedichte in Lieder und Lieder in kurze Filme.",
+    ctaAll:"\u00dcberall anh\u00f6ren",
+    discog:"Diskografie",soon:"Demn\u00e4chst",about:"\u00dcber mich",listen:"Anh\u00f6ren",
+    allPlatforms:"Alle Plattformen \u00b7 BandLink",
+    emailLabel:"Kontakt",copyBtn:"Kopieren",copied:"Kopiert!",
+    outBadge:"Jetzt verf\u00fcgbar",soonBadge:"Bald",langLabel:"DE",
+    aboutPara:'<span class="drop">K</span>onstantin Sacharow ist ein Singer-Songwriter. Urban Romance und Lyric-Pop \u2014 \u00fcber Liebe, Verlust und innere St\u00e4rke. Ich verwandle Gedichte in Lieder und Lieder in kleine Filme: Musik, Videos, visuelle Geschichten.'
   }
 };
 
@@ -927,7 +941,7 @@ document.querySelectorAll('.lp-opt').forEach(btn=>{
 })();</script>
 <script>(function(){
   var M={ru:{label:"Подача",reveal_scroll:"Проявление при скролле",kinetic_hero:"Кинетический герой",magnetic_cards:"Живые карточки",ambient_motion:"Живой фон",classic:"Классика"},
-        en:{label:"Motion",reveal_scroll:"Scroll reveal",kinetic_hero:"Kinetic hero",magnetic_cards:"Live cards",ambient_motion:"Ambient background",classic:"Classic"}};
+        en:{label:"Motion",reveal_scroll:"Scroll reveal",kinetic_hero:"Kinetic hero",magnetic_cards:"Live cards",ambient_motion:"Ambient background",classic:"Classic"},de:{label:"Darstellung",reveal_scroll:"Enthüllen beim Scrollen",kinetic_hero:"Kinetischer Held",magnetic_cards:"Lebendige Karten",ambient_motion:"Lebendiger Hintergrund",classic:"Klassisch"}};
   function cur(){return document.documentElement.getAttribute('data-mode')||'reveal_scroll';}
   function mark(){document.querySelectorAll('.modepanel button').forEach(function(b){b.setAttribute('aria-pressed',b.getAttribute('data-mode')===cur());});}
   function lang(){try{var l=(document.documentElement.lang||'ru').slice(0,2);var t=M[l]||M.ru;
@@ -995,7 +1009,7 @@ document.querySelectorAll('.lp-opt').forEach(btn=>{
 })();</script>
 <script>(function(){
   var H={ru:{label:"Герой",vinyl:"Пластинка",cd:"CD-диск",amp:"Усилитель",speaker:"Колонка",drum:"Драм-машина"},
-        en:{label:"Object",vinyl:"Vinyl",cd:"CD",amp:"Amplifier",speaker:"Speaker",drum:"Drum machine"}};
+        en:{label:"Object",vinyl:"Vinyl",cd:"CD",amp:"Amplifier",speaker:"Speaker",drum:"Drum machine"},de:{label:"Objekt",vinyl:"Schallplatte",cd:"CD",amp:"Verstärker",speaker:"Lautsprecher",drum:"Drummachine"}};
   function cur(){return document.documentElement.getAttribute('data-hero')||'vinyl';}
   function mark(){document.querySelectorAll('.heropanel button').forEach(function(b){b.setAttribute('aria-pressed',b.getAttribute('data-hero')===cur());});}
   function lang(){try{var l=(document.documentElement.lang||'ru').slice(0,2);var t=H[l]||H.ru;
@@ -1009,7 +1023,7 @@ document.querySelectorAll('.lp-opt').forEach(btn=>{
   mark();lang();
 })();</script>
 <script>(function(){
-  var V={ru:{label:"Вид",skin:"Облик",mode:"Подача",hero:"Герой"},en:{label:"View",skin:"Theme",mode:"Motion",hero:"Object"}};
+  var V={ru:{label:"Вид",skin:"Облик",mode:"Подача",hero:"Герой"},en:{label:"View",skin:"Theme",mode:"Motion",hero:"Object"},de:{label:"Ansicht",skin:"Erscheinungsbild",mode:"Darstellung",hero:"Objekt"}};
   function lang(){try{var l=(document.documentElement.lang||'ru').slice(0,2);var t=V[l]||V.ru;
     document.querySelectorAll('[data-i18n-view]').forEach(function(n){var k=n.getAttribute('data-i18n-view');if(t[k])n.textContent=t[k];});}catch(e){}}
   var btn=document.getElementById('viewbtn'),menu=document.getElementById('viewmenu');
@@ -1020,7 +1034,7 @@ document.querySelectorAll('.lp-opt').forEach(btn=>{
 })();</script>
 <script>(function(){
   var T={ru:{title:"Видеоклипы",sub:"Маленькие фильмы к песням. Выбери площадку и смотри прямо здесь."},
-        en:{title:"Music videos",sub:"Little films for the songs. Pick a platform and watch right here."}};
+        en:{title:"Music videos",sub:"Little films for the songs. Pick a platform and watch right here."},de:{title:"Musikvideos",sub:"Kleine Filme zu den Liedern. Wähle eine Plattform und schau direkt hier."}};
   function lang(){try{var l=(document.documentElement.lang||'ru').slice(0,2);var t=T[l]||T.ru;
     document.querySelectorAll('[data-i18n-videos]').forEach(function(n){var k=n.getAttribute('data-i18n-videos');if(t[k])n.textContent=t[k];});}catch(e){}}
   function track(title,src){try{var SB="https://qhxhdzwtcjzdinbicjxl.supabase.co",K="sb_publishable_6giNbAp4HJTGo_FQCLV6AA_WtwMQlFP";
