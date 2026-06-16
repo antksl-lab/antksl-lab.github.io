@@ -11,22 +11,11 @@
 <meta property="og:type" content="music.musician">
 <meta property="og:title" content="Константин Захаров">
 <meta property="og:description" content="Городской романс, лирический поп и R&amp;B. Превращаю стихи в песни, а песни — в маленькие фильмы.">
-<meta property="og:url" content="https://antksl-lab.github.io/">
+<meta property="og:url" content="https://band.link/konstantinzakharov">
 <meta property="og:site_name" content="Константин Захаров">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Константин Захаров">
 <meta name="twitter:description" content="Городской романс, лирический поп и R&amp;B.">
-<!-- Yandex.Metrika counter -->
-<script type="text/javascript">
-   (function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
-   m[i].l=1*new Date();
-   for(var j=0;j<document.scripts.length;j++){if(document.scripts[j].src===r){return;}}
-   k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})
-   (window,document,"script","https://mc.yandex.ru/metrika/tag.js","ym");
-   ym(109704037,"init",{clickmap:true,trackLinks:true,accurateTrackBounce:true,webvisor:true});
-</script>
-<noscript><div><img src="https://mc.yandex.ru/watch/109704037" style="position:absolute;left:-9999px;" alt=""/></div></noscript>
-<!-- /Yandex.Metrika counter -->
 <!-- TODO после хостинга: добавь домен и картинку 1200x630 для превью в Telegram/соцсетях -->
 <!-- <link rel="canonical" href="https://ТВОЙ-ДОМЕН/"> -->
 <!-- <meta property="og:image" content="https://ТВОЙ-ДОМЕН/og.jpg"><meta name="twitter:image" content="https://ТВОЙ-ДОМЕН/og.jpg"> -->
@@ -860,6 +849,26 @@ document.querySelectorAll('.lp-opt').forEach(btn=>{
 (function(){
   var SB_URL="https://qhxhdzwtcjzdinbicjxl.supabase.co", SB_KEY="sb_publishable_6giNbAp4HJTGo_FQCLV6AA_WtwMQlFP";
   if(!SB_URL||SB_URL.indexOf("http")!==0) return;
+  /* BOT_FILTER_LAW: не пишем в аналитику синтетический трафик — браузерная
+     автоматизация (Selenium/Playwright/Puppeteer → navigator.webdriver),
+     headless/бот-UA, и self-referrer (claude.ai/anthropic/локалка).
+     Срабатывает один раз на загрузку, без cookie. Гео-датацентры (Asia/Ashburn/UTC)
+     отсекаются на чтении в дашборде/SQL, т.к. на клиенте IP/ASN недоступен. */
+  var BOT=(function(){
+    try{
+      var n=navigator||{}, ua=(n.userAgent||"").toLowerCase(), ref="";
+      try{ ref=document.referrer? new URL(document.referrer).hostname.replace(/^www\./,'') : ""; }catch(e){ ref=""; }
+      var SELF=["claude.ai","anthropic.com","claudeusercontent.com","localhost","127.0.0.1"];
+      var reBot=/headless|phantom|selenium|playwright|puppeteer|webdriver|electron|slimerjs|\bbot\b|spider|crawl|scrap|preview|monitor|pingdom|lighthouse|gtmetrix|python-requests|curl|wget|node-fetch|axios|okhttp|java\/|go-http|libwww|httpclient/;
+      if(n.webdriver===true) return 1;
+      if(ua==="") return 1;
+      if(reBot.test(ua)) return 1;
+      if(n.languages && n.languages.length===0) return 1;
+      for(var i=0;i<SELF.length;i++){ if(ref===SELF[i] || ref.indexOf("."+SELF[i])>-1) return 1; }
+      return 0;
+    }catch(e){ return 0; }
+  })();
+  try{ window.__ANTKSL_BOT=BOT; }catch(e){}
   function sid(){try{var k="antksl_sid",v=sessionStorage.getItem(k);
     if(!v){v=Math.random().toString(36).slice(2)+Date.now().toString(36);sessionStorage.setItem(k,v);}return v;}catch(e){return "nosess";}}
   function host(u){try{return new URL(u).hostname.replace(/^www\./,'');}catch(e){return "";}}
@@ -878,6 +887,7 @@ document.querySelectorAll('.lp-opt').forEach(btn=>{
     session:sid()
   };
   function send(ev){
+    if(BOT) return;
     try{
       var body=JSON.stringify(Object.assign({},base,ev));
       // sendBeacon не блокирует уход со страницы; fallback на fetch
@@ -940,7 +950,7 @@ document.querySelectorAll('.lp-opt').forEach(btn=>{
   new MutationObserver(apply).observe(document.documentElement,{attributes:true,attributeFilter:['lang']});
   // аналитика кликов поддержки (в общий сборщик)
   document.querySelectorAll('.support-btn').forEach(function(b){b.addEventListener('click',function(){
-    try{var SB="https://qhxhdzwtcjzdinbicjxl.supabase.co",K="sb_publishable_6giNbAp4HJTGo_FQCLV6AA_WtwMQlFP";
+    try{if(window.__ANTKSL_BOT)return;var SB="https://qhxhdzwtcjzdinbicjxl.supabase.co",K="sb_publishable_6giNbAp4HJTGo_FQCLV6AA_WtwMQlFP";
       if(typeof fetch==="function")fetch(SB+"/rest/v1/events",{method:"POST",keepalive:true,
         headers:{"Content-Type":"application/json","apikey":K,"Authorization":"Bearer "+K,"Prefer":"return=minimal"},
         body:JSON.stringify({type:"click_support",detail:b.getAttribute("data-support"),path:location.pathname})}).catch(function(){});
@@ -1045,7 +1055,7 @@ document.querySelectorAll('.lp-opt').forEach(btn=>{
         en:{title:"Music videos",sub:"Little films for the songs. Pick a platform and watch right here."},de:{title:"Musikvideos",sub:"Kleine Filme zu den Liedern. Wähle eine Plattform und schau direkt hier."}};
   function lang(){try{var l=(document.documentElement.lang||'ru').slice(0,2);var t=T[l]||T.ru;
     document.querySelectorAll('[data-i18n-videos]').forEach(function(n){var k=n.getAttribute('data-i18n-videos');if(t[k])n.textContent=t[k];});}catch(e){}}
-  function track(title,src){try{var SB="https://qhxhdzwtcjzdinbicjxl.supabase.co",K="sb_publishable_6giNbAp4HJTGo_FQCLV6AA_WtwMQlFP";
+  function track(title,src){try{if(window.__ANTKSL_BOT)return;var SB="https://qhxhdzwtcjzdinbicjxl.supabase.co",K="sb_publishable_6giNbAp4HJTGo_FQCLV6AA_WtwMQlFP";
     if(typeof fetch==="function")fetch(SB+"/rest/v1/events",{method:"POST",keepalive:true,
       headers:{"Content-Type":"application/json","apikey":K,"Authorization":"Bearer "+K,"Prefer":"return=minimal"},
       body:JSON.stringify({type:"click_video",release:title,detail:src,path:location.pathname})}).catch(function(){});}catch(e){}}
