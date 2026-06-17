@@ -203,6 +203,8 @@
     .viewbtn span[data-i18n-view]{display:none}
     .viewbtn span:first-child{font-size:15px}
     .viewmenu{min-width:200px;max-width:calc(100vw - 24px)}
+    /* старые отдельные бары-дубли (их содержимое уже в меню ✦) — убрать пустые рамки */
+    .skinbar,.modebar,.herobar{display:none!important}
   }
 
 /* ===== SKIN SYSTEM (data-skin на <html>) ===== */
@@ -410,7 +412,30 @@ html[data-skin="tactile_brutalism"] .video-src button{border-radius:0}
 /* Кнопки поддержки одинаковой ширины */
 .support-btn{min-width:230px;justify-content:center}
 
-</style>
+/* === Кнопка «наверх»: круг с янтарным кольцом-прогрессом (мини-пластинка) === */
+.totop{position:fixed;right:20px;bottom:20px;width:52px;height:52px;z-index:90;
+  border:none;background:transparent;cursor:pointer;padding:0;
+  opacity:0;visibility:hidden;transform:translateY(14px);
+  transition:opacity .3s ease,transform .3s ease,visibility .3s;}
+.totop.show{opacity:1;visibility:visible;transform:translateY(0);}
+.totop .tt-disc{position:absolute;inset:5px;border-radius:50%;
+  background:radial-gradient(circle at 50% 50%,var(--amber-2) 0 22%,var(--vinyl) 23% 100%);
+  box-shadow:0 6px 22px rgba(25,18,11,.4),inset 0 0 0 1px rgba(255,255,255,.06);
+  display:flex;align-items:center;justify-content:center;transition:transform .25s ease;}
+.totop:hover .tt-disc{transform:rotate(18deg);}
+.totop .tt-arrow{position:relative;z-index:2;color:var(--paper);
+  filter:drop-shadow(0 1px 2px rgba(0,0,0,.5));}
+.totop svg.tt-ring{position:absolute;inset:0;width:100%;height:100%;transform:rotate(-90deg);}
+.totop .tt-track{fill:none;stroke:rgba(43,32,22,.25);stroke-width:3;}
+.totop .tt-prog{fill:none;stroke:var(--amber);stroke-width:3;stroke-linecap:round;
+  stroke-dasharray:151;stroke-dashoffset:151;transition:stroke-dashoffset .1s linear;}
+@media(max-width:768px){.totop{right:14px;bottom:14px;width:46px;height:46px;}}
+@media(prefers-reduced-motion:reduce){
+  .totop{transition:opacity .2s;transform:none;}
+  .totop.show{transform:none;}
+  .totop:hover .tt-disc{transform:none;}
+}
+
 </head>
 <body>
 <div class="viewbar">
@@ -1118,5 +1143,37 @@ document.querySelectorAll('.lp-opt').forEach(btn=>{
   new MutationObserver(lang).observe(document.documentElement,{attributes:true,attributeFilter:['lang']});
   lang();
 })();</script>
+<button class="totop" id="toTop" aria-label="Наверх" title="Наверх">
+  <svg class="tt-ring" viewBox="0 0 52 52" aria-hidden="true">
+    <circle class="tt-track" cx="26" cy="26" r="24"></circle>
+    <circle class="tt-prog" id="ttProg" cx="26" cy="26" r="24"></circle>
+  </svg>
+  <span class="tt-disc">
+    <svg class="tt-arrow" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M12 19V5M5 12l7-7 7 7"/>
+    </svg>
+  </span>
+</button>
+<script>
+(function(){
+  var btn=document.getElementById('toTop'),prog=document.getElementById('ttProg');
+  if(!btn||!prog)return;
+  var C=2*Math.PI*24; // длина окружности r=24
+  prog.style.strokeDasharray=C;
+  var reduce=window.matchMedia('(prefers-reduced-motion:reduce)').matches;
+  function onScroll(){
+    var st=window.pageYOffset||document.documentElement.scrollTop;
+    var h=document.documentElement.scrollHeight-document.documentElement.clientHeight;
+    var pct=h>0?st/h:0;
+    prog.style.strokeDashoffset=C*(1-pct);
+    if(st>320)btn.classList.add('show');else btn.classList.remove('show');
+  }
+  window.addEventListener('scroll',onScroll,{passive:true});
+  onScroll();
+  btn.addEventListener('click',function(){
+    window.scrollTo({top:0,behavior:reduce?'auto':'smooth'});
+  });
+})();
+</script>
 </body>
 </html>
