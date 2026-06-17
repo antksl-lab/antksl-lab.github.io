@@ -180,6 +180,21 @@
   .lp-opt:hover,.lp-opt.active{background:var(--amber);color:var(--paper)}
   #emailPanel{min-width:230px}
   @media(max-width:700px){.nav-links{display:none}.btn-nav span:not(#langCur){display:none}}
+  /* === МОБИЛЬНАЯ ШАПКА: убрать скученность, не дать языку уехать за край === */
+  @media(max-width:560px){
+    .nav-in{padding:10px 14px;gap:8px}
+    .brand{font-size:16px;gap:7px;min-width:0;flex:1 1 auto;overflow:hidden}
+    .brand-av{width:28px;height:28px;flex:0 0 auto}
+    .nav-right{gap:5px;flex:0 0 auto}
+    .btn-nav{padding:6px 8px}
+    .btn-nav.icon-only{padding:6px 7px}
+    #langCur{font-size:11px}
+    .nav-panel{min-width:170px}
+  }
+  @media(max-width:380px){
+    .brand{font-size:14px}
+    .brand b{display:inline}
+  }
 
 /* ===== SKIN SYSTEM (data-skin на <html>) ===== */
 :root{--maxw:1180px;--display:'Playfair Display',Georgia,serif;--body:'Spectral',Georgia,serif}
