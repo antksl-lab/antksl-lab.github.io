@@ -185,7 +185,7 @@
     .nav-in{padding:10px 14px;gap:8px}
     .brand{font-size:17px;gap:7px;min-width:0;flex:1 1 auto;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
     .brand-av{width:28px;height:28px;flex:0 0 auto}
-    .nav-right{gap:5px;flex:0 0 auto}
+    .nav-right{gap:5px;flex:0 0 auto;margin-right:52px}
     .btn-nav{padding:6px 8px}
     .btn-nav.icon-only{padding:6px 7px}
     #langCur{font-size:11px}
@@ -199,9 +199,9 @@
   /* === VIEW-кнопка: на мобиле только иконка, компактная, не лезет на шапку === */
   @media(max-width:768px){
     .viewbar{top:13px;right:12px}
-    .viewbtn{width:auto;padding:8px 11px}
+    .viewbtn{width:42px;height:42px;padding:0;justify-content:center;border-radius:50%}
     .viewbtn span[data-i18n-view]{display:none}
-    .viewbtn span:first-child{font-size:15px}
+    .viewbtn span:first-child{font-size:16px;line-height:1}
     .viewmenu{min-width:200px;max-width:calc(100vw - 24px)}
     /* старые отдельные бары-дубли (их содержимое уже в меню ✦) — убрать пустые рамки */
     .skinbar,.modebar,.herobar{display:none!important}
