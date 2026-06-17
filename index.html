@@ -198,10 +198,10 @@
   }
   /* === VIEW-кнопка: на мобиле только иконка, компактная, не лезет на шапку === */
   @media(max-width:768px){
-    .viewbar{top:13px;right:12px}
-    .viewbtn{width:42px;height:42px;padding:0;justify-content:center;border-radius:50%}
-    .viewbtn span[data-i18n-view]{display:none}
-    .viewbtn span:first-child{font-size:16px;line-height:1}
+    html .viewbar{top:13px;right:12px}
+    .viewbar .viewbtn{width:42px;height:42px;padding:0;justify-content:center;border-radius:50%}
+    .viewbar .viewbtn span[data-i18n-view]{display:none}
+    .viewbar .viewbtn span:first-child{font-size:16px;line-height:1}
     .viewmenu{min-width:200px;max-width:calc(100vw - 24px)}
     /* старые отдельные бары-дубли (их содержимое уже в меню ✦) — убрать пустые рамки */
     .skinbar,.modebar,.herobar{display:none!important}
