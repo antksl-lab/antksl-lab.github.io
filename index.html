@@ -490,6 +490,16 @@ html[data-skin="tactile_brutalism"] .video-src button{border-radius:0}
     @keyframes heroWipe{from{clip-path:inset(0 100% 0 0);transform:translateY(8px)}to{clip-path:inset(0 0 0 0);transform:none}}
   }
 
+  /* 6. Читаемость текста героя поверх пластинки/любого фона — ТЕМО-ЗАВИСИМО.
+        Ореол берёт цвет текущей темы var(--paper) и сам перекрашивается при смене
+        облика (CSS-переменные обновляются мгновенно). Текст получает подложку цвета
+        фона страницы → пара ink-на-paper читаема в любой из 7 тем, при любом тексте.
+        На самом фоне страницы paper-на-paper = невидим; на виниле — вытягивает текст. */
+  .hero .eyebrow,.hero .hero-name,.hero .hero-tag,.hero .hero-sub{
+    position:relative;z-index:4;
+    text-shadow:0 0 1px var(--paper),0 1px 2px var(--paper),0 0 7px var(--paper),
+                0 0 14px var(--paper),0 0 22px var(--paper)}
+
   @media(prefers-reduced-motion:reduce){
     .js-elevate .sec-line{transform:none}
     .js-elevate .sec-head .sec-num,.js-elevate .sec-head .sec-title{opacity:1;transform:none}
