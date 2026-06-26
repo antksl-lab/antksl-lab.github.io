@@ -415,6 +415,30 @@ html[data-skin="tactile_brutalism"] .video-card{border-radius:0;border:2px solid
 .video-src button[aria-pressed="true"]{background:var(--amber);color:#10100c;border-color:var(--amber)}
 html[data-skin="tactile_brutalism"] .video-src button[aria-pressed="true"]{color:#fff}
 html[data-skin="tactile_brutalism"] .video-src button{border-radius:0}
+/* ─── Рилзы (вертикальные Shorts 9:16) ─── */
+.reels{max-width:var(--maxw);margin:0 auto;padding:64px 24px}
+.reels h2{font-family:var(--display);font-size:clamp(28px,4vw,42px);color:var(--ink);margin:0 0 8px;text-align:center}
+.reels .vsub{color:var(--ink-soft);text-align:center;margin:0 auto 32px;font-family:var(--body);max-width:580px;line-height:1.55}
+.reel-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:22px;max-width:840px;margin:0 auto}
+.reel-card .video-frame{aspect-ratio:9/16}
+.reel-card{display:flex;flex-direction:column}
+.reel-card .video-meta{flex:1;display:flex;flex-direction:column}
+.reel-card .video-src{margin-top:auto}
+.reel-card .video-poster .play{width:56px;height:56px}
+.reel-card .video-meta{padding:13px 15px 15px}
+.reel-cap{color:var(--ink-soft);font-family:var(--body);font-size:13px;line-height:1.5;margin:6px 0 12px}
+.reel-badge{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.04em;padding:3px 9px;border-radius:99px;margin-bottom:8px}
+.reel-badge.out{background:var(--amber);color:#10100c}
+.reel-badge.soon{background:transparent;color:var(--amber);border:1px solid var(--amber)}
+html[data-skin="tactile_brutalism"] .reel-badge{border-radius:0}
+.reel-listen{display:flex;align-items:center;justify-content:center;gap:7px;width:100%;margin-top:10px;padding:9px 12px;border-radius:8px;border:1px solid var(--line-2);background:transparent;color:var(--ink);font-family:var(--body);font-size:13px;font-weight:600;text-decoration:none;transition:all .14s}
+.reel-listen:hover{background:var(--amber);color:#10100c;border-color:var(--amber)}
+html[data-skin="tactile_brutalism"] .reel-listen{border-radius:0}
+html[data-skin="tactile_brutalism"] .reel-listen:hover{color:#fff}
+.reel-hidden{display:none!important}
+.reel-more{display:block;margin:28px auto 0;padding:11px 28px;border-radius:99px;border:1px solid var(--line-2);background:transparent;color:var(--ink);font-family:var(--body);font-size:14px;font-weight:600;cursor:pointer;transition:all .14s}
+.reel-more:hover{background:var(--amber);color:#10100c;border-color:var(--amber)}
+html[data-skin="tactile_brutalism"] .reel-more{border-radius:0}
 
 
 /* Кнопки поддержки одинаковой ширины */
@@ -571,6 +595,7 @@ html[data-skin="tactile_brutalism"] .video-src button{border-radius:0}
   <a class="brand" href="#top"><img class="av-img brand-av" alt="Константин Захаров"> Константин&nbsp;<b>Захаров</b></a>
   <div class="nav-links">
     <a href="#releases" data-i18n="discog">Дискография</a>
+    <a href="#reels" data-i18n="reels">Рилзы</a>
     <a href="#soon" data-i18n="soon">Скоро</a>
     <a href="#about" data-i18n="about">О себе</a>
     <a href="#listen" data-i18n="listen">Слушать</a>
@@ -727,6 +752,72 @@ html[data-skin="tactile_brutalism"] .video-src button{border-radius:0}
   </div>
 </section>
 
+<section id="reels" class="reels">
+  <h2 data-i18n-reels="title">Рилзы</h2>
+  <p class="vsub" data-i18n-reels="sub">Короткие вертикальные истории — здесь живёт мелодия песни. Услышь её в рилзе, а потом слушай целиком: трек уже вышел или совсем скоро появится на всех площадках.</p>
+  <div class="reel-grid">
+
+  <div class="video-card reel-card" data-clip="r0" data-yt="9IBv_oWix9A" data-vk-oid="239543600" data-vk-id="456239023">
+    <div class="video-frame">
+      <div class="video-poster" role="button" tabindex="0" aria-label="Смотреть рилз «The Cherry Orchard»"><span class="play"></span></div>
+    </div>
+    <div class="video-meta">
+      <span class="reel-badge soon" data-i18n-reels="b_0307">Скоро · 03.07</span>
+      <h3 class="vt">The Cherry Orchard</h3>
+      <p class="reel-cap">Вишнёвый сад, где когда-то учились любить, не забывается. Даже в чужой стране.</p>
+      <div class="video-src">
+        <button data-src="vk" aria-pressed="true">VK Видео</button>
+        <button data-src="yt" aria-pressed="false">YouTube</button>
+      </div>
+      <a class="reel-listen" href="https://band.link/cherryorchard" target="_blank" rel="noopener">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+        <span data-i18n-reels="listen">Слушать песню</span>
+      </a>
+    </div>
+  </div>
+
+  <div class="video-card reel-card" data-clip="r1" data-yt="e2LJX7O07Fs" data-vk-oid="239543600" data-vk-id="456239022">
+    <div class="video-frame">
+      <div class="video-poster" role="button" tabindex="0" aria-label="Смотреть рилз «Наш поэт Владимир»"><span class="play"></span></div>
+    </div>
+    <div class="video-meta">
+      <span class="reel-badge soon" data-i18n-reels="b_2507">Скоро · 25.07</span>
+      <h3 class="vt">Наш поэт Владимир</h3>
+      <p class="reel-cap">Посвящение Владимиру Высоцкому. Не мессия и не бог — а поэт от Бога.</p>
+      <div class="video-src">
+        <button data-src="vk" aria-pressed="true">VK Видео</button>
+        <button data-src="yt" aria-pressed="false">YouTube</button>
+      </div>
+      <a class="reel-listen" href="https://band.link/nashpoet" target="_blank" rel="noopener">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+        <span data-i18n-reels="listen">Слушать песню</span>
+      </a>
+    </div>
+  </div>
+
+  <div class="video-card reel-card" data-clip="r2" data-yt="iTvSCnLOydI" data-vk-oid="239543600" data-vk-id="456239021">
+    <div class="video-frame">
+      <div class="video-poster" role="button" tabindex="0" aria-label="Смотреть рилз «Плыли перед взором облака»"><span class="play"></span></div>
+    </div>
+    <div class="video-meta">
+      <span class="reel-badge out" data-i18n-reels="b_out">Уже вышел</span>
+      <h3 class="vt">Плыли перед взором облака</h3>
+      <p class="reel-cap">Музыка, которая остаётся после — как облака за окном поезда. Тихая. Настоящая.</p>
+      <div class="video-src">
+        <button data-src="vk" aria-pressed="true">VK Видео</button>
+        <button data-src="yt" aria-pressed="false">YouTube</button>
+      </div>
+      <a class="reel-listen" href="https://band.link/plylioblaka" target="_blank" rel="noopener">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+        <span data-i18n-reels="listen">Слушать песню</span>
+      </a>
+    </div>
+  </div>
+
+  </div>
+  <button class="reel-more" id="reelMore" type="button" style="display:none"><span data-i18n-reels="more">Показать ещё</span></button>
+</section>
+
 <section id="videos" class="videos">
   <h2 data-i18n-videos="title">Видеоклипы</h2>
   <p class="vsub" data-i18n-videos="sub">Маленькие фильмы к песням. Выбери площадку и смотри прямо здесь.</p>
@@ -809,7 +900,7 @@ html[data-skin="tactile_brutalism"] .video-src button{border-radius:0}
     eyebrow:"Городской романс \u00b7 лирический поп \u00b7 R&B",
     heroTag:"Превращаю стихи в песни, а песни \u2014 в маленькие фильмы.",
     ctaAll:"Слушать на всех площадках",
-    discog:"Дискография",soon:"Скоро",about:"О себе",listen:"Слушать",
+    discog:"Дискография",reels:"Рилзы",soon:"Скоро",about:"О себе",listen:"Слушать",
     allPlatforms:"Все площадки \u00b7 BandLink",
     emailLabel:"Написать мне",copyBtn:"Скопировать",copied:"Скопировано!",
     outBadge:"Вышел",soonBadge:"Скоро",langLabel:"РУ",
@@ -819,7 +910,7 @@ html[data-skin="tactile_brutalism"] .video-src button{border-radius:0}
     eyebrow:"Urban Romance \u00b7 Lyric Pop \u00b7 R&B",
     heroTag:"I turn poems into songs, and songs into short films.",
     ctaAll:"Listen Everywhere",
-    discog:"Discography",soon:"Coming Soon",about:"About",listen:"Listen",
+    discog:"Discography",reels:"Reels",soon:"Coming Soon",about:"About",listen:"Listen",
     allPlatforms:"All Platforms \u00b7 BandLink",
     emailLabel:"Write me",copyBtn:"Copy",copied:"Copied!",
     outBadge:"Out Now",soonBadge:"Coming",langLabel:"EN",
@@ -829,7 +920,7 @@ html[data-skin="tactile_brutalism"] .video-src button{border-radius:0}
     eyebrow:"\u30a2\u30fc\u30d0\u30f3\u30fb\u30ed\u30de\u30f3\u30b9 \u00b7 \u30ea\u30ea\u30c3\u30af\u30fb\u30dd\u30c3\u30d7 \u00b7 R&B",
     heroTag:"\u8a69\u3092\u6b4c\u306b\u3001\u6b4c\u3092\u5c0f\u3055\u306a\u6620\u753b\u306b\u5909\u3048\u3066\u3044\u304f\u3002",
     ctaAll:"\u5168\u30d7\u30e9\u30c3\u30c8\u30d5\u30a9\u30fc\u30e0\u3067\u8074\u304f",
-    discog:"\u30c7\u30a3\u30b9\u30b3\u30b0\u30e9\u30d5\u30a3\u30fc",soon:"\u8fd1\u65e5\u516c\u958b",about:"\u30d7\u30ed\u30d5\u30a3\u30fc\u30eb",listen:"\u97f3\u697d\u3092\u8074\u304f",
+    discog:"\u30c7\u30a3\u30b9\u30b3\u30b0\u30e9\u30d5\u30a3\u30fc",reels:"\u30ea\u30fc\u30eb",soon:"\u8fd1\u65e5\u516c\u958b",about:"\u30d7\u30ed\u30d5\u30a3\u30fc\u30eb",listen:"\u97f3\u697d\u3092\u8074\u304f",
     allPlatforms:"\u5168\u30d7\u30e9\u30c3\u30c8\u30d5\u30a9\u30fc\u30e0 \u00b7 BandLink",
     emailLabel:"\u304a\u554f\u3044\u5408\u308f\u305b",copyBtn:"\u30b3\u30d4\u30fc",copied:"\u30b3\u30d4\u30fc\u3057\u307e\u3057\u305f\uff01",
     outBadge:"\u914d\u4fe1\u4e2d",soonBadge:"\u8fd1\u65e5\u516c\u958b",langLabel:"JA",
@@ -839,7 +930,7 @@ html[data-skin="tactile_brutalism"] .video-src button{border-radius:0}
     eyebrow:"\u90fd\u5e02\u6d6a\u6f2b \u00b7 \u6292\u60c5\u6d41\u884c \u00b7 R&B",
     heroTag:"\u5c06\u8bd7\u6b4c\u53d8\u6210\u6b4c\u66f2\uff0c\u5c06\u6b4c\u66f2\u53d8\u6210\u5c0f\u7535\u5f71\u3002",
     ctaAll:"\u5168\u5e73\u53f0\u6536\u542c",
-    discog:"\u5531\u7247\u76ee\u5f55",soon:"\u5373\u5c06\u53d1\u5e03",about:"\u5173\u4e8e\u6211",listen:"\u6536\u542c",
+    discog:"\u5531\u7247\u76ee\u5f55",reels:"\u77ed\u89c6\u9891",soon:"\u5373\u5c06\u53d1\u5e03",about:"\u5173\u4e8e\u6211",listen:"\u6536\u542c",
     allPlatforms:"\u5168\u5e73\u53f0 \u00b7 BandLink",
     emailLabel:"\u8054\u7cfb\u6211",copyBtn:"\u590d\u5236",copied:"\u5df2\u590d\u5236\uff01",
     outBadge:"\u5df2\u53d1\u5e03",soonBadge:"\u5373\u5c06",langLabel:"ZH",
@@ -848,7 +939,7 @@ html[data-skin="tactile_brutalism"] .video-src button{border-radius:0}
     eyebrow:"Urban Romance \u00b7 Lyric Pop \u00b7 R&B",
     heroTag:"Ich verwandle Gedichte in Lieder und Lieder in kurze Filme.",
     ctaAll:"\u00dcberall anh\u00f6ren",
-    discog:"Diskografie",soon:"Demn\u00e4chst",about:"\u00dcber mich",listen:"Anh\u00f6ren",
+    discog:"Diskografie",reels:"Reels",soon:"Demn\u00e4chst",about:"\u00dcber mich",listen:"Anh\u00f6ren",
     allPlatforms:"Alle Plattformen \u00b7 BandLink",
     emailLabel:"Kontakt",copyBtn:"Kopieren",copied:"Kopiert!",
     outBadge:"Jetzt verf\u00fcgbar",soonBadge:"Bald",langLabel:"DE",
@@ -1300,5 +1391,34 @@ document.querySelectorAll('.lp-opt').forEach(btn=>{
   }
 })();
 </script>
+<script>(function(){
+  var R={
+    ru:{title:"Рилзы",sub:"Короткие вертикальные истории — здесь живёт мелодия песни. Услышь её в рилзе, а потом слушай целиком: трек уже вышел или совсем скоро появится на всех площадках.",listen:"Слушать песню",b_out:"Уже вышел",b_0307:"Скоро · 03.07",b_2507:"Скоро · 25.07",more:"Показать ещё"},
+    en:{title:"Reels",sub:"Short vertical stories — where a song's melody lives. Catch it in a reel, then hear the whole thing: the track is already out or arriving very soon everywhere.",listen:"Listen to the song",b_out:"Out now",b_0307:"Soon · Jul 3",b_2507:"Soon · Jul 25",more:"Show more"},
+    de:{title:"Reels",sub:"Kurze vertikale Geschichten — hier lebt die Melodie des Liedes. Hör sie im Reel und dann ganz: Der Track ist schon da oder erscheint bald überall.",listen:"Song anhören",b_out:"Jetzt da",b_0307:"Bald · 3.07",b_2507:"Bald · 25.07",more:"Mehr zeigen"},
+    ja:{title:"リール",sub:"縦型のショートストーリー——曲のメロディーがここに。リールで聴いて、そのあとフルで。楽曲はすでに配信中、または間もなく各プラットフォームに登場します。",listen:"曲を聴く",b_out:"配信中",b_0307:"近日 · 7/3",b_2507:"近日 · 7/25",more:"もっと見る"},
+    zh:{title:"短视频",sub:"竖屏短片——歌曲的旋律在这里。先在短视频里听见，再完整聆听：歌曲已上线，或即将登陆各大平台。",listen:"收听歌曲",b_out:"已发布",b_0307:"即将 · 7/3",b_2507:"即将 · 7/25",more:"显示更多"}
+  };
+  function lang(){try{var l=(document.documentElement.lang||'ru').slice(0,2);var t=R[l]||R.ru;
+    document.querySelectorAll('[data-i18n-reels]').forEach(function(n){var k=n.getAttribute('data-i18n-reels');if(t[k])n.textContent=t[k];});}catch(e){}}
+  // лимит видимых карточек + «Показать ещё» (на вырост: новые рилзы скрываются за 6-й автоматически)
+  var LIMIT=6;
+  var grid=document.querySelector('.reel-grid');
+  var cards=grid?[].slice.call(grid.querySelectorAll('.reel-card')):[];
+  var more=document.getElementById('reelMore');
+  function applyLimit(){
+    if(!grid||!more)return;
+    if(cards.length<=LIMIT){more.style.display='none';return;}
+    cards.forEach(function(c,i){if(i>=LIMIT)c.classList.add('reel-hidden');});
+    more.style.display='';
+  }
+  if(more)more.addEventListener('click',function(){
+    cards.forEach(function(c){c.classList.remove('reel-hidden');});
+    more.style.display='none';
+  });
+  applyLimit();
+  new MutationObserver(lang).observe(document.documentElement,{attributes:true,attributeFilter:['lang']});
+  lang();
+})();</script>
 </body>
 </html>
