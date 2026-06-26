@@ -779,6 +779,25 @@ html[data-skin="tactile_brutalism"] .reel-more{border-radius:0}
     </div>
   </div>
 
+  <div class="video-card reel-card" data-clip="r3" data-yt="qGRdFY4mmoI" data-vk-oid="239543600" data-vk-id="456239024">
+    <div class="video-frame">
+      <div class="video-poster" role="button" tabindex="0" aria-label="Смотреть рилз «Moontan»"><span class="play"></span></div>
+    </div>
+    <div class="video-meta">
+      <span class="reel-badge soon" data-i18n-reels="b_1707">Скоро · 17.07</span>
+      <h3 class="vt">Moontan</h3>
+      <p class="reel-cap">Ночной свет меняет всё. Луна — как лейбл на коже, который не смыть.</p>
+      <div class="video-src">
+        <button data-src="vk" aria-pressed="true">VK Видео</button>
+        <button data-src="yt" aria-pressed="false">YouTube</button>
+      </div>
+      <a class="reel-listen" href="https://band.link/pAAK3" target="_blank" rel="noopener">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+        <span data-i18n-reels="listen">Слушать песню</span>
+      </a>
+    </div>
+  </div>
+
   <div class="video-card reel-card" data-clip="r1" data-yt="xV5Y6ZOBg7s" data-vk-oid="239543600" data-vk-id="456239022">
     <div class="video-frame">
       <div class="video-poster" role="button" tabindex="0" aria-label="Смотреть рилз «Наш поэт Владимир»"><span class="play"></span></div>
@@ -1396,11 +1415,11 @@ document.querySelectorAll('.lp-opt').forEach(btn=>{
 </script>
 <script>(function(){
   var R={
-    ru:{title:"Рилзы",sub:"Короткие вертикальные истории — здесь живёт мелодия песни. Услышь её в рилзе, а потом слушай целиком: трек уже вышел или совсем скоро появится на всех площадках.",listen:"Слушать песню",b_out:"Уже вышел",b_0307:"Скоро · 03.07",b_2507:"Скоро · 25.07",more:"Показать ещё"},
-    en:{title:"Reels",sub:"Short vertical stories — where a song's melody lives. Catch it in a reel, then hear the whole thing: the track is already out or arriving very soon everywhere.",listen:"Listen to the song",b_out:"Out now",b_0307:"Soon · Jul 3",b_2507:"Soon · Jul 25",more:"Show more"},
-    de:{title:"Reels",sub:"Kurze vertikale Geschichten — hier lebt die Melodie des Liedes. Hör sie im Reel und dann ganz: Der Track ist schon da oder erscheint bald überall.",listen:"Song anhören",b_out:"Jetzt da",b_0307:"Bald · 3.07",b_2507:"Bald · 25.07",more:"Mehr zeigen"},
-    ja:{title:"リール",sub:"縦型のショートストーリー——曲のメロディーがここに。リールで聴いて、そのあとフルで。楽曲はすでに配信中、または間もなく各プラットフォームに登場します。",listen:"曲を聴く",b_out:"配信中",b_0307:"近日 · 7/3",b_2507:"近日 · 7/25",more:"もっと見る"},
-    zh:{title:"短视频",sub:"竖屏短片——歌曲的旋律在这里。先在短视频里听见，再完整聆听：歌曲已上线，或即将登陆各大平台。",listen:"收听歌曲",b_out:"已发布",b_0307:"即将 · 7/3",b_2507:"即将 · 7/25",more:"显示更多"}
+    ru:{title:"Рилзы",sub:"Короткие вертикальные истории — здесь живёт мелодия песни. Услышь её в рилзе, а потом слушай целиком: трек уже вышел или совсем скоро появится на всех площадках.",listen:"Слушать песню",b_out:"Уже вышел",b_0307:"Скоро · 03.07",b_1707:"Скоро · 17.07",b_2507:"Скоро · 25.07",more:"Показать ещё"},
+    en:{title:"Reels",sub:"Short vertical stories — where a song's melody lives. Catch it in a reel, then hear the whole thing: the track is already out or arriving very soon everywhere.",listen:"Listen to the song",b_out:"Out now",b_0307:"Soon · Jul 3",b_1707:"Soon · Jul 17",b_2507:"Soon · Jul 25",more:"Show more"},
+    de:{title:"Reels",sub:"Kurze vertikale Geschichten — hier lebt die Melodie des Liedes. Hör sie im Reel und dann ganz: Der Track ist schon da oder erscheint bald überall.",listen:"Song anhören",b_out:"Jetzt da",b_0307:"Bald · 3.07",b_1707:"Bald · 17.07",b_2507:"Bald · 25.07",more:"Mehr zeigen"},
+    ja:{title:"リール",sub:"縦型のショートストーリー——曲のメロディーがここに。リールで聴いて、そのあとフルで。楽曲はすでに配信中、または間もなく各プラットフォームに登場します。",listen:"曲を聴く",b_out:"配信中",b_0307:"近日 · 7/3",b_1707:"近日 · 7/17",b_2507:"近日 · 7/25",more:"もっと見る"},
+    zh:{title:"短视频",sub:"竖屏短片——歌曲的旋律在这里。先在短视频里听见，再完整聆听：歌曲已上线，或即将登陆各大平台。",listen:"收听歌曲",b_out:"已发布",b_0307:"即将 · 7/3",b_1707:"即将 · 7/17",b_2507:"即将 · 7/25",more:"显示更多"}
   };
   function lang(){try{var l=(document.documentElement.lang||'ru').slice(0,2);var t=R[l]||R.ru;
     document.querySelectorAll('[data-i18n-reels]').forEach(function(n){var k=n.getAttribute('data-i18n-reels');if(t[k])n.textContent=t[k];});}catch(e){}}
