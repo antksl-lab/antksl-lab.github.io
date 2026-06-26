@@ -200,9 +200,12 @@
     .nav-panel{min-width:170px}
   }
   @media(max-width:480px){
-    .brand{font-size:14px;white-space:normal;overflow:visible;text-overflow:clip;line-height:1.12;padding-right:8px}
+    .brand{font-size:14px;flex:0 1 auto;min-width:0;gap:8px}
+    .brand-name{min-width:0;white-space:normal;line-height:1.1;overflow:visible}
+    .brand-name b{white-space:nowrap}
     .brand-av{width:26px;height:26px}
-    .nav-in{padding:9px 12px;gap:10px}
+    .nav-in{padding:9px 12px;gap:12px}
+    .nav-right{flex:0 0 auto}
   }
   /* === VIEW-кнопка: на мобиле только иконка, компактная, не лезет на шапку === */
   @media(max-width:768px){
@@ -592,7 +595,7 @@ html[data-skin="tactile_brutalism"] .reel-more{border-radius:0}
 <div class="grain"></div>
 
 <nav><div class="nav-in">
-  <a class="brand" href="#top"><img class="av-img brand-av" alt="Константин Захаров"> Константин <b>Захаров</b></a>
+  <a class="brand" href="#top"><img class="av-img brand-av" alt="Константин Захаров"><span class="brand-name">Константин <b>Захаров</b></span></a>
   <div class="nav-links">
     <a href="#releases" data-i18n="discog">Дискография</a>
     <a href="#reels" data-i18n="reels">Рилзы</a>
