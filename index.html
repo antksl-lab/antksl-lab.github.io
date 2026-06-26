@@ -1287,10 +1287,10 @@ document.querySelectorAll('.lp-opt').forEach(btn=>{
         en:{title:"Music videos",sub:"Little films for the songs. Pick a platform and watch right here."},de:{title:"Musikvideos",sub:"Kleine Filme zu den Liedern. Wähle eine Plattform und schau direkt hier."}};
   function lang(){try{var l=(document.documentElement.lang||'ru').slice(0,2);var t=T[l]||T.ru;
     document.querySelectorAll('[data-i18n-videos]').forEach(function(n){var k=n.getAttribute('data-i18n-videos');if(t[k])n.textContent=t[k];});}catch(e){}}
-  function track(title,src){try{if(window.__ANTKSL_BOT)return;var SB="https://qhxhdzwtcjzdinbicjxl.supabase.co",K="sb_publishable_6giNbAp4HJTGo_FQCLV6AA_WtwMQlFP";
+  function track(title,src,kind){try{if(window.__ANTKSL_BOT)return;var SB="https://qhxhdzwtcjzdinbicjxl.supabase.co",K="sb_publishable_6giNbAp4HJTGo_FQCLV6AA_WtwMQlFP";
     if(typeof fetch==="function")fetch(SB+"/rest/v1/events",{method:"POST",keepalive:true,
       headers:{"Content-Type":"application/json","apikey":K,"Authorization":"Bearer "+K,"Prefer":"return=minimal"},
-      body:JSON.stringify({type:"click_video",release:title,detail:src,path:location.pathname})}).catch(function(){});}catch(e){}}
+      body:JSON.stringify({type:kind||"click_video",release:title,detail:src,path:location.pathname})}).catch(function(){});}catch(e){}}
   function srcOf(card){return card.querySelector('.video-src button[aria-pressed="true"]').getAttribute('data-src');}
   function play(card){
     var src=srcOf(card), frame=card.querySelector('.video-frame');
@@ -1298,7 +1298,7 @@ document.querySelectorAll('.lp-opt').forEach(btn=>{
       ? 'https://www.youtube.com/embed/'+card.getAttribute('data-yt')+'?autoplay=1&rel=0'
       : 'https://vkvideo.ru/video_ext.php?oid=-'+card.getAttribute('data-vk-oid')+'&id='+card.getAttribute('data-vk-id')+'&hd=2&autoplay=1';
     frame.innerHTML='<iframe src="'+url+'" allow="autoplay; encrypted-media; fullscreen; picture-in-picture" allowfullscreen></iframe>';
-    track(card.querySelector('.vt').textContent, src);
+    track(card.querySelector('.vt').textContent, src, card.classList.contains('reel-card')?'click_reel':'click_video');
   }
   document.querySelectorAll('.video-card').forEach(function(card){
     var poster=card.querySelector('.video-poster');
@@ -1417,6 +1417,19 @@ document.querySelectorAll('.lp-opt').forEach(btn=>{
     more.style.display='none';
   });
   applyLimit();
+  // трекинг кликов по «Слушать песню» (band.link) — видно по каким рилзам уходят слушать
+  var SB="https://qhxhdzwtcjzdinbicjxl.supabase.co",K="sb_publishable_6giNbAp4HJTGo_FQCLV6AA_WtwMQlFP";
+  function trk(type,release,detail){try{if(window.__ANTKSL_BOT)return;
+    if(typeof fetch==="function")fetch(SB+"/rest/v1/events",{method:"POST",keepalive:true,
+      headers:{"Content-Type":"application/json","apikey":K,"Authorization":"Bearer "+K,"Prefer":"return=minimal"},
+      body:JSON.stringify({type:type,release:release,detail:detail,path:location.pathname})}).catch(function(){});}catch(e){}}
+  document.querySelectorAll('#reels .reel-listen').forEach(function(a){
+    a.addEventListener('click',function(){
+      var card=a.closest('.reel-card'), ttl=card?(card.querySelector('.vt')||{}).textContent||'':'';
+      var slug=(a.getAttribute('href')||'').split('/').filter(Boolean).pop()||'';
+      trk('click_reel_listen',ttl,slug);
+    });
+  });
   new MutationObserver(lang).observe(document.documentElement,{attributes:true,attributeFilter:['lang']});
   lang();
 })();</script>
