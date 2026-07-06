@@ -798,7 +798,7 @@ html[data-skin="tactile_brutalism"] .reel-more{border-radius:0}
     </div>
   </div>
 
-  <div class="video-card reel-card" data-clip="r9" data-yt="ltJh8pS8WiE">
+  <div class="video-card reel-card" data-clip="r9" data-yt="ltJh8pS8WiE" data-mp4="media/lunnyy_zagar_reel.mp4">
     <div class="video-frame">
       <div class="video-poster" role="button" tabindex="0" aria-label="Смотреть рилз «Лунный загар»"><span class="play"></span></div>
     </div>
@@ -1433,7 +1433,14 @@ document.querySelectorAll('.lp-opt').forEach(btn=>{
       body:JSON.stringify({type:kind||"click_video",release:title,detail:src,path:location.pathname})}).catch(function(){});}catch(e){}}
   function srcOf(card){return card.querySelector('.video-src button[aria-pressed="true"]').getAttribute('data-src');}
   function play(card){
-    var src=srcOf(card), frame=card.querySelector('.video-frame');
+    var frame=card.querySelector('.video-frame');
+    var mp4=card.getAttribute('data-mp4');
+    if(mp4){  // локальный файл рилза — всегда играет в плеере, без ограничений встраивания
+      frame.innerHTML='<video src="'+mp4+'" controls autoplay playsinline style="position:absolute;inset:0;width:100%;height:100%;background:#000;object-fit:cover"></video>';
+      track(card.querySelector('.vt').textContent,'mp4',card.classList.contains('reel-card')?'click_reel':'click_video');
+      return;
+    }
+    var src=srcOf(card);
     var url = src==='yt'
       ? 'https://www.youtube.com/embed/'+card.getAttribute('data-yt')+'?autoplay=1&rel=0'
       : 'https://vkvideo.ru/video_ext.php?oid=-'+card.getAttribute('data-vk-oid')+'&id='+card.getAttribute('data-vk-id')+'&hd=2&autoplay=1';
