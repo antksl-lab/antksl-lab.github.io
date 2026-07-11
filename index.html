@@ -1253,21 +1253,12 @@ function setLang(lang){
   var nav=(navigator.language||navigator.userLanguage||'ru').slice(0,2).toLowerCase();
   currentLang=(nav==='ru'||nav==='be'||nav==='uk')?'ru':'en';
   renderAll(true);setLang(currentLang);
-  // Гео-уточнение — откладываем после рендера страницы (не блокирует FCP).
-  setTimeout(function(){
-    try{
-      if(typeof fetch==='function'){
-        fetch('https://ipapi.co/json/')
-          .then(function(r){return r.json();})
-          .then(function(d){
-            var cc=(d&&d.country_code)||'';
-            var geo=(['RU','BY'].indexOf(cc)!==-1)?'ru':'en';
-            if(geo!==currentLang){currentLang=geo;setLang(geo);}
-          })
-          .catch(function(){});
-      }
-    }catch(e){}
-  }, 2000);
+  // Язык определяем через navigator.language — мгновенно, без внешнего запроса.
+  try{
+    var navLang=(navigator.language||navigator.userLanguage||'en').toLowerCase().slice(0,2);
+    var geo=(['ru','be'].indexOf(navLang)!==-1)?'ru':'en';
+    if(geo!==currentLang){currentLang=geo;setLang(geo);}
+  }catch(e){}
 })();
 const yr=document.getElementById('yr');if(yr) yr.textContent=new Date().getFullYear();
 function closeAllPanels(){document.querySelectorAll('.nav-panel').forEach(p=>{p.classList.remove('open');});}
@@ -1369,16 +1360,12 @@ document.querySelectorAll('.lp-opt').forEach(btn=>{
     // Гео по IP (бесплатный сервис) с фолбэком: pageview уйдёт в любом случае.
     var sent=false;
     function fire(extra){ if(sent) return; sent=true; if(extra){base.country=extra.country||base.country; base.city=extra.city||"";} send({type:"pageview"}); }
+    // Страну берём из navigator.language — без внешнего запроса.
     try{
-      if(typeof fetch==="function"){
-        var to=setTimeout(function(){fire(null);},800); // не ждём дольше 0.8с
-        setTimeout(function(){
-          fetch("https://ipapi.co/json/").then(function(r){return r.json();}).then(function(d){
-            clearTimeout(to);
-            fire({country:(d&&(d.country_name||d.country))||base.country, city:(d&&d.city)||""});
-          }).catch(function(){clearTimeout(to);fire(null);});
-        }, 0);
-      } else { fire(null); }
+      var navL=(navigator.language||'en').toLowerCase();
+      var cMap={'ru':'Россия','be':'Беларусь','uk':'Украина','en':'Other'};
+      var cKey=navL.slice(0,2);
+      fire({country:cMap[cKey]||navL, city:""});
     }catch(e){ fire(null); }
   })();
   // 2) Клики — делегирование по всему документу
