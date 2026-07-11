@@ -1355,19 +1355,19 @@ document.querySelectorAll('.lp-opt').forEach(btn=>{
       }
     }catch(e){}
   }
-  // 1) Просмотр страницы
-  (function(){
-    // Гео по IP (бесплатный сервис) с фолбэком: pageview уйдёт в любом случае.
-    var sent=false;
-    function fire(extra){ if(sent) return; sent=true; if(extra){base.country=extra.country||base.country; base.city=extra.city||"";} send({type:"pageview"}); }
-    // Страну берём из navigator.language — без внешнего запроса.
-    try{
-      var navL=(navigator.language||'en').toLowerCase();
-      var cMap={'ru':'Россия','be':'Беларусь','uk':'Украина','en':'Other'};
-      var cKey=navL.slice(0,2);
-      fire({country:cMap[cKey]||navL, city:""});
-    }catch(e){ fire(null); }
-  })();
+  // 1) Просмотр страницы — откладываем после рендера чтобы Supabase не блокировал FCP
+  setTimeout(function(){
+    (function(){
+      var sent=false;
+      function fire(extra){ if(sent) return; sent=true; if(extra){base.country=extra.country||base.country; base.city=extra.city||"";} send({type:"pageview"}); }
+      try{
+        var navL=(navigator.language||'en').toLowerCase();
+        var cMap={'ru':'Россия','be':'Беларусь','uk':'Украина','en':'Other'};
+        var cKey=navL.slice(0,2);
+        fire({country:cMap[cKey]||navL, city:""});
+      }catch(e){ fire(null); }
+    })();
+  }, 3000);
   // 2) Клики — делегирование по всему документу
   document.addEventListener("click",function(e){
     try{
