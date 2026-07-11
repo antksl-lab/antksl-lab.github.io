@@ -1,13 +1,18 @@
 <!doctype html>
 <html lang="ru">
 <head>
-<!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-EYGLP0P6W5"></script>
+<!-- Google tag (gtag.js) — отложен на 3с чтобы не блокировать FCP -->
 <script>
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-  gtag('config', 'G-EYGLP0P6W5');
+  setTimeout(function(){
+    var s=document.createElement('script');
+    s.async=true;
+    s.src='https://www.googletagmanager.com/gtag/js?id=G-EYGLP0P6W5';
+    document.head.appendChild(s);
+    gtag('js', new Date());
+    gtag('config', 'G-EYGLP0P6W5');
+  }, 3000);
 </script>
 <script>/* skin anti-flash: ставим тему ДО отрисовки */(function(){try{var s=localStorage.getItem('antksl_skin');if(!s){s='aurora_soul';}document.documentElement.setAttribute('data-skin',s);}catch(e){document.documentElement.setAttribute('data-skin','aurora_soul');}})();</script>
 <script>(function(){try{var hr=localStorage.getItem('antksl_hero')||'vinyl';document.documentElement.setAttribute('data-hero',hr);}catch(e){document.documentElement.setAttribute('data-hero','vinyl');}})();</script>
@@ -1556,15 +1561,22 @@ document.querySelectorAll('.lp-opt').forEach(btn=>{
 (function(){
   var btn=document.getElementById('toTop'),prog=document.getElementById('ttProg');
   if(!btn||!prog)return;
-  var C=2*Math.PI*24; // длина окружности r=24
+  var C=2*Math.PI*24;
   prog.style.strokeDasharray=C;
   var reduce=window.matchMedia('(prefers-reduced-motion:reduce)').matches;
+  var _raf1=null, _h1=0;
+  function updateH1(){ _h1=document.documentElement.scrollHeight-document.documentElement.clientHeight; }
+  updateH1();
+  window.addEventListener('resize',updateH1,{passive:true});
   function onScroll(){
-    var st=window.pageYOffset||document.documentElement.scrollTop;
-    var h=document.documentElement.scrollHeight-document.documentElement.clientHeight;
-    var pct=h>0?st/h:0;
-    prog.style.strokeDashoffset=C*(1-pct);
-    if(st>320)btn.classList.add('show');else btn.classList.remove('show');
+    if(_raf1) return;
+    _raf1=requestAnimationFrame(function(){
+      _raf1=null;
+      var st=window.pageYOffset||document.documentElement.scrollTop;
+      var pct=_h1>0?st/_h1:0;
+      prog.style.strokeDashoffset=C*(1-pct);
+      if(st>320)btn.classList.add('show');else btn.classList.remove('show');
+    });
   }
   window.addEventListener('scroll',onScroll,{passive:true});
   onScroll();
@@ -1582,12 +1594,18 @@ document.querySelectorAll('.lp-opt').forEach(btn=>{
   /* дорожка-прогресс */
   var g=document.createElement('div'); g.id='groove'; document.body.appendChild(g);
   var nav=document.querySelector('nav');
+  var _raf2=null, _max=1;
+  function updateMax(){ _max=(document.documentElement.scrollHeight-document.documentElement.clientHeight)||1; }
+  updateMax();
+  window.addEventListener('resize',updateMax,{passive:true});
   function onScroll(){
-    var h=document.documentElement;
-    var max=(h.scrollHeight-h.clientHeight)||1;
-    var y=window.scrollY||h.scrollTop||0;
-    g.style.width=(Math.min(1,Math.max(0,y/max))*100)+'%';
-    if(nav){ y>20?nav.classList.add('is-scrolled'):nav.classList.remove('is-scrolled'); }
+    if(_raf2) return;
+    _raf2=requestAnimationFrame(function(){
+      _raf2=null;
+      var y=window.scrollY||document.documentElement.scrollTop||0;
+      g.style.width=(Math.min(1,Math.max(0,y/_max))*100)+'%';
+      if(nav){ y>20?nav.classList.add('is-scrolled'):nav.classList.remove('is-scrolled'); }
+    });
   }
   window.addEventListener('scroll',onScroll,{passive:true}); onScroll();
 
