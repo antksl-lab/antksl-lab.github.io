@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ANTKSL — Electronic Press Kit | Константин Захаров</title>
+  <meta name="description" content="Electronic Press Kit артиста ANTKSL (Константин Захаров). Биография, релизы, контакты для промоутеров и редакторов.">
+  <meta property="og:title" content="ANTKSL — Press Kit">
+  <meta property="og:description" content="Городской романс и R&B. Биография, материалы для прессы, контакты.">
+  <meta property="og:type" content="profile">
+  <meta property="og:url" content="https://antksl-lab.github.io/press">
+  <meta name="robots" content="index, follow">
+
+  <!-- Schema.org MusicArtist (= MusicGroup по словарю schema.org) -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "MusicGroup",
+    "name": "ANTKSL",
+    "alternateName": "Константин Захаров",
+    "genre": ["Городской романс", "R&B", "Soul"],
+    "url": "https://antksl-lab.github.io/press",
+    "sameAs": [
+      "https://music.yandex.ru/artist/26082374",
+      "https://vk.com/zakharov_music",
+      "https://t.me/zakharov_antksl",
+      "https://www.youtube.com/@Surtaiha",
+      "https://band.link/antksl"
+    ],
+    "description": "Константин Захаров — российский музыкант, работающий под именем ANTKSL. Городской романс, R&B и лирическая поп-музыка. Дистрибуция через 682 Distribution."
+  }
+  </script>
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0d0d0f;
+      --surface: #16161a;
+      --surface2: #1e1e24;
+      --border: #2a2a35;
+      --accent: #c8a96e;
+      --accent-dim: rgba(200, 169, 110, 0.15);
+      --text: #e8e6e0;
+      --text-dim: #8a8780;
+      --text-muted: #555358;
+      --radius: 8px;
+      --max: 720px;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Georgia', 'Times New Roman', serif;
+      font-size: 16px;
+      line-height: 1.7;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    /* ─── LAYOUT ─── */
+    .wrap { max-width: var(--max); margin: 0 auto; padding: 0 20px; }
+
+    /* ─── HERO ─── */
+    .hero {
+      padding: 60px 0 48px;
+      border-bottom: 1px solid var(--border);
+    }
+    .hero-label {
+      font-family: 'Helvetica Neue', Arial, sans-serif;
+      font-size: 11px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 20px;
+    }
+    .hero-name {
+      font-size: clamp(42px, 9vw, 72px);
+      font-weight: 400;
+      letter-spacing: -0.02em;
+      line-height: 1.05;
+      color: var(--text);
+      margin-bottom: 12px;
+    }
+    .hero-sub {
+      font-family: 'Helvetica Neue', Arial, sans-serif;
+      font-size: 14px;
+      color: var(--text-dim);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+    .hero-cta {
+      margin-top: 32px;
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 11px 22px;
+      border-radius: 4px;
+      font-family: 'Helvetica Neue', Arial, sans-serif;
+      font-size: 13px;
+      letter-spacing: 0.05em;
+      font-weight: 500;
+      cursor: pointer;
+      transition: opacity 0.15s;
+    }
+    .btn:hover { opacity: 0.8; text-decoration: none; }
+    .btn-primary { background: var(--accent); color: #0d0d0f; }
+    .btn-outline { border: 1px solid var(--border); color: var(--text-dim); background: transparent; }
+
+    /* ─── SECTIONS ─── */
+    .section { padding: 48px 0; border-bottom: 1px solid var(--border); }
+    .section:last-child { border-bottom: none; }
+    .section-tag {
+      font-family: 'Helvetica Neue', Arial, sans-serif;
+      font-size: 10px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 24px;
+    }
+    .section-title {
+      font-size: 22px;
+      font-weight: 400;
+      margin-bottom: 20px;
+      color: var(--text);
+    }
+
+    /* ─── BIO ─── */
+    .bio-tabs {
+      display: flex;
+      gap: 4px;
+      margin-bottom: 24px;
+      border-bottom: 1px solid var(--border);
+      font-family: 'Helvetica Neue', Arial, sans-serif;
+    }
+    .tab-btn {
+      padding: 10px 16px;
+      font-size: 12px;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      cursor: pointer;
+      border: none;
+      background: none;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -1px;
+      transition: color 0.15s, border-color 0.15s;
+    }
+    .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+    .bio-panel { display: none; }
+    .bio-panel.active { display: block; }
+    .bio-text { color: var(--text-dim); font-size: 16px; line-height: 1.8; }
+    .bio-copy-btn {
+      margin-top: 16px;
+      font-family: 'Helvetica Neue', Arial, sans-serif;
+      font-size: 12px;
+      color: var(--text-muted);
+      background: none;
+      border: 1px solid var(--border);
+      padding: 8px 14px;
+      border-radius: 4px;
+      cursor: pointer;
+      letter-spacing: 0.04em;
+      transition: color 0.15s;
+    }
+    .bio-copy-btn:hover { color: var(--accent); }
+
+    /* ─── RELEASES ─── */
+    .releases-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 20px;
+    }
+    .release-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      transition: border-color 0.15s;
+    }
+    .release-card:hover { border-color: var(--accent); }
+    .release-cover {
+      aspect-ratio: 1;
+      background: var(--surface2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      color: var(--text-muted);
+      overflow: hidden;
+    }
+    .release-cover img { width: 100%; height: 100%; object-fit: cover; }
+    .release-info { padding: 14px; }
+    .release-title { font-size: 14px; color: var(--text); margin-bottom: 4px; }
+    .release-meta {
+      font-family: 'Helvetica Neue', Arial, sans-serif;
+      font-size: 11px;
+      color: var(--text-muted);
+      letter-spacing: 0.04em;
+      margin-bottom: 10px;
+    }
+    .release-link {
+      font-family: 'Helvetica Neue', Arial, sans-serif;
+      font-size: 11px;
+      color: var(--accent);
+      letter-spacing: 0.05em;
+    }
+
+    /* ─── STATS ─── */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: 16px;
+    }
+    .stat-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+    }
+    .stat-num {
+      font-size: 28px;
+      font-weight: 400;
+      color: var(--accent);
+      line-height: 1;
+      margin-bottom: 6px;
+    }
+    .stat-label {
+      font-family: 'Helvetica Neue', Arial, sans-serif;
+      font-size: 11px;
+      color: var(--text-muted);
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    /* ─── PLATFORMS ─── */
+    .platform-list { display: flex; flex-direction: column; gap: 10px; }
+    .platform-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 18px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      transition: border-color 0.15s;
+    }
+    .platform-row:hover { border-color: var(--accent); }
+    .platform-name {
+      font-family: 'Helvetica Neue', Arial, sans-serif;
+      font-size: 13px;
+      color: var(--text);
+    }
+    .platform-handle { font-size: 13px; color: var(--accent); }
+
+    /* ─── CONTACT ─── */
+    .contact-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 32px;
+    }
+    .contact-box p { color: var(--text-dim); margin-bottom: 24px; }
+    .contact-email {
+      font-family: 'Helvetica Neue', Arial, sans-serif;
+      font-size: 20px;
+      color: var(--accent);
+      letter-spacing: 0.02em;
+    }
+
+    /* ─── FOOTER ─── */
+    .footer {
+      padding: 32px 0;
+      font-family: 'Helvetica Neue', Arial, sans-serif;
+      font-size: 12px;
+      color: var(--text-muted);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    /* ─── DIVIDER ─── */
+    .accent-line {
+      width: 40px;
+      height: 1px;
+      background: var(--accent);
+      margin: 20px 0;
+    }
+
+    /* ─── MOBILE ─── */
+    @media (max-width: 480px) {
+      .hero { padding: 40px 0 36px; }
+      .releases-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+      .stats-row { grid-template-columns: repeat(2, 1fr); }
+      .contact-box { padding: 24px; }
+      .footer { flex-direction: column; align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══ HERO ═══ -->
+<div class="wrap">
+  <section class="hero">
+    <div class="hero-label">Electronic Press Kit</div>
+    <h1 class="hero-name">ANTKSL</h1>
+    <div class="hero-sub">Константин Захаров · Городской романс · R&amp;B · Soul</div>
+    <div class="accent-line"></div>
+    <div class="hero-cta">
+      <a class="btn btn-primary" href="https://band.link/antksl" target="_blank" rel="noopener">
+        Слушать музыку
+      </a>
+      <a class="btn btn-outline" href="https://antksl-lab.github.io" target="_blank" rel="noopener">
+        Сайт артиста
+      </a>
+    </div>
+  </section>
+</div>
+
+<!-- ═══ БИОГРАФИЯ ═══ -->
+<div class="wrap">
+  <section class="section">
+    <div class="section-tag">Биография</div>
+    <div class="bio-tabs" role="tablist">
+      <button class="tab-btn active" onclick="showBio('short')" role="tab">50 слов</button>
+      <button class="tab-btn" onclick="showBio('medium')" role="tab">Средняя</button>
+      <button class="tab-btn" onclick="showBio('full')" role="tab">Полная</button>
+    </div>
+
+    <div id="bio-short" class="bio-panel active">
+      <p class="bio-text" id="bio-text-short">
+        Константин Захаров (ANTKSL) — российский музыкант, автор городского романса и R&amp;B.
+        Создаёт музыку на стыке лирики и современного звука. Тексты — в соавторстве
+        с поэтессой Ниной Георгиевной. Дистрибуция через 682 Distribution.
+      </p>
+      <button class="bio-copy-btn" onclick="copyBio('bio-text-short')">Скопировать текст</button>
+    </div>
+
+    <div id="bio-medium" class="bio-panel">
+      <p class="bio-text" id="bio-text-medium">
+        Константин Захаров — российский музыкант и автор-исполнитель, работающий под именем ANTKSL.
+        Пишет и продюсирует городской романс, R&amp;B и лирическую поп-музыку.
+        Тексты создаются в соавторстве с поэтессой Ниной Георгиевной.
+        Выпускает музыку через 682 Distribution.
+        Использует современные AI-инструменты в производстве видео и музыки.
+      </p>
+      <button class="bio-copy-btn" onclick="copyBio('bio-text-medium')">Скопировать текст</button>
+    </div>
+
+    <div id="bio-full" class="bio-panel">
+      <p class="bio-text" id="bio-text-full">
+        Константин Захаров — российский музыкант, продюсер и автор-исполнитель, работающий
+        под именем ANTKSL. Основное направление — городской романс, R&amp;B и Soul: жанры,
+        в которых лирическая глубина встречается с современным электронным звуком.
+        Тексты создаются в соавторстве с поэтессой Ниной Георгиевной, музыка и аранжировки — авторские.<br><br>
+        Дистрибуция осуществляется через 682 Distribution. Активно исследует применение
+        искусственного интеллекта в музыкальном производстве: генерация аранжировок (Suno),
+        создание видеоклипов (Google Flow/Veo).<br><br>
+        Официальный сайт: <a href="https://antksl-lab.github.io">antksl-lab.github.io</a>.
+      </p>
+      <button class="bio-copy-btn" onclick="copyBio('bio-text-full')">Скопировать текст</button>
+    </div>
+  </section>
+</div>
+
+<!-- ═══ РЕЛИЗЫ ═══ -->
+<div class="wrap">
+  <section class="section">
+    <div class="section-tag">Дискография · Ключевые релизы</div>
+    <div class="releases-grid">
+
+      <div class="release-card">
+        <div class="release-cover">♪</div>
+        <div class="release-info">
+          <div class="release-title">Вишнёвый сад</div>
+          <div class="release-meta">2026 · Городской романс</div>
+          <a class="release-link" href="https://band.link/fg947" target="_blank" rel="noopener">Слушать →</a>
+        </div>
+      </div>
+
+      <div class="release-card">
+        <div class="release-cover">♪</div>
+        <div class="release-info">
+          <div class="release-title">Огонь гори</div>
+          <div class="release-meta">2026 · R&amp;B</div>
+          <a class="release-link" href="https://band.link/antksl" target="_blank" rel="noopener">Слушать →</a>
+        </div>
+      </div>
+
+      <div class="release-card">
+        <div class="release-cover">♪</div>
+        <div class="release-info">
+          <div class="release-title">Горсть песка</div>
+          <div class="release-meta">2026 · Soul</div>
+          <a class="release-link" href="https://band.link/antksl" target="_blank" rel="noopener">Слушать →</a>
+        </div>
+      </div>
+
+      <div class="release-card">
+        <div class="release-cover">♪</div>
+        <div class="release-info">
+          <div class="release-title">Из пепла</div>
+          <div class="release-meta">2026 · R&amp;B</div>
+          <a class="release-link" href="https://band.link/antksl" target="_blank" rel="noopener">Слушать →</a>
+        </div>
+      </div>
+
+      <div class="release-card">
+        <div class="release-cover">♪</div>
+        <div class="release-info">
+          <div class="release-title">Лунный загар</div>
+          <div class="release-meta">2026 · Лирика</div>
+          <a class="release-link" href="https://band.link/antksl" target="_blank" rel="noopener">Слушать →</a>
+        </div>
+      </div>
+
+      <div class="release-card">
+        <div class="release-cover">♪</div>
+        <div class="release-info">
+          <div class="release-title">Наш поэт Владимир</div>
+          <div class="release-meta">2026 · Городской романс</div>
+          <a class="release-link" href="https://band.link/antksl" target="_blank" rel="noopener">Слушать →</a>
+        </div>
+      </div>
+
+    </div>
+
+    <div style="margin-top: 24px;">
+      <a class="btn btn-outline" href="https://band.link/antksl" target="_blank" rel="noopener">
+        Все релизы на BandLink →
+      </a>
+    </div>
+  </section>
+</div>
+
+<!-- ═══ ДАННЫЕ ═══ -->
+<div class="wrap">
+  <section class="section">
+    <div class="section-tag">Факты</div>
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-num">12+</div>
+        <div class="stat-label">Релизов</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num">682</div>
+        <div class="stat-label">Distribution</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num">2026</div>
+        <div class="stat-label">Активный год</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num">AI</div>
+        <div class="stat-label">Suno · Flow · Veo</div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- ═══ ПЛАТФОРМЫ ═══ -->
+<div class="wrap">
+  <section class="section">
+    <div class="section-tag">Площадки</div>
+    <div class="platform-list">
+      <a class="platform-row" href="https://music.yandex.ru/artist/26082374" target="_blank" rel="noopener">
+        <span class="platform-name">Яндекс Музыка</span>
+        <span class="platform-handle">ID 26082374 →</span>
+      </a>
+      <a class="platform-row" href="https://vk.com/zakharov_music" target="_blank" rel="noopener">
+        <span class="platform-name">VK Музыка / VK</span>
+        <span class="platform-handle">zakharov_music →</span>
+      </a>
+      <a class="platform-row" href="https://www.youtube.com/@Surtaiha" target="_blank" rel="noopener">
+        <span class="platform-name">YouTube</span>
+        <span class="platform-handle">@Surtaiha →</span>
+      </a>
+      <a class="platform-row" href="https://t.me/zakharov_antksl" target="_blank" rel="noopener">
+        <span class="platform-name">Telegram</span>
+        <span class="platform-handle">@zakharov_antksl →</span>
+      </a>
+      <a class="platform-row" href="https://band.link/antksl" target="_blank" rel="noopener">
+        <span class="platform-name">BandLink · Все стриминги</span>
+        <span class="platform-handle">band.link/antksl →</span>
+      </a>
+    </div>
+  </section>
+</div>
+
+<!-- ═══ КОНТАКТ ═══ -->
+<div class="wrap">
+  <section class="section">
+    <div class="section-tag">Для прессы и промоутеров</div>
+    <div class="contact-box">
+      <p>
+        Запросы на интервью, плейлисты, коллаборации и партнёрства — по Telegram.
+        Отвечаю в течение 24 часов.
+      </p>
+      <a class="contact-email" href="https://t.me/zakharov_antksl" target="_blank" rel="noopener">
+        @zakharov_antksl →
+      </a>
+    </div>
+  </section>
+</div>
+
+<!-- ═══ FOOTER ═══ -->
+<div class="wrap">
+  <footer class="footer">
+    <span>© 2026 ANTKSL · Константин Захаров · Лейбл ANTKSL · 682 Distribution</span>
+    <a href="https://antksl-lab.github.io">antksl-lab.github.io</a>
+  </footer>
+</div>
+
+<script>
+  function showBio(type) {
+    document.querySelectorAll('.bio-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('bio-' + type).classList.add('active');
+    event.target.classList.add('active');
+  }
+
+  function copyBio(id) {
+    const el = document.getElementById(id);
+    const text = el.innerText || el.textContent;
+    navigator.clipboard.writeText(text.trim()).then(() => {
+      const btn = el.nextElementSibling;
+      const orig = btn.textContent;
+      btn.textContent = 'Скопировано ✓';
+      setTimeout(() => { btn.textContent = orig; }, 2000);
+    });
+  }
+</script>
+
+</body>
+</html>
