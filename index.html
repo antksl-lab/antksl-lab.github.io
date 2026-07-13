@@ -1318,10 +1318,11 @@ document.querySelectorAll('.lp-opt').forEach(btn=>{
   function country(){try{var tz=Intl.DateTimeFormat().resolvedOptions().timeZone||"";
     var m={"Europe/Moscow":"RU","Europe/Kaliningrad":"RU","Asia/Yekaterinburg":"RU","Asia/Novosibirsk":"RU","Asia/Krasnoyarsk":"RU","Europe/Minsk":"BY","Europe/Kiev":"UA","Europe/Kyiv":"UA","Asia/Almaty":"KZ"};
     return m[tz]||tz.split("/")[0]||"";}catch(e){return "";}}
-  var base={
+  function city(){try{var tz=Intl.DateTimeFormat().resolvedOptions().timeZone||"";return (tz.split("/").pop()||"").replace(/_/g," ");}catch(e){return "";}}
+var base={
     referrer:document.referrer||"",
     source:utm()||host(document.referrer)||"",
-    country:country(),city:"",
+    country:country(),city:city(),
     lang:(document.documentElement.lang||navigator.language||"").slice(0,2),
     device:(/Mobi|Android|iPhone|iPad/i.test(navigator.userAgent))?"mobile":"desktop",
     screen:(window.screen&&screen.width)?screen.width+"x"+screen.height:"",
