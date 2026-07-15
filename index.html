@@ -880,7 +880,7 @@ html[data-skin="tactile_brutalism"] .reel-more{border-radius:0}
     </div>
   </div>
 
-  <div class="video-card reel-card" data-clip="r9" data-yt="ltJh8pS8WiE" data-open-yt="ltJh8pS8WiE">
+  <div class="video-card reel-card" data-clip="r9" data-yt="ltJh8pS8WiE" data-vk-oid="239543600" data-vk-id="456239058">
     <div class="video-frame">
       <div class="video-poster" role="button" tabindex="0" aria-label="Смотреть рилз «Лунный загар»"><span class="play"></span></div>
     </div>
@@ -889,7 +889,8 @@ html[data-skin="tactile_brutalism"] .reel-more{border-radius:0}
       <h3 class="vt">Лунный загар</h3>
       <p class="reel-cap">Зимняя ночь, лунный свет и тишина января.</p>
       <div class="video-src">
-        <button data-src="yt" aria-pressed="true">YouTube</button>
+        <button data-src="vk" aria-pressed="true">VK Видео</button>
+        <button data-src="yt" aria-pressed="false">YouTube</button>
       </div>
       <a class="reel-listen" href="https://band.link/lunnyzagar" target="_blank" rel="noopener">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
@@ -1506,13 +1507,16 @@ var base={
   function srcOf(card){return card.querySelector('.video-src button[aria-pressed="true"]').getAttribute('data-src');}
   function play(card){
     var frame=card.querySelector('.video-frame');
+    var src=srcOf(card);
     var ext=card.getAttribute('data-open-yt');
-    if(ext){  // открыть рилз на YouTube в новой вкладке
+    // data-open-yt = ролик с возрастным ограничением 18+: YouTube ЗАПРЕЩАЕТ его встраивание
+    // где-либо, поэтому для YT-источника открываем на самом YouTube. ВАЖНО: проверка
+    // привязана к выбранному источнику — иначе VK-плеер этой карточки никогда не сыграет.
+    if(ext && src==='yt'){
       window.open('https://www.youtube.com/shorts/'+ext,'_blank','noopener');
       track(card.querySelector('.vt').textContent,'yt',card.classList.contains('reel-card')?'click_reel':'click_video');
       return;
     }
-    var src=srcOf(card);
     var url = src==='yt'
       ? 'https://www.youtube.com/embed/'+card.getAttribute('data-yt')+'?autoplay=1&rel=0'
       : 'https://vkvideo.ru/video_ext.php?oid=-'+card.getAttribute('data-vk-oid')+'&id='+card.getAttribute('data-vk-id')+'&hd=2&autoplay=1';
