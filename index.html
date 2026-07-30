@@ -320,6 +320,11 @@ html[data-skin="glass_depth"] .skinfx b:nth-child(1){background:#3a6dff}html[dat
 /* Grain только для grain_warmth и tactile_brutalism */
 .skingrain{position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:0;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
 html[data-skin="grain_warmth"] .skingrain,html[data-skin="aurora_soul"] .skingrain{opacity:.05}
+/* STUDIO BG — пульт за aurora-блобами */
+html[data-skin="aurora_soul"] body::before{content:'';position:fixed;inset:0;z-index:-3;background:url('studio-bg.jpg') center/cover no-repeat;opacity:.45;pointer-events:none}
+/* Читаемость текста поверх пульта */
+html[data-skin="aurora_soul"] .hero-sub,html[data-skin="aurora_soul"] .hero-tag{text-shadow:0 1px 16px rgba(0,0,0,.85),0 0 40px rgba(0,0,0,.5)}
+html[data-skin="aurora_soul"] .eyebrow{text-shadow:0 1px 10px rgba(0,0,0,.9)}
 html[data-skin="tactile_brutalism"] .skingrain{opacity:.08}
 /* Стеклянные карточки для aurora/glass */
 html[data-skin="aurora_soul"] .card,html[data-skin="glass_depth"] .card{backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
