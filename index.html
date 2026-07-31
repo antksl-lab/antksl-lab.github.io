@@ -12,6 +12,17 @@
 <script>/* skin anti-flash: ставим тему ДО отрисовки */(function(){try{var s=localStorage.getItem('antksl_skin');if(!s){s='aurora_soul';}document.documentElement.setAttribute('data-skin',s);}catch(e){document.documentElement.setAttribute('data-skin','aurora_soul');}})();</script>
 <script>(function(){try{var hr=localStorage.getItem('antksl_hero')||'vinyl';document.documentElement.setAttribute('data-hero',hr);}catch(e){document.documentElement.setAttribute('data-hero','vinyl');}})();</script>
 <script>(function(){try{var m=localStorage.getItem('antksl_mode')||'reveal_scroll';document.documentElement.setAttribute('data-mode',m);}catch(e){document.documentElement.setAttribute('data-mode','reveal_scroll');}})();</script>
+<script>/* WEB_DESIGN_ENGINE v1.8 · TRANSITION_ATLAS — «View Transitions API с безопасным fallback».
+   Объявлен до всех потребителей (облик, режим, герой), чтобы порядок скриптов не мог его уронить.
+   Проверяем И поддержку API, И системную настройку движения. Если чего-то нет — обновление DOM
+   выполняется сразу тем же кодом: переход не является условием доступа к контенту. */
+window.antkslVT=function(update){
+  if(typeof update!=='function')return;
+  var reduce=false;
+  try{reduce=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;}catch(e){}
+  if(!document.startViewTransition||reduce){update();return;}
+  try{document.startViewTransition(update);}catch(e){update();}
+};</script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Константин Захаров — официальный сайт</title>
@@ -166,11 +177,18 @@
   .nav-links a:hover::after{width:100%}
   @media(max-width:680px){.nav-links{display:none}}
   header.hero{position:relative;z-index:3;max-width:var(--maxw);margin:0 auto;padding:92px 28px 70px;min-height:76vh;display:flex;flex-direction:column;justify-content:center;overflow:hidden}
-  .eyebrow{font-family:var(--mono);text-transform:uppercase;letter-spacing:.26em;font-size:12px;color:var(--amber);margin-bottom:20px}
+  .eyebrow{font-family:var(--mono);text-transform:uppercase;letter-spacing:.26em;font-size:13px;color:var(--amber);color:color-mix(in oklab,var(--amber) 65%,var(--ink));margin-bottom:20px}
   .hero-name{font-family:var(--display);font-weight:700;line-height:.97;font-size:clamp(52px,12vw,150px);margin:0;color:var(--ink);letter-spacing:-.01em}
   .hero-name .l2{color:var(--amber)}
+  /* ── WEB_DESIGN_ENGINE v1.8 · TYPOGRAPHY_ATLAS ────────────────────────────
+     text-wrap:balance — заголовок делится на строки по равной длине, а не по
+     остатку; убирает «лесенку» и одинокое слово в последней строке.
+     text-wrap:pretty — не даёт абзацу закончиться словом-сиротой.
+     Прогрессивно: браузер без поддержки просто игнорирует свойство. */
+  .hero-name,.sec-title,.card-title,.cover-title,h2,h3{text-wrap:balance}
+  .hero-tag,.card-desc,.cover-desc,p{text-wrap:pretty}
   .hero-sub{font-family:var(--mono);letter-spacing:.16em;text-transform:uppercase;font-size:12px;color:var(--muted);margin-top:24px}
-  .hero-tag{max-width:540px;margin-top:22px;font-size:21px;font-style:italic;color:var(--ink-soft)}
+  .hero-tag{max-width:600px;margin-top:22px;font-size:23px;font-style:italic;color:var(--ink-soft);color:color-mix(in oklab,var(--ink-soft) 50%,var(--ink))}
   .hero-cta{margin-top:34px;display:flex;gap:14px;flex-wrap:wrap}
   .btn{font-family:var(--mono);font-size:12px;letter-spacing:.1em;text-transform:uppercase;text-decoration:none;padding:14px 24px;border-radius:2px;transition:.3s;display:inline-flex;align-items:center;gap:8px;border:1.5px solid var(--ink)}
   .btn-solid{background:var(--amber);color:var(--paper);border-color:var(--amber)}
@@ -301,6 +319,41 @@
 
 /* ===== SKIN SYSTEM (data-skin на <html>) ===== */
 :root{--maxw:1180px;--display:'Playfair Display',Georgia,serif;--body:'Spectral',Georgia,serif}
+
+/* ── WEB_DESIGN_ENGINE v1.8 · DARK_MODE_ATLAS «design_dark_intentionally» ────
+   color-scheme сообщает браузеру тон интерфейса: полоса прокрутки, поля ввода
+   и системные контролы перекрашиваются под тему. Без него на тёмных обликах
+   оставалась светлая полоса прокрутки — единственное белое пятно на странице. */
+html{color-scheme:dark}
+html[data-skin="editorial_mono"]{color-scheme:light}
+
+/* ── MICRO_INTERACTION_ATLAS «micro_delight» ────────────────────────────────
+   Выделение текста в цвете облика вместо системного синего. */
+::selection{background:var(--amber);color:var(--paper)}
+::-moz-selection{background:var(--amber);color:var(--paper)}
+:root{accent-color:var(--amber)}
+
+/* ── NAVIGATION_ATLAS ───────────────────────────────────────────────────────
+   Шапка sticky, поэтому якорные переходы приводили заголовок ПОД неё.
+   scroll-margin-top отодвигает точку остановки на высоту шапки с воздухом.
+   Только реальные цели навигации: #lblring — это SVG-путь для текста по кругу. */
+:where(section[id],header#top){scroll-margin-top:88px}
+@media(max-width:680px){:where(section[id],header#top){scroll-margin-top:72px}}
+
+/* Выпадающие панели не прокручивают страницу под собой. */
+.viewmenu,.skinpanel,.modepanel,.heropanel,.nav-panel{overscroll-behavior:contain}
+
+/* ── TRANSITION_ATLAS v1.8 «View Transitions API с безопасным fallback» ──────
+   Смена облика/режима/предмета — это смена состояния всей страницы, и раньше
+   она происходила скачком. Кросс-фейд делает переключение мягким.
+   Длительность короткая (260мс) по закону page_transition_choreo: 200–400мс. */
+@media (prefers-reduced-motion:no-preference){
+  ::view-transition-old(root),::view-transition-new(root){
+    animation-duration:.26s;animation-timing-function:cubic-bezier(.22,.61,.36,1)}
+}
+@media (prefers-reduced-motion:reduce){
+  ::view-transition-old(root),::view-transition-new(root){animation:none}
+}
 html[data-skin="aurora_soul"]{--paper:#0d0b1a;--card:rgba(30,24,54,.62);--ink:#f3eefb;--ink-soft:#cbbfe6;--muted:#9385c0;--amber:#c9a8ff;--amber-2:#ff9ec7;--vinyl:#0a0814;--line:rgba(201,168,255,.18);--line-2:rgba(201,168,255,.34)}
 html[data-skin="tactile_brutalism"]{--paper:#0a0a0a;--card:#141414;--ink:#ededed;--ink-soft:#bdbdbd;--muted:#7a7a7a;--amber:#ff3b30;--amber-2:#ffffff;--vinyl:#000;--line:rgba(255,255,255,.22);--line-2:rgba(255,255,255,.4)}
 html[data-skin="editorial_mono"]{--paper:#faf8f4;--card:#fffdf9;--ink:#1a1a1a;--ink-soft:#444;--muted:#8a8073;--amber:#7a5c3e;--amber-2:#b89b7a;--vinyl:#e8e2d6;--line:rgba(26,26,26,.14);--line-2:rgba(26,26,26,.3)}
@@ -689,7 +742,7 @@ html[data-skin="tactile_brutalism"] .reel-more{border-radius:0}
             en:{label:"Theme",aurora:"Aurora",grain:"Warm grain",glass:"Frosted glass",editorial:"Light minimal",bento:"Bento",brutal:"Brutal"},de:{label:"Erscheinungsbild",aurora:"Nordlicht",grain:"Warmes Korn",glass:"Mattglas",editorial:"Hell minimal",bento:"Bento",brutal:"Brutal"}};
   function cur(){return document.documentElement.getAttribute('data-skin')||'aurora_soul';}
   function mark(){document.querySelectorAll('.skinpanel button').forEach(function(b){b.setAttribute('aria-pressed',b.getAttribute('data-skin')===cur());});}
-  function setSkin(s){document.documentElement.setAttribute('data-skin',s);try{localStorage.setItem('antksl_skin',s);}catch(e){}mark();}
+  function setSkin(s){window.antkslVT(function(){document.documentElement.setAttribute('data-skin',s);});try{localStorage.setItem('antksl_skin',s);}catch(e){}mark();}
   function applyLang(){try{var l=(document.documentElement.lang||'ru').slice(0,2);var t=I18N[l]||I18N.ru;
     document.querySelectorAll('[data-i18n-skin]').forEach(function(n){var k=n.getAttribute('data-i18n-skin');if(t[k])n.textContent=t[k];});}catch(e){}}
   var panel=document.getElementById('skinpanel'),tog=document.getElementById('skintoggle');
@@ -1606,7 +1659,7 @@ var base={
     if(m==='ambient_motion'){/* CSS сам, фон дышит */}
     mark();
   }
-  function setMode(m){document.documentElement.setAttribute('data-mode',m);try{localStorage.setItem('antksl_mode',m);}catch(e){}apply(m);}
+  function setMode(m){window.antkslVT(function(){document.documentElement.setAttribute('data-mode',m);});try{localStorage.setItem('antksl_mode',m);}catch(e){}apply(m);}
 
   // переключатель
   var panel=document.getElementById('modepanel'),tog=document.getElementById('modetoggle');
@@ -1625,7 +1678,7 @@ var base={
   function mark(){document.querySelectorAll('.heropanel button').forEach(function(b){b.setAttribute('aria-pressed',b.getAttribute('data-hero')===cur());});}
   function lang(){try{var l=(document.documentElement.lang||'ru').slice(0,2);var t=H[l]||H.ru;
     document.querySelectorAll('[data-i18n-hero]').forEach(function(n){var k=n.getAttribute('data-i18n-hero');if(t[k])n.textContent=t[k];});}catch(e){}}
-  function setHero(x){document.documentElement.setAttribute('data-hero',x);try{localStorage.setItem('antksl_hero',x);}catch(e){}mark();}
+  function setHero(x){window.antkslVT(function(){document.documentElement.setAttribute('data-hero',x);});try{localStorage.setItem('antksl_hero',x);}catch(e){}mark();}
   var panel=document.getElementById('heropanel'),tog=document.getElementById('herotoggle');
   if(tog){tog.addEventListener('click',function(){var o=panel.classList.toggle('open');tog&&tog.setAttribute('aria-expanded',o);});}
   document.addEventListener('click',function(e){if(!e.target.closest('.herobar')){panel.classList.remove('open');if(tog)tog.setAttribute('aria-expanded','false');}});
