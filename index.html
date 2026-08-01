@@ -217,6 +217,34 @@ window.antkslVT=function(update){
   .deck-sheen{position:absolute;left:10%;top:10%;width:80%;height:80%;border-radius:50%;pointer-events:none;mix-blend-mode:screen;
     background:radial-gradient(120% 95% at 32% 24%,rgba(255,244,222,.2),transparent 56%)}
   .tonearm{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+
+  /* ── ХОД ТОНАРМА ──────────────────────────────────────────────────────────
+     Тонарм вращается вокруг опоры (772,150); длина до иглы 595.
+     Геометрия посчитана по viewBox 1000×1000: пластинка R=400, этикетка R=132.
+       θ = +8°  → игла на радиусе 372 — внешний край, начало записи
+       θ = -27° → игла на радиусе ~155 — вплотную к этикетке, конец записи
+     Дальше -30.2° игла всё равно не уйдёт: расстояние опора→центр (443)
+     короче тонарма (595), поэтому минимальный радиус ограничен физически.
+     Тень и корпус вращаются синхронно, но при подъёме корпус уходит вверх,
+     а тень слабеет и остаётся на пластинке — так читается отрыв иглы. */
+  .arm-body,.arm-shadow{transform-box:view-box;transform-origin:772px 150px}
+  .arm-body{animation:armPlay 26s linear infinite}
+  .arm-shadow{animation:armShadow 26s linear infinite}
+
+  @keyframes armPlay{
+    0%,1%   {transform:translateY(0)    rotate(8deg);   animation-timing-function:linear}
+    76%     {transform:translateY(0)    rotate(-27deg); animation-timing-function:ease-in-out}
+    80%     {transform:translateY(-20px) rotate(-27deg);animation-timing-function:ease-in-out}
+    90%     {transform:translateY(-20px) rotate(8deg);  animation-timing-function:ease-in}
+    95%,100%{transform:translateY(0)    rotate(8deg)}
+  }
+  @keyframes armShadow{
+    0%,1%   {transform:rotate(8deg);opacity:.22;  animation-timing-function:linear}
+    76%     {transform:rotate(-27deg);opacity:.22;animation-timing-function:ease-in-out}
+    80%     {transform:rotate(-27deg);opacity:.07;animation-timing-function:ease-in-out}
+    90%     {transform:rotate(8deg);opacity:.07;  animation-timing-function:ease-in}
+    95%,100%{transform:rotate(8deg);opacity:.22}
+  }
   @keyframes platterspin{to{transform:rotate(1turn)}}
   @media(max-width:1040px){.deck{display:none}}
   .eyebrow,.hero-name,.hero-sub,.hero-tag,.hero-cta{animation:fadeup 1s both}
@@ -268,7 +296,7 @@ window.antkslVT=function(update){
   .reveal{opacity:0;transform:translateY(22px);transition:opacity .8s,transform .8s}
   .reveal.in{opacity:1;transform:none}
   a:focus-visible,.btn:focus-visible,.link-pill:focus-visible{outline:2px solid var(--amber);outline-offset:3px}
-  @media(prefers-reduced-motion:reduce){.grain,.platter,.eyebrow,.hero-name,.hero-sub,.hero-tag,.hero-cta{animation:none}.card{transition:none}.card:hover{transform:none}}
+  @media(prefers-reduced-motion:reduce){.grain,.platter,.eyebrow,.hero-name,.hero-sub,.hero-tag,.hero-cta,.arm-body,.arm-shadow{animation:none}.card{transition:none}.card:hover{transform:none}}
   .nav-right{display:flex;align-items:center;gap:6px}
   .btn-nav{display:flex;align-items:center;gap:6px;background:transparent;border:1.5px solid var(--line-2);border-radius:2px;padding:7px 10px;cursor:pointer;color:var(--ink-soft);font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;transition:.22s;white-space:nowrap}
   .btn-nav.icon-only{padding:7px 9px}
@@ -892,10 +920,11 @@ html[data-skin="tactile_brutalism"] .reel-more{border-radius:0}
         <filter id="armsh" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="7"/></filter>
       </defs>
       <!-- тень тонарма на пластинке -->
-      <g filter="url(#armsh)" opacity=".22">
+      <g class="arm-shadow" filter="url(#armsh)" opacity=".22">
         <path d="M775,158 C 640,212 470,258 360,303 C 300,328 256,346 232,358" fill="none" stroke="#0a0703" stroke-width="15" stroke-linecap="round"/>
         <ellipse cx="222" cy="372" rx="26" ry="13" fill="#0a0703"/>
       </g>
+      <g class="arm-body">
       <!-- противовес -->
       <line x1="772" y1="150" x2="850" y2="98" stroke="url(#cw)" stroke-width="30" stroke-linecap="round"/>
       <circle cx="852" cy="96" r="20" fill="#241a10" stroke="#0f0a06" stroke-width="2"/>
@@ -903,10 +932,6 @@ html[data-skin="tactile_brutalism"] .reel-more{border-radius:0}
       <path d="M772,150 C 640,205 470,250 360,295 C 300,320 255,338 228,350" fill="none" stroke="#5b4f3a" stroke-width="17" stroke-linecap="round"/>
       <path d="M772,150 C 640,205 470,250 360,295 C 300,320 255,338 228,350" fill="none" stroke="url(#metal)" stroke-width="12" stroke-linecap="round"/>
       <path d="M772,150 C 640,205 470,250 360,295 C 300,320 255,338 228,350" fill="none" stroke="rgba(255,255,255,.45)" stroke-width="2.4" stroke-linecap="round" opacity=".7"/>
-      <!-- опора (пивот) -->
-      <circle cx="772" cy="150" r="26" fill="#2b2016"/>
-      <circle cx="772" cy="150" r="17" fill="url(#metal)"/>
-      <circle cx="772" cy="150" r="5" fill="#3a3120"/>
       <!-- головка звукоснимателя + игла -->
       <g transform="rotate(-26 228 350)">
         <rect x="196" y="338" width="62" height="26" rx="6" fill="url(#metal)" stroke="#4a3f2c" stroke-width="1.5"/>
@@ -914,6 +939,11 @@ html[data-skin="tactile_brutalism"] .reel-more{border-radius:0}
         <path d="M206,364 L214,388 L222,364 Z" fill="#1c140d"/>
       </g>
       <circle cx="220" cy="372" r="4.5" fill="#cf8a45"/>
+      </g>
+      <!-- опора (пивот) — не вращается, это ось -->
+      <circle cx="772" cy="150" r="26" fill="#2b2016"/>
+      <circle cx="772" cy="150" r="17" fill="url(#metal)"/>
+      <circle cx="772" cy="150" r="5" fill="#3a3120"/>
     </svg>
   </div>
   <div class="eyebrow" data-i18n="eyebrow">Городской романс · лирический поп · R&amp;B</div>
