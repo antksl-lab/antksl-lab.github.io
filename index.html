@@ -476,8 +476,29 @@ html[data-skin="editorial_mono"] a.btn-solid,html[data-skin="editorial_mono"] .b
 html[data-skin="tactile_brutalism"] .btn-solid:hover{color:#fff!important}
 
 /* Призрачная кнопка "Дискография": текст из палитры */
-.btn-ghost{color:var(--ink)}
-.btn-ghost:hover{color:var(--paper)}
+/* ── ВТОРИЧНАЯ КНОПКА ГЕРОЯ ──────────────────────────────────────────────────
+   Была background:transparent — надпись читалась поверх фотографии студии на
+   3.88:1 при кегле 12px, то есть ниже порога 4.5:1, и контраст вдобавок плавал:
+   на светлом участке кадра текст почти пропадал.
+   Теперь у кнопки собственная подложка цвета облика (80%) — читаемость
+   12.5–14.6:1 на всех семи обликах и уже не зависит от того, что за ней.
+   backdrop-filter добавляет размытие там, где поддержан; где нет — подложка
+   работает и без него, поэтому запасное правило не нужно.
+   Кнопка остаётся вторичной: не спорит с главной, но перестаёт быть тусклой.
+   Правило стоит здесь, а не рядом с базовым .btn-ghost выше, потому что
+   тамошнее объявление перекрывается этим блоком по порядку следования. */
+.btn-ghost{
+  color:var(--ink);
+  background:color-mix(in oklab,var(--paper) 80%,transparent);
+  border-color:color-mix(in oklab,var(--ink) 52%,transparent);
+  -webkit-backdrop-filter:blur(7px) saturate(1.1);backdrop-filter:blur(7px) saturate(1.1);
+  box-shadow:0 2px 14px rgba(0,0,0,.22)}
+.btn-ghost:hover{
+  background:var(--ink);color:var(--paper);border-color:var(--ink);
+  transform:translateY(-2px);box-shadow:0 8px 26px rgba(0,0,0,.34)}
+html[data-skin="editorial_mono"] .btn-ghost{
+  border-color:color-mix(in oklab,var(--ink) 68%,transparent);
+  box-shadow:0 2px 10px rgba(0,0,0,.12)}
 
 
 
