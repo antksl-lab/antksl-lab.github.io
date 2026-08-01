@@ -476,11 +476,31 @@ html[data-skin="editorial_mono"] .nav-in{background:var(--paper);border-bottom-c
   transition:transform .15s,box-shadow .15s;border:1px solid var(--line-2)}
 .support-btn:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(0,0,0,.3)}
 .support-btn .ic{font-size:20px;line-height:1}
-.support-btn.primary{background:var(--amber);color:#10100c;border-color:var(--amber)}
-html[data-skin="tactile_brutalism"] .support-btn.primary{color:#fff}
-html[data-skin="editorial_mono"] .support-btn.primary{color:#faf8f4}
-.support-btn.secondary{background:transparent;color:var(--ink)}
-.support-btn.secondary:hover{border-color:var(--amber);color:var(--amber)}
+/* ── КНОПКИ ПОДДЕРЖКИ В ФИРМЕННЫХ ЦВЕТАХ СЕРВИСОВ ────────────────────────────
+   Цвета сняты пипеткой с официальных страниц:
+     Яндекс Чаевые — фон иконки #170023, звезда розово-сиренево-голубым градиентом
+     ЮMoney        — фиолетовый логотипа #8b3ffd, кнопка действия #702ff4
+   Раньше первая кнопка красилась в var(--amber) (цвет облика, а не бренда),
+   а вторая была background:transparent — на фоне студии её почти не было видно.
+   Брендовые цвета намеренно НЕ зависят от облика: логотип платёжного сервиса
+   не должен перекрашиваться вместе с темой сайта. */
+.support-btn.primary{
+  background:#170023;color:#fff;border-color:#8f5fb8;
+  box-shadow:0 4px 18px rgba(23,0,35,.45)}
+.support-btn.primary:hover{background:#220033;border-color:#b487dd;
+  box-shadow:0 8px 30px rgba(70,20,110,.55)}
+.support-btn.primary .ic{
+  background:linear-gradient(135deg,#fcc3d7 0%,#e2c0f7 45%,#9fb6e8 100%);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+  -webkit-text-fill-color:transparent;font-size:22px}
+
+.support-btn.secondary{
+  background:#8b3ffd;color:#fff;border-color:#8b3ffd;
+  box-shadow:0 4px 18px rgba(112,47,244,.38)}
+.support-btn.secondary:hover{background:#702ff4;border-color:#702ff4;color:#fff;
+  box-shadow:0 8px 30px rgba(112,47,244,.55)}
+.support-btn.secondary .ic{color:#fff}
+
 html[data-skin="tactile_brutalism"] .support-btn{border-radius:0}
 .support-note{margin-top:18px;font-size:13px;color:var(--muted)}
 
@@ -1283,7 +1303,7 @@ html[data-skin="tactile_brutalism"] .reel-more{border-radius:0}
   <p data-i18n-support="text">Если моя музыка отзывается в вашем сердце — вы можете поддержать создание новых песен. Спасибо, что вы рядом.</p>
   <div class="support-btns">
     <a class="support-btn primary" href="https://tips.yandex.ru/guest/payment/3988395" target="_blank" rel="noopener" data-support="tips">
-      <span class="ic">♥</span><span data-i18n-support="tips">Яндекс Чаевые</span>
+      <span class="ic">✦</span><span data-i18n-support="tips">Яндекс Чаевые</span>
     </a>
     <a class="support-btn secondary" href="https://yoomoney.ru/to/4100119373602642" target="_blank" rel="noopener" data-support="yoomoney">
       <span class="ic">♥</span><span data-i18n-support="yoomoney">ЮMoney</span>
