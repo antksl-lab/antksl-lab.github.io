@@ -54,7 +54,7 @@ window.antkslVT=function(update){
   try{document.startViewTransition(update);}catch(e){update();}
 };</script>
 <title>Константин Захаров — официальный сайт</title>
-<meta name="site-fix-version" content="2026-08-02-responsive-hero-two-lines-mobile-v10">
+<meta name="site-fix-version" content="2026-08-02-responsive-hero-physical-line-break-v11">
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
 <meta name="description" content="Константин Захаров — городской романс, лирический поп и R&amp;B. Превращаю стихи в песни, а песни — в маленькие фильмы. Музыка, клипы, визуальные истории.">
 <meta name="color-scheme" content="dark light">
@@ -1146,39 +1146,39 @@ html[data-skin="editorial_mono"] .reel-badge.out{color:#fff}
     html[data-hero="vinyl"] .hero-obj[data-obj="vinyl"]{right:-112px!important}
   }
 
-  /* FIX 2026-08-02 v10: жёстко фиксируем две строки имени на смартфоне.
-     flex-direction:column не зависит от переноса текста и не позволяет фамилии
-     приклеиться к имени даже при мобильном масштабировании шрифта. */
+  /* FIX 2026-08-02 v11: физический перенос строки в HTML.
+     <br> работает даже если мобильный браузер использует старый CSS из кэша,
+     поэтому имя и фамилия не могут склеиться в одну строку. */
+  .hero-name[data-artist-name]{
+    display:block!important;
+    white-space:normal!important;
+    overflow:visible!important;
+  }
+  .hero-name[data-artist-name] > .l1,
+  .hero-name[data-artist-name] > .l2{
+    display:inline-block!important;
+    position:static!important;
+    float:none!important;
+    width:auto!important;
+    max-width:100%!important;
+    margin-left:0!important;
+    margin-right:0!important;
+    white-space:nowrap!important;
+    overflow:visible!important;
+  }
+  .hero-name[data-artist-name] > .hero-name-break{
+    display:block!important;
+  }
+  .hero-name[data-artist-name] > .l2{
+    margin-top:-.02em!important;
+    padding-bottom:.20em!important;
+  }
+
   @media(max-width:768px){
     .hero-name[data-artist-name]{
-      display:flex!important;
-      flex-direction:column!important;
-      align-items:flex-start!important;
-      justify-content:flex-start!important;
-      flex-wrap:nowrap!important;
-      gap:0!important;
       width:calc(100vw - 36px)!important;
       max-width:calc(100vw - 36px)!important;
       min-width:0!important;
-      white-space:normal!important;
-      overflow:visible!important;
-    }
-    .hero-name[data-artist-name] > .l1,
-    .hero-name[data-artist-name] > .l2{
-      display:block!important;
-      position:static!important;
-      float:none!important;
-      flex:0 0 auto!important;
-      width:auto!important;
-      max-width:100%!important;
-      margin-left:0!important;
-      margin-right:0!important;
-      white-space:nowrap!important;
-      overflow:visible!important;
-    }
-    .hero-name[data-artist-name] > .l2{
-      margin-top:-.02em!important;
-      padding-bottom:.20em!important;
     }
   }
 </style>
@@ -1387,7 +1387,7 @@ html[data-skin="editorial_mono"] .reel-badge.out{color:#fff}
       <circle cx="772" cy="150" r="5" fill="#3a3120"/>
     </svg>
   </div>
-  <h1 class="hero-name" data-artist-name><span class="l1">Константин</span><span class="l2">Захаров</span></h1>
+  <h1 class="hero-name" data-artist-name><span class="l1">Константин</span><br class="hero-name-break" aria-hidden="true"><span class="l2">Захаров</span></h1>
   <div class="eyebrow" data-i18n="eyebrow">Городской романс · лирический поп · R&amp;B</div>
   <p class="hero-tag" data-i18n="heroTag">Превращаю стихи в песни, а песни — в маленькие фильмы.</p>
   <div class="hero-cta">
