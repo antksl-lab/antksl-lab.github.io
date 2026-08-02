@@ -6,42 +6,37 @@
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1">
 <script>
-/* Privacy-first analytics bootstrap: no Google or Supabase request before consent. */
+/* Automatic privacy-minimized analytics: no consent banner, no analytics cookies.
+   Google Analytics runs with analytics_storage=denied (cookieless pings only).
+   The site's own Supabase counters remain enabled for aggregate page/click statistics. */
 (function(){
-  var KEY='antksl_analytics_consent', GA_ID='G-EYGLP0P6W5';
+  var GA_ID='G-EYGLP0P6W5';
   window.dataLayer=window.dataLayer||[];
   window.gtag=window.gtag||function(){window.dataLayer.push(arguments);};
   window.gtag('consent','default',{
-    analytics_storage:'denied',ad_storage:'denied',ad_user_data:'denied',
-    ad_personalization:'denied',functionality_storage:'granted',security_storage:'granted',
-    wait_for_update:500
+    analytics_storage:'denied',
+    ad_storage:'denied',
+    ad_user_data:'denied',
+    ad_personalization:'denied',
+    functionality_storage:'granted',
+    security_storage:'granted'
   });
-  function read(){try{return localStorage.getItem(KEY)||'';}catch(e){return '';}}
-  function allowed(){return read()==='granted';}
-  function loadGoogle(){
-    if(!allowed()||document.getElementById('antksl-ga4'))return;
-    var js=document.createElement('script');
-    js.id='antksl-ga4';js.async=true;
-    js.src='https://www.googletagmanager.com/gtag/js?id='+encodeURIComponent(GA_ID);
-    document.head.appendChild(js);
-    window.gtag('consent','update',{
-      analytics_storage:'granted',ad_storage:'denied',
-      ad_user_data:'denied',ad_personalization:'denied'
-    });
-    window.gtag('js',new Date());
-    window.gtag('config',GA_ID,{anonymize_ip:true,allow_google_signals:false,allow_ad_personalization_signals:false});
-  }
-  function set(value){
-    try{localStorage.setItem(KEY,value);}catch(e){}
-    if(value==='granted')loadGoogle();
-    else window.gtag('consent','update',{
-      analytics_storage:'denied',ad_storage:'denied',
-      ad_user_data:'denied',ad_personalization:'denied'
-    });
-    try{document.dispatchEvent(new CustomEvent('antksl:analytics-consent',{detail:value}));}catch(e){}
-  }
-  window.ANTKSL_ANALYTICS={allowed:allowed,set:set,loadGoogle:loadGoogle,choice:read};
-  if(allowed())loadGoogle();
+  window.gtag('set','ads_data_redaction',true);
+  var js=document.createElement('script');
+  js.id='antksl-ga4';
+  js.async=true;
+  js.src='https://www.googletagmanager.com/gtag/js?id='+encodeURIComponent(GA_ID);
+  document.head.appendChild(js);
+  window.gtag('js',new Date());
+  window.gtag('config',GA_ID,{
+    anonymize_ip:true,
+    allow_google_signals:false,
+    allow_ad_personalization_signals:false
+  });
+  window.ANTKSL_ANALYTICS={
+    allowed:function(){return true;},
+    mode:'cookieless-no-banner'
+  };
 })();
 </script>
 <script>/* skin anti-flash: ставим тему ДО отрисовки */(function(){try{var s=localStorage.getItem('antksl_skin');if(!s){s='aurora_soul';}document.documentElement.setAttribute('data-skin',s);}catch(e){document.documentElement.setAttribute('data-skin','aurora_soul');}})();</script>
@@ -59,7 +54,7 @@ window.antkslVT=function(update){
   try{document.startViewTransition(update);}catch(e){update();}
 };</script>
 <title>Константин Захаров — официальный сайт</title>
-<meta name="site-fix-version" content="2026-08-02-static-runtime-audit-v4">
+<meta name="site-fix-version" content="2026-08-02-cookieless-stats-no-banner-v5">
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
 <meta name="description" content="Константин Захаров — городской романс, лирический поп и R&amp;B. Превращаю стихи в песни, а песни — в маленькие фильмы. Музыка, клипы, визуальные истории.">
 <meta name="color-scheme" content="dark light">
@@ -959,15 +954,6 @@ html[data-skin="editorial_mono"] .reel-badge.out{color:#fff}
   .nav-right{margin-right:52px}
 }
 @media(max-width:480px){.nav-right{margin-right:48px}}
-.privacy-settings{margin-top:14px;border:0;background:transparent;color:var(--amber);font:inherit;text-decoration:underline;cursor:pointer}
-.consent-banner{position:fixed;left:16px;right:16px;bottom:16px;z-index:1000;max-width:760px;margin:auto;padding:18px;background:var(--card);color:var(--ink);border:1px solid var(--line-2);box-shadow:0 18px 60px rgba(0,0,0,.45);border-radius:10px;backdrop-filter:blur(12px)}
-.consent-banner[hidden]{display:none}
-.consent-banner p{margin:0 0 14px;font-size:15px;line-height:1.55;color:var(--ink-soft)}
-.consent-actions{display:flex;gap:10px;flex-wrap:wrap}
-.consent-actions button{padding:10px 16px;border:1px solid var(--line-2);border-radius:4px;font-family:var(--mono);cursor:pointer}
-#consentAccept{background:var(--amber);color:#10100c;border-color:var(--amber)}
-#consentDecline{background:transparent;color:var(--ink)}
-@media(max-width:560px){.consent-banner{left:10px;right:10px;bottom:10px}.consent-actions button{flex:1 1 100%}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
 
 </style>
@@ -1724,7 +1710,6 @@ html[data-skin="editorial_mono"] .reel-badge.out{color:#fff}
 <footer>
   <div class="fname">Константин Захаров</div>
   <div>© <span id="yr"></span> Константин Захаров · Label ANTKSL · <a href="https://vk.com/zakharov_music" target="_blank" rel="noopener">vk.com/zakharov_music</a></div>
-  <button class="privacy-settings" id="consentSettings" type="button">Настройки аналитики</button>
 </footer>
 <script>
   // ---- data (твой реальный каталог) ----
@@ -2098,14 +2083,10 @@ document.querySelectorAll('#mobileNavPanel a').forEach(a=>{
     return m[tz]||tz.split("/")[0]||"";}catch(e){return "";}}
   function city(){try{var tz=Intl.DateTimeFormat().resolvedOptions().timeZone||"";return (tz.split("/").pop()||"").replace(/_/g," ");}catch(e){return "";}}
 var base={
-    referrer:document.referrer||"",
     source:utm()||host(document.referrer)||"",
-    country:country(),city:city(),
     lang:(document.documentElement.lang||navigator.language||"").slice(0,2),
     device:(/Mobi|Android|iPhone|iPad/i.test(navigator.userAgent))?"mobile":"desktop",
-    screen:(window.screen&&screen.width)?screen.width+"x"+screen.height:"",
-    path:location.pathname,
-    session:sid()
+    path:location.pathname
   };
   function send(ev){
     if(BOT || !window.ANTKSL_ANALYTICS || !window.ANTKSL_ANALYTICS.allowed()) return;
@@ -2118,25 +2099,14 @@ var base={
         // sendBeacon не шлёт заголовки — используем fetch с keepalive для ключей
       }
       if(typeof fetch==="function"){
-        fetch(url,{method:"POST",keepalive:true,
+        fetch(url,{method:"POST",keepalive:true,credentials:"omit",referrerPolicy:"no-referrer",
           headers:{"Content-Type":"application/json","apikey":SB_KEY,"Authorization":"Bearer "+SB_KEY,"Prefer":"return=minimal"},
           body:body}).catch(function(){});
       }
     }catch(e){}
   }
   // 1) Просмотр страницы — откладываем после рендера чтобы Supabase не блокировал FCP
-  setTimeout(function(){
-    (function(){
-      var sent=false;
-      function fire(extra){ if(sent) return; sent=true; if(extra){base.country=extra.country||base.country; base.city=extra.city||"";} send({type:"pageview"}); }
-      try{
-        var navL=(navigator.language||'en').toLowerCase();
-        var cMap={'ru':'Россия','be':'Беларусь','uk':'Украина','en':'Other'};
-        var cKey=navL.slice(0,2);
-        fire({country:cMap[cKey]||navL, city:""});
-      }catch(e){ fire(null); }
-    })();
-  }, 3000);
+  setTimeout(function(){ send({type:"pageview"}); }, 3000);
   // 2) Клики — делегирование по всему документу
   document.addEventListener("click",function(e){
     try{
@@ -2171,7 +2141,7 @@ var base={
   // аналитика кликов поддержки (в общий сборщик)
   document.querySelectorAll('.support-btn').forEach(function(b){b.addEventListener('click',function(){
     try{if(window.__ANTKSL_BOT||!window.ANTKSL_ANALYTICS||!window.ANTKSL_ANALYTICS.allowed())return;var SB="https://qhxhdzwtcjzdinbicjxl.supabase.co",K="sb_publishable_6giNbAp4HJTGo_FQCLV6AA_WtwMQlFP";
-      if(typeof fetch==="function")fetch(SB+"/rest/v1/events",{method:"POST",keepalive:true,
+      if(typeof fetch==="function")fetch(SB+"/rest/v1/events",{method:"POST",keepalive:true,credentials:"omit",referrerPolicy:"no-referrer",
         headers:{"Content-Type":"application/json","apikey":K,"Authorization":"Bearer "+K,"Prefer":"return=minimal"},
         body:JSON.stringify({type:"click_support",detail:b.getAttribute("data-support"),path:location.pathname})}).catch(function(){});
     }catch(e){}
@@ -2346,7 +2316,7 @@ var base={
   function lang(){try{var l=(document.documentElement.lang||'ru').slice(0,2);var t=T[l]||T.ru;
     document.querySelectorAll('[data-i18n-videos]').forEach(function(n){var k=n.getAttribute('data-i18n-videos');if(t[k])n.textContent=t[k];});}catch(e){}}
   function track(title,src,kind){try{if(window.__ANTKSL_BOT||!window.ANTKSL_ANALYTICS||!window.ANTKSL_ANALYTICS.allowed())return;var SB="https://qhxhdzwtcjzdinbicjxl.supabase.co",K="sb_publishable_6giNbAp4HJTGo_FQCLV6AA_WtwMQlFP";
-    if(typeof fetch==="function")fetch(SB+"/rest/v1/events",{method:"POST",keepalive:true,
+    if(typeof fetch==="function")fetch(SB+"/rest/v1/events",{method:"POST",keepalive:true,credentials:"omit",referrerPolicy:"no-referrer",
       headers:{"Content-Type":"application/json","apikey":K,"Authorization":"Bearer "+K,"Prefer":"return=minimal"},
       body:JSON.stringify({type:kind||"click_video",release:title,detail:src,path:location.pathname})}).catch(function(){});}catch(e){}}
   function srcOf(card){return card.querySelector('.video-src button[aria-pressed="true"]').getAttribute('data-src');}
@@ -2526,7 +2496,7 @@ var base={
   // трекинг кликов по «Слушать песню» (band.link) — видно по каким рилзам уходят слушать
   var SB="https://qhxhdzwtcjzdinbicjxl.supabase.co",K="sb_publishable_6giNbAp4HJTGo_FQCLV6AA_WtwMQlFP";
   function trk(type,release,detail){try{if(window.__ANTKSL_BOT||!window.ANTKSL_ANALYTICS||!window.ANTKSL_ANALYTICS.allowed())return;
-    if(typeof fetch==="function")fetch(SB+"/rest/v1/events",{method:"POST",keepalive:true,
+    if(typeof fetch==="function")fetch(SB+"/rest/v1/events",{method:"POST",keepalive:true,credentials:"omit",referrerPolicy:"no-referrer",
       headers:{"Content-Type":"application/json","apikey":K,"Authorization":"Bearer "+K,"Prefer":"return=minimal"},
       body:JSON.stringify({type:type,release:release,detail:detail,path:location.pathname})}).catch(function(){});}catch(e){}}
   document.querySelectorAll('#reels .reel-listen').forEach(function(a){
@@ -2540,37 +2510,6 @@ var base={
   lang();
 })();</script>
 
-<div class="consent-banner" id="consentBanner" role="dialog" aria-modal="false" aria-labelledby="consentTitle" hidden>
-  <p id="consentTitle"><strong data-consent="title">Аналитика сайта</strong><br><span data-consent="text">Сайт не отправляет статистику в Google Analytics и Supabase без вашего разрешения. Выбор можно изменить внизу страницы.</span></p>
-  <div class="consent-actions">
-    <button id="consentAccept" type="button" data-consent="accept">Разрешить аналитику</button>
-    <button id="consentDecline" type="button" data-consent="decline">Только необходимые функции</button>
-  </div>
-</div>
-<script>
-(function(){
-  var b=document.getElementById('consentBanner'),a=document.getElementById('consentAccept'),d=document.getElementById('consentDecline'),st=document.getElementById('consentSettings');
-  if(!b||!window.ANTKSL_ANALYTICS)return;
-  var T={
-    ru:{title:'Аналитика сайта',text:'Сайт не отправляет статистику в Google Analytics и Supabase без вашего разрешения. Выбор можно изменить внизу страницы.',accept:'Разрешить аналитику',decline:'Только необходимые функции',settings:'Настройки аналитики'},
-    uk:{title:'Аналітика сайту',text:'Сайт не надсилає статистику до Google Analytics і Supabase без вашого дозволу. Вибір можна змінити внизу сторінки.',accept:'Дозволити аналітику',decline:'Лише необхідні функції',settings:'Налаштування аналітики'},
-    en:{title:'Site analytics',text:'The site does not send statistics to Google Analytics or Supabase without your permission. You can change this choice at the bottom of the page.',accept:'Allow analytics',decline:'Necessary functions only',settings:'Analytics settings'},
-    de:{title:'Website-Analyse',text:'Die Website sendet ohne Ihre Erlaubnis keine Statistiken an Google Analytics oder Supabase. Sie können die Auswahl unten auf der Seite ändern.',accept:'Analyse erlauben',decline:'Nur notwendige Funktionen',settings:'Analyse-Einstellungen'},
-    ja:{title:'サイト解析',text:'許可なく Google Analytics や Supabase に統計情報を送信しません。ページ下部で選択を変更できます。',accept:'解析を許可',decline:'必要な機能のみ',settings:'解析設定'},
-    zh:{title:'网站分析',text:'未经您的许可，网站不会向 Google Analytics 或 Supabase 发送统计信息。您可以在页面底部更改选择。',accept:'允许分析',decline:'仅必要功能',settings:'分析设置'}
-  };
-  function apply(){var l=(document.documentElement.lang||'ru').slice(0,2),t=T[l]||T.ru;document.querySelectorAll('[data-consent]').forEach(function(n){var k=n.getAttribute('data-consent');if(t[k])n.textContent=t[k];});if(st)st.textContent=t.settings;}
-  function open(){apply();b.hidden=false;setTimeout(function(){(a||d).focus();},0);}
-  function close(){b.hidden=true;}
-  if(!window.ANTKSL_ANALYTICS.choice())open();
-  a&&a.addEventListener('click',function(){window.ANTKSL_ANALYTICS.set('granted');close();});
-  d&&d.addEventListener('click',function(){window.ANTKSL_ANALYTICS.set('denied');close();});
-  st&&st.addEventListener('click',open);
-  document.addEventListener('keydown',function(e){if(e.key==='Escape'&&!b.hidden)close();});
-  new MutationObserver(apply).observe(document.documentElement,{attributes:true,attributeFilter:['lang']});
-  apply();
-})();
-</script>
 
 <script>
 document.addEventListener('keydown',function(e){
