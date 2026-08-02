@@ -2,159 +2,229 @@
 <html lang="ru">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>ANTKSL · VK Bridge Token Test</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>ANTKSL · VK Bridge Publisher 1.4</title>
   <script src="https://unpkg.com/@vkontakte/vk-bridge@2.15.0/dist/browser.min.js"></script>
   <style>
     :root{font-family:Arial,sans-serif;color:#162133;background:#eef2f7}
-    body{margin:0;padding:24px}
-    main{max-width:680px;margin:30px auto;background:#fff;border-radius:20px;padding:28px;box-shadow:0 12px 40px #0002}
+    *{box-sizing:border-box}body{margin:0;padding:24px}
+    main{max-width:780px;margin:24px auto;background:#fff;border-radius:20px;padding:28px;box-shadow:0 12px 40px #0002}
     h1{font-size:27px;margin:0 0 10px}.muted{color:#657084;line-height:1.55}
-    button{border:0;border-radius:12px;padding:14px 18px;font-size:17px;font-weight:700;cursor:pointer;background:#2688eb;color:#fff;margin:8px 8px 8px 0}
-    button.secondary{background:#e9eef6;color:#17223b}button:disabled{opacity:.5;cursor:not-allowed}
-    #status{padding:14px;border-radius:12px;background:#f3f6fa;white-space:pre-wrap;line-height:1.45}
-    #status[data-kind="ok"]{background:#e9f8ee;color:#155c2d}
-    #status[data-kind="error"]{background:#fff0f0;color:#8b1d1d}
-    code{background:#edf1f6;padding:2px 6px;border-radius:5px}
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:18px 0}
+    label{font-weight:700;color:#39465a}input{display:block;width:100%;margin-top:7px;padding:12px;border:1px solid #cbd4e1;border-radius:10px;font-size:16px}
+    button{border:0;border-radius:12px;padding:14px 18px;font-size:16px;font-weight:700;cursor:pointer;background:#2688eb;color:#fff;margin:8px 8px 8px 0}
+    button.secondary{background:#e9eef6;color:#17223b}button:disabled{opacity:.45;cursor:not-allowed}
+    #status{padding:15px;border-radius:12px;background:#f3f6fa;white-space:pre-wrap;line-height:1.48;min-height:90px}
+    code{background:#edf1f6;padding:2px 6px;border-radius:5px}.ok{color:#087b37}.warn{color:#8a5200}
+    @media(max-width:650px){.grid{grid-template-columns:1fr}body{padding:10px}main{padding:20px}}
   </style>
 </head>
 <body>
 <main>
-  <h1>ANTKSL · проверка токена внутри VK Bridge</h1>
-  <p class="muted">Страница должна быть открыта <b>внутри VK Mini App</b>. Она получает токен с правами <code>photos</code>, <code>wall</code>, <code>video</code>, <code>groups</code>, а затем проверяет <code>users.get</code> через <code>VKWebAppCallAPIMethod</code>. Токен не сохраняется и полностью на экран не выводится.</p>
-  <button id="get">Получить и проверить токен</button>
-  <button id="copy" class="secondary" disabled>Скопировать токен после PASS</button>
+  <h1>ANTKSL · публикация через VK Bridge</h1>
+  <p class="muted">Python хранит очередь и файлы только на вашем компьютере. Эта страница получает временный токен внутри VK, передаёт записи в отложенную очередь VK и не сохраняет токен.</p>
+  <div class="grid">
+    <label>Локальный адрес Python
+      <input id="server" value="http://127.0.0.1:8765" autocomplete="off">
+    </label>
+    <label>Код сессии из PowerShell
+      <input id="session" type="password" autocomplete="off" placeholder="Вставьте одноразовый код">
+    </label>
+  </div>
+  <button id="connect">1. Подключиться к Python</button>
+  <button id="auth" class="secondary" disabled>2. Получить и проверить токен</button>
+  <button id="sync" disabled>3. Передать очередь в VK</button>
   <p id="status">Инициализация VK Bridge…</p>
 </main>
 <script>
 (() => {
-  const status = document.getElementById('status');
-  const getBtn = document.getElementById('get');
-  const copyBtn = document.getElementById('copy');
-  let token = '';
+  const $ = id => document.getElementById(id);
+  const status = $('status');
+  const connectBtn = $('connect');
+  const authBtn = $('auth');
+  const syncBtn = $('sync');
   let appId = Number(new URLSearchParams(location.search).get('vk_app_id') || 0);
+  let base = '';
+  let sessionKey = '';
+  let config = null;
+  let jobs = [];
+  let token = '';
+  let lines = [];
 
-  function show(text, kind = '') {
-    status.textContent = text;
-    status.dataset.kind = kind;
+  function resetLog(text){ lines = [text]; status.textContent = lines.join('\n'); }
+  function log(text){ lines.push(text); status.textContent = lines.join('\n'); }
+  function errorText(e){
+    return e?.error_data?.error_reason || e?.error_data?.error_msg || e?.message || String(e);
   }
-
-  function errorText(error) {
-    if (error && error.error_data) {
-      return String(
-        error.error_data.error_reason ||
-        error.error_data.error_msg ||
-        error.error_data.error_type ||
-        JSON.stringify(error.error_data)
-      );
+  function normalizeServer(value){
+    const url = new URL(value.trim());
+    if (url.protocol !== 'http:' || url.hostname !== '127.0.0.1') {
+      throw new Error('Разрешён только адрес http://127.0.0.1:ПОРТ');
     }
-    return String(error && error.message ? error.message : error);
+    return url.origin;
+  }
+  async function local(path, options={}){
+    const headers = {...(options.headers || {}), 'X-ANTKSL-Session': sessionKey};
+    if (options.body) headers['Content-Type'] = 'application/json';
+    const response = await fetch(base + path, {...options, headers, cache:'no-store'});
+    const data = await response.json().catch(() => ({ok:false,error:'Python вернул не JSON'}));
+    if (!response.ok || !data.ok) throw new Error(data.error || `HTTP ${response.status}`);
+    return data;
+  }
+  async function api(method, params={}){
+    const data = await vkBridge.send('VKWebAppCallAPIMethod', {
+      method,
+      params: {...params, access_token: token, v: config.api_version}
+    });
+    return data.response;
+  }
+  async function saveResult(value){
+    return local('/result', {method:'POST', body:JSON.stringify(value)});
   }
 
-  async function init() {
+  async function init(){
     try {
       await vkBridge.send('VKWebAppInit');
       if (!appId) {
         const launch = await vkBridge.send('VKWebAppGetLaunchParams');
         appId = Number(launch.vk_app_id || 0);
       }
-      if (!appId) {
-        throw new Error('Не найден vk_app_id. Откройте страницу именно как VK Mini App.');
-      }
-      show('VK Bridge готов. App ID: ' + appId + '\nНажмите «Получить и проверить токен».');
-    } catch (error) {
-      show('ОШИБКА ИНИЦИАЛИЗАЦИИ VK BRIDGE\n' + errorText(error), 'error');
-      getBtn.disabled = true;
+      if (!appId) throw new Error('Не найден vk_app_id. Откройте страницу внутри VK Mini App.');
+      resetLog(`VK Bridge готов. App ID: ${appId}\nЗапустите Python-команду vk-bridge-server и выполните шаг 1.`);
+    } catch(e) {
+      resetLog('Ошибка инициализации: ' + errorText(e));
+      connectBtn.disabled = true;
     }
   }
 
-  getBtn.onclick = async () => {
-    let stage = 'получения токена';
+  connectBtn.onclick = async () => {
     try {
-      token = '';
-      getBtn.disabled = true;
-      copyBtn.disabled = true;
-      show('VK запрашивает разрешения…');
-
-      const authData = await vkBridge.send('VKWebAppGetAuthToken', {
-        app_id: appId,
-        scope: 'photos,wall,video,groups'
-      });
-
-      token = String(authData.access_token || '');
-      if (!token) {
-        throw new Error('VK не вернул access_token.');
-      }
-
-      const rights = String(authData.scope || '');
-      const masked = token.slice(0, 8) + '…' + token.slice(-6);
-      stage = 'проверки users.get внутри VK Bridge';
-      show(
-        'Токен получен.\n' +
-        'Выданные права: ' + rights + '\n' +
-        'Токен: ' + masked + '\n\n' +
-        'Проверяю users.get через VKWebAppCallAPIMethod…'
-      );
-
-      const apiData = await vkBridge.send('VKWebAppCallAPIMethod', {
-        method: 'users.get',
-        params: {
-          access_token: token,
-          v: '5.199'
-        }
-      });
-
-      const users = apiData && Array.isArray(apiData.response) ? apiData.response : [];
-      if (!users.length || !users[0] || !users[0].id) {
-        throw new Error('VK Bridge не вернул пользователя в response.');
-      }
-
-      copyBtn.disabled = false;
-      getBtn.disabled = false;
-      show(
-        'VK BRIDGE TEST: PASS\n' +
-        'users.get: PASS\n' +
-        'User ID: ' + users[0].id + '\n' +
-        'Выданные права: ' + rights + '\n' +
-        'Токен: ' + masked + '\n\n' +
-        'Токен работает внутри VK Bridge.\n' +
-        'Сделайте снимок этого результата. vk-token-import пока не запускайте.',
-        'ok'
-      );
-    } catch (error) {
-      token = '';
-      copyBtn.disabled = true;
-      getBtn.disabled = false;
-      show(
-        'VK BRIDGE TEST: FAIL\n' +
-        'Этап: ' + stage + '\n' +
-        'Ошибка: ' + errorText(error) + '\n\n' +
-        'Сделайте снимок этого результата. vk-token-import не запускайте.',
-        'error'
-      );
+      connectBtn.disabled = true;
+      resetLog('Подключение к локальному Python…');
+      base = normalizeServer($('server').value);
+      sessionKey = $('session').value.trim();
+      if (sessionKey.length < 20) throw new Error('Вставьте полный одноразовый код сессии из PowerShell.');
+      config = await local('/config');
+      const queue = await local('/jobs');
+      jobs = Array.isArray(queue.jobs) ? queue.jobs : [];
+      log(`Подключено. Группа: ${config.group_id}. Заданий VK: ${jobs.length}.`);
+      authBtn.disabled = false;
+    } catch(e) {
+      log('ОШИБКА: ' + errorText(e));
+      connectBtn.disabled = false;
     }
   };
 
-  copyBtn.onclick = async () => {
-    if (!token) return;
+  authBtn.onclick = async () => {
     try {
-      await navigator.clipboard.writeText(token);
-    } catch (_) {
-      const ta = document.createElement('textarea');
-      ta.value = token;
-      ta.style.position = 'fixed';
-      ta.style.opacity = '0';
-      document.body.appendChild(ta);
-      ta.select();
-      document.execCommand('copy');
-      ta.remove();
+      authBtn.disabled = true;
+      log('VK запрашивает права photos, wall, video, groups…');
+      const data = await vkBridge.send('VKWebAppGetAuthToken', {
+        app_id: appId,
+        scope: 'photos,wall,video,groups'
+      });
+      token = String(data.access_token || '');
+      if (!token) throw new Error('VK не вернул access_token.');
+      const users = await api('users.get');
+      const user = Array.isArray(users) ? users[0] : null;
+      if (!user?.id) throw new Error('users.get не подтвердил токен.');
+      log(`VK BRIDGE TEST: PASS. User ID: ${user.id}.`);
+      log(`Права: ${String(data.scope || '')}. Токен остаётся только в памяти страницы.`);
+      syncBtn.disabled = jobs.length === 0;
+      if (!jobs.length) log('Очередь VK пуста.');
+    } catch(e) {
+      token = '';
+      log('ОШИБКА ТОКЕНА: ' + errorText(e));
+      authBtn.disabled = false;
     }
-    show(
-      'VK BRIDGE TEST: PASS\n' +
-      'Токен скопирован после успешной проверки внутри VK Bridge.\n' +
-      'vk-token-import пока не запускайте.',
-      'ok'
-    );
+  };
+
+  async function uploadPhoto(job){
+    const server = await api('photos.getWallUploadServer', {group_id: config.group_id});
+    if (!server?.upload_url) throw new Error('photos.getWallUploadServer не вернул upload_url.');
+    const sent = await local('/upload', {
+      method:'POST',
+      body:JSON.stringify({job_id:job.job_id, media_type:'photo', upload_url:server.upload_url})
+    });
+    const up = sent.upload || {};
+    const saved = await api('photos.saveWallPhoto', {
+      group_id: config.group_id,
+      photo: up.photo || '',
+      server: up.server || '',
+      hash: up.hash || ''
+    });
+    const photo = Array.isArray(saved) ? saved[0] : null;
+    if (photo?.owner_id == null || photo?.id == null) throw new Error('photos.saveWallPhoto не вернул фотографию.');
+    return `photo${photo.owner_id}_${photo.id}`;
+  }
+
+  async function uploadVideo(job){
+    const saved = await api('video.save', {
+      group_id: config.group_id,
+      name: job.video_title,
+      description: job.message.slice(0, 5000),
+      wallpost: 0,
+      is_private: 0,
+      repeat: 0,
+      compression: 1
+    });
+    if (!saved?.upload_url) throw new Error('video.save не вернул upload_url.');
+    await local('/upload', {
+      method:'POST',
+      body:JSON.stringify({job_id:job.job_id, media_type:'video', upload_url:saved.upload_url})
+    });
+    if (saved.owner_id == null || saved.video_id == null) throw new Error('video.save не вернул owner_id/video_id.');
+    let attachment = `video${saved.owner_id}_${saved.video_id}`;
+    if (saved.access_key) attachment += `_${saved.access_key}`;
+    return attachment;
+  }
+
+  async function publish(job){
+    log(`Задание ${job.job_id}: загрузка ${job.media_name}…`);
+    const attachment = job.media_type === 'video' ? await uploadVideo(job) : await uploadPhoto(job);
+    const now = Math.floor(Date.now() / 1000);
+    const scheduled = Number(job.publish_at) > now + 60;
+    const params = {
+      owner_id: config.owner_id,
+      from_group: 1,
+      message: job.message,
+      attachments: attachment,
+      guid: `antksl-${job.job_id}`
+    };
+    if (scheduled) params.publish_date = Number(job.publish_at);
+    const response = await api('wall.post', params);
+    if (response?.post_id == null) throw new Error('wall.post не вернул post_id.');
+    await saveResult({
+      job_id:job.job_id,
+      success:true,
+      scheduled,
+      post_id:response.post_id,
+      attachment,
+      media_type:job.media_type
+    });
+    log(`PASS ${job.job_id}: ${scheduled ? 'передано в отложенную очередь VK' : 'опубликовано'}, post_id ${response.post_id}.`);
+  }
+
+  syncBtn.onclick = async () => {
+    syncBtn.disabled = true;
+    connectBtn.disabled = true;
+    authBtn.disabled = true;
+    let ok = 0;
+    let failed = 0;
+    for (const job of jobs) {
+      try {
+        await publish(job);
+        ok++;
+      } catch(e) {
+        failed++;
+        const message = errorText(e);
+        log(`FAIL ${job.job_id}: ${message}`);
+        try { await saveResult({job_id:job.job_id, success:false, error:message}); } catch(_) {}
+      }
+    }
+    token = '';
+    log(`ГОТОВО. Успешно: ${ok}. Ошибок: ${failed}. Токен удалён из памяти страницы.`);
+    authBtn.disabled = false;
   };
 
   init();
