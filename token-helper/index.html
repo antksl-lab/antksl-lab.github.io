@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ANTKSL · VK API Token Helper</title>
+  <script src="https://unpkg.com/@vkontakte/vk-bridge@2.15.0/dist/browser.min.js"></script>
+  <style>
+    :root{font-family:Arial,sans-serif;color:#162133;background:#eef2f7}
+    body{margin:0;padding:24px}
+    main{max-width:680px;margin:30px auto;background:#fff;border-radius:20px;padding:28px;box-shadow:0 12px 40px #0002}
+    h1{font-size:27px;margin:0 0 10px}.muted{color:#657084;line-height:1.55}
+    button{border:0;border-radius:12px;padding:14px 18px;font-size:17px;font-weight:700;cursor:pointer;background:#2688eb;color:#fff;margin:8px 8px 8px 0}
+    button.secondary{background:#e9eef6;color:#17223b}button:disabled{opacity:.5;cursor:not-allowed}
+    #status{padding:14px;border-radius:12px;background:#f3f6fa;white-space:pre-wrap;line-height:1.45}
+    code{background:#edf1f6;padding:2px 6px;border-radius:5px}
+  </style>
+</head>
+<body>
+<main>
+  <h1>ANTKSL · пользовательский токен VK API</h1>
+  <p class="muted">Страница должна быть открыта <b>внутри VK Mini App</b>. Она запрашивает только права, необходимые публикатору: <code>photos</code>, <code>wall</code>, <code>video</code>, <code>groups</code>. Токен не сохраняется на сайте и остаётся только в памяти страницы.</p>
+  <button id="get">Получить токен</button>
+  <button id="copy" class="secondary" disabled>Скопировать токен</button>
+  <p id="status">Инициализация VK Bridge…</p>
+</main>
+<script>
+(() => {
+  const status = document.getElementById('status');
+  const getBtn = document.getElementById('get');
+  const copyBtn = document.getElementById('copy');
+  let token = '';
+  let appId = Number(new URLSearchParams(location.search).get('vk_app_id') || 0);
+
+  function show(text){ status.textContent = text; }
+  async function init(){
+    try {
+      await vkBridge.send('VKWebAppInit');
+      if (!appId) {
+        const launch = await vkBridge.send('VKWebAppGetLaunchParams');
+        appId = Number(launch.vk_app_id || 0);
+      }
+      if (!appId) throw new Error('Не найден vk_app_id. Откройте страницу именно как VK Mini App.');
+      show('VK Bridge готов. App ID: ' + appId + '\nНажмите «Получить токен».');
+    } catch (e) {
+      show('Ошибка инициализации: ' + (e && e.message ? e.message : String(e)));
+      getBtn.disabled = true;
+    }
+  }
+
+  getBtn.onclick = async () => {
+    try {
+      getBtn.disabled = true;
+      show('VK запрашивает разрешения…');
+      const data = await vkBridge.send('VKWebAppGetAuthToken', {
+        app_id: appId,
+        scope: 'photos,wall,video,groups'
+      });
+      token = String(data.access_token || '');
+      if (!token) throw new Error('VK не вернул access_token.');
+      const masked = token.slice(0, 8) + '…' + token.slice(-6);
+      show('Токен получен.\nВыданные права: ' + String(data.scope || '') + '\nТокен: ' + masked + '\nНажмите «Скопировать токен».');
+      copyBtn.disabled = false;
+    } catch (e) {
+      show('Ошибка получения токена: ' + (e && e.error_data && e.error_data.error_reason ? e.error_data.error_reason : (e.message || String(e))));
+      getBtn.disabled = false;
+    }
+  };
+
+  copyBtn.onclick = async () => {
+    if (!token) return;
+    try {
+      await navigator.clipboard.writeText(token);
+    } catch (_) {
+      const ta = document.createElement('textarea');
+      ta.value = token; ta.style.position='fixed'; ta.style.opacity='0';
+      document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove();
+    }
+    show('Токен скопирован.\nВ CMD выполните: py -3 ANTKSL_STORY_BOT_v1_3.py vk-token-import\nВставьте токен в скрытый запрос и нажмите Enter.');
+  };
+  init();
+})();
+</script>
+</body>
+</html>
