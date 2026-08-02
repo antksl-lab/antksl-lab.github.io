@@ -54,7 +54,7 @@ window.antkslVT=function(update){
   try{document.startViewTransition(update);}catch(e){update();}
 };</script>
 <title>Константин Захаров — официальный сайт</title>
-<meta name="site-fix-version" content="2026-08-02-hero-name-moved-v6">
+<meta name="site-fix-version" content="2026-08-02-hero-name-two-lines-smaller-v7">
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
 <meta name="description" content="Константин Захаров — городской романс, лирический поп и R&amp;B. Превращаю стихи в песни, а песни — в маленькие фильмы. Музыка, клипы, визуальные истории.">
 <meta name="color-scheme" content="dark light">
@@ -412,7 +412,7 @@ window.antkslVT=function(update){
   @media(max-width:680px){.nav-links{display:none}}
   header.hero{position:relative;z-index:3;max-width:var(--maxw);margin:0 auto;padding:92px 28px 70px;min-height:76vh;display:flex;flex-direction:column;justify-content:center;overflow:hidden}
   .eyebrow{font-family:var(--mono);text-transform:uppercase;letter-spacing:.26em;font-size:13px;color:var(--amber);color:color-mix(in oklab,var(--amber) 65%,var(--ink));margin-bottom:20px}
-  .hero-name{font-family:var(--display);font-weight:700;line-height:.97;font-size:clamp(52px,12vw,150px);margin:0;color:var(--ink);letter-spacing:-.01em}
+  .hero-name{font-family:var(--display);font-weight:700;line-height:.97;font-size:clamp(35px,8vw,100px);max-width:760px;margin:0;color:var(--ink);letter-spacing:-.01em}
   .hero-name .l1,.hero-name .l2{display:block}
   .hero-name .l2{color:var(--amber)}
   .brand-avatar-only{gap:0;flex:0 0 auto}
@@ -1027,6 +1027,13 @@ html[data-skin="editorial_mono"] .reel-badge.out{color:#fff}
     .js-elevate .sec-line{transform:none}
     .js-elevate .sec-head .sec-num,.js-elevate .sec-head .sec-title{opacity:1;transform:none}
     #groove{display:none}
+  }
+
+  /* FIX 2026-08-02: имя в герое — в 1.5 раза меньше и строго в две строки */
+  .hero-name{font-size:clamp(35px,8vw,100px)!important;max-width:760px!important;white-space:normal!important}
+  .hero-name .l1,.hero-name .l2{display:block!important;white-space:nowrap!important}
+  @media(max-width:680px){
+    .hero-name{font-size:clamp(42px,12vw,74px)!important;max-width:100%!important}
   }
 </style>
 
