@@ -54,7 +54,7 @@ window.antkslVT=function(update){
   try{document.startViewTransition(update);}catch(e){update();}
 };</script>
 <title>Константин Захаров — официальный сайт</title>
-<meta name="site-fix-version" content="2026-08-02-responsive-hero-physical-line-break-v11">
+<meta name="site-fix-version" content="2026-08-02-cross-profile-hero-line-lock-v12">
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
 <meta name="description" content="Константин Захаров — городской романс, лирический поп и R&amp;B. Превращаю стихи в песни, а песни — в маленькие фильмы. Музыка, клипы, визуальные истории.">
 <meta name="color-scheme" content="dark light">
@@ -2340,8 +2340,12 @@ var base={
     }catch(e){document.querySelectorAll('.card,.reveal,section>h2').forEach(function(n){n.classList.add('in');});}
   }
   function showAll(){document.querySelectorAll('.card,.reveal,section>h2').forEach(function(n){n.classList.add('in');n.style.transitionDelay='';});}
-  function splitHero(){ // пословное проявление заголовка героя
-    try{var hs=document.querySelectorAll('.hero h1,.hero .lead,.hero .tagline,.hero p');
+  function splitHero(){ // пословное проявление текста героя
+    try{
+      /* Имя артиста намеренно не разбираем на слова. В нём есть физический <br>
+         между именем и фамилией; прежняя обработка через textContent удаляла
+         этот перенос и склеивала «КонстантинЗахаров» в режиме kinetic_hero. */
+      var hs=document.querySelectorAll('.hero h1:not([data-artist-name]),.hero .lead,.hero .tagline,.hero p');
       hs.forEach(function(el){if(el.dataset.kin)return;el.dataset.kin='1';el.dataset.orig=el.innerHTML;
         var words=el.textContent.split(/(\s+)/);el.innerHTML='';
         words.forEach(function(w,i){if(w.trim()===''){el.appendChild(document.createTextNode(w));return;}
