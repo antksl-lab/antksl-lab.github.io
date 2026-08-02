@@ -54,7 +54,7 @@ window.antkslVT=function(update){
   try{document.startViewTransition(update);}catch(e){update();}
 };</script>
 <title>Константин Захаров — официальный сайт</title>
-<meta name="site-fix-version" content="2026-08-02-hero-name-two-lines-smaller-v7">
+<meta name="site-fix-version" content="2026-08-02-hero-name-raised-descender-fix-v8">
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
 <meta name="description" content="Константин Захаров — городской романс, лирический поп и R&amp;B. Превращаю стихи в песни, а песни — в маленькие фильмы. Музыка, клипы, визуальные истории.">
 <meta name="color-scheme" content="dark light">
@@ -1029,11 +1029,28 @@ html[data-skin="editorial_mono"] .reel-badge.out{color:#fff}
     #groove{display:none}
   }
 
-  /* FIX 2026-08-02: имя в герое — в 1.5 раза меньше и строго в две строки */
-  .hero-name{font-size:clamp(35px,8vw,100px)!important;max-width:760px!important;white-space:normal!important}
-  .hero-name .l1,.hero-name .l2{display:block!important;white-space:nowrap!important}
+  /* FIX 2026-08-02: имя в герое — меньше, в две строки и поднято выше.
+     Дополнительный нижний запас сохраняет целиком нижний вынос буквы «р». */
+  .hero-name{
+    font-size:clamp(35px,8vw,100px)!important;
+    max-width:760px!important;
+    white-space:normal!important;
+    overflow:visible!important;
+    translate:0 -14px;
+    padding-bottom:.06em;
+  }
+  .hero-name .l1,.hero-name .l2{
+    display:block!important;
+    white-space:nowrap!important;
+    overflow:visible!important;
+  }
+  .hero-name .l2{padding-bottom:.08em!important}
   @media(max-width:680px){
-    .hero-name{font-size:clamp(42px,12vw,74px)!important;max-width:100%!important}
+    .hero-name{
+      font-size:clamp(42px,12vw,74px)!important;
+      max-width:100%!important;
+      translate:0 -8px;
+    }
   }
 </style>
 
