@@ -54,7 +54,7 @@ window.antkslVT=function(update){
   try{document.startViewTransition(update);}catch(e){update();}
 };</script>
 <title>Константин Захаров — официальный сайт</title>
-<meta name="site-fix-version" content="2026-08-02-cross-profile-hero-line-lock-v12">
+<meta name="site-fix-version" content="2026-08-02-desktop-hero-composition-v13">
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
 <meta name="description" content="Константин Захаров — городской романс, лирический поп и R&amp;B. Превращаю стихи в песни, а песни — в маленькие фильмы. Музыка, клипы, визуальные истории.">
 <meta name="color-scheme" content="dark light">
@@ -1179,6 +1179,49 @@ html[data-skin="editorial_mono"] .reel-badge.out{color:#fff}
       width:calc(100vw - 36px)!important;
       max-width:calc(100vw - 36px)!important;
       min-width:0!important;
+    }
+  }
+
+  /* FIX 2026-08-02 v14: desktop hero composition.
+     Текстовый блок поднят ещё немного выше в спокойную верхнюю треть кадра, имя стало компактнее,
+     а CTA стоят сразу под авторской строкой. Центральная часть студии и микшерный
+     пульт остаются визуально открытыми. Мобильная композиция v9–v11 не затронута. */
+  @media(min-width:769px){
+    header.hero{
+      justify-content:flex-start!important;
+      padding-top:clamp(46px,6.4vh,76px)!important;
+      padding-bottom:96px!important;
+    }
+    .hero-name,
+    .hero-name[data-artist-name]{
+      max-width:620px!important;
+      font-size:clamp(48px,5.2vw,78px)!important;
+      line-height:.92!important;
+      letter-spacing:-.018em!important;
+      translate:0 0!important;
+      padding-bottom:.06em!important;
+    }
+    .hero-name[data-artist-name] > .l2{
+      margin-top:-.04em!important;
+      padding-bottom:.10em!important;
+    }
+    .hero .eyebrow{
+      margin-top:8px!important;
+      margin-bottom:0!important;
+    }
+    .hero .hero-tag{
+      max-width:570px!important;
+      margin-top:14px!important;
+      font-size:clamp(18px,1.35vw,21px)!important;
+      line-height:1.42!important;
+    }
+    .hero .hero-cta{
+      margin-top:17px!important;
+      gap:12px!important;
+    }
+    .hero .hero-cta .btn{
+      padding:12px 20px!important;
+      font-size:11px!important;
     }
   }
 </style>
