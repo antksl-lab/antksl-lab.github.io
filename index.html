@@ -24,14 +24,20 @@
     js.id='antksl-ga4';js.async=true;
     js.src='https://www.googletagmanager.com/gtag/js?id='+encodeURIComponent(GA_ID);
     document.head.appendChild(js);
-    window.gtag('consent','update',{analytics_storage:'granted'});
+    window.gtag('consent','update',{
+      analytics_storage:'granted',ad_storage:'denied',
+      ad_user_data:'denied',ad_personalization:'denied'
+    });
     window.gtag('js',new Date());
     window.gtag('config',GA_ID,{anonymize_ip:true,allow_google_signals:false,allow_ad_personalization_signals:false});
   }
   function set(value){
     try{localStorage.setItem(KEY,value);}catch(e){}
     if(value==='granted')loadGoogle();
-    else window.gtag('consent','update',{analytics_storage:'denied'});
+    else window.gtag('consent','update',{
+      analytics_storage:'denied',ad_storage:'denied',
+      ad_user_data:'denied',ad_personalization:'denied'
+    });
     try{document.dispatchEvent(new CustomEvent('antksl:analytics-consent',{detail:value}));}catch(e){}
   }
   window.ANTKSL_ANALYTICS={allowed:allowed,set:set,loadGoogle:loadGoogle,choice:read};
@@ -53,9 +59,11 @@ window.antkslVT=function(update){
   try{document.startViewTransition(update);}catch(e){update();}
 };</script>
 <title>Константин Захаров — официальный сайт</title>
-<meta name="site-fix-version" content="2026-08-02-restored-v3">
+<meta name="site-fix-version" content="2026-08-02-static-runtime-audit-v4">
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
 <meta name="description" content="Константин Захаров — городской романс, лирический поп и R&amp;B. Превращаю стихи в песни, а песни — в маленькие фильмы. Музыка, клипы, визуальные истории.">
+<meta name="color-scheme" content="dark light">
+<meta name="theme-color" content="#0d0b1a">
 <meta property="og:type" content="music.musician">
 <meta property="og:title" content="Константин Захаров">
 <meta property="og:description" content="Городской романс, лирический поп и R&amp;B. Превращаю стихи в песни, а песни — в маленькие фильмы.">
@@ -65,6 +73,8 @@ window.antkslVT=function(update){
 <meta name="twitter:title" content="Константин Захаров">
 <meta name="twitter:description" content="Городской романс, лирический поп и R&amp;B.">
 <link rel="canonical" href="https://antksl-lab.github.io/">
+<!-- Default hero background is a CSS image; preload makes it discoverable before CSS evaluation. -->
+<link rel="preload" as="image" href="studio-bg.avif" type="image/avif" fetchpriority="high">
 <!-- ВЕРИФИКАЦИЯ ПОИСКОВИКОВ: вставь сюда meta-теги, которые выдадут сервисы -->
 <!-- <meta name="yandex-verification" content="ВСТАВЬ_КОД_ИЗ_ВЕБМАСТЕРА"> -->
 <!-- <meta name="google-site-verification" content="ВСТАВЬ_КОД_ИЗ_SEARCH_CONSOLE"> -->
@@ -1035,29 +1045,29 @@ html[data-skin="editorial_mono"] .reel-badge.out{color:#fff}
 </head>
 <body>
 <div class="viewbar">
-<button type="button" class="viewbtn" id="viewbtn" aria-expanded="false" aria-controls="viewmenu"><span>✦</span><span data-i18n-view="label">Вид</span></button>
-<div class="viewmenu" id="viewmenu" role="menu">
-<div><div class="vsec-title" data-i18n-view="skin">Облик</div><div class="skinpanel" id="skinpanel" role="listbox" aria-label="Выбор облика сайта">
-<button type="button" data-skin="aurora_soul" role="option"><span class="sw" style="background:#7a4dff"></span><span data-i18n-skin="aurora">Северное сияние</span></button>
-<button type="button" data-skin="grain_warmth" role="option"><span class="sw" style="background:#e0a458"></span><span data-i18n-skin="grain">Тёплое зерно</span></button>
-<button type="button" data-skin="glass_depth" role="option"><span class="sw" style="background:#6ea8fe"></span><span data-i18n-skin="glass">Матовое стекло</span></button>
-<button type="button" data-skin="editorial_mono" role="option"><span class="sw" style="background:#b89b7a"></span><span data-i18n-skin="editorial">Светлый минимал</span></button>
-<button type="button" data-skin="bento_showcase" role="option"><span class="sw" style="background:#a8ff60"></span><span data-i18n-skin="bento">Бенто-витрина</span></button>
-<button type="button" data-skin="tactile_brutalism" role="option"><span class="sw" style="background:#ff3b30"></span><span data-i18n-skin="brutal">Брутал</span></button>
+<button type="button" class="viewbtn" id="viewbtn" aria-expanded="false" aria-controls="viewmenu" aria-haspopup="dialog"><span>✦</span><span data-i18n-view="label">Вид</span></button>
+<div class="viewmenu" id="viewmenu" role="dialog" aria-modal="false" aria-label="Настройки вида">
+<div><div class="vsec-title" data-i18n-view="skin">Облик</div><div class="skinpanel" id="skinpanel" role="group" aria-label="Выбор облика сайта">
+<button type="button" data-skin="aurora_soul"><span class="sw" style="background:#7a4dff"></span><span data-i18n-skin="aurora">Северное сияние</span></button>
+<button type="button" data-skin="grain_warmth"><span class="sw" style="background:#e0a458"></span><span data-i18n-skin="grain">Тёплое зерно</span></button>
+<button type="button" data-skin="glass_depth"><span class="sw" style="background:#6ea8fe"></span><span data-i18n-skin="glass">Матовое стекло</span></button>
+<button type="button" data-skin="editorial_mono"><span class="sw" style="background:#b89b7a"></span><span data-i18n-skin="editorial">Светлый минимал</span></button>
+<button type="button" data-skin="bento_showcase"><span class="sw" style="background:#a8ff60"></span><span data-i18n-skin="bento">Бенто-витрина</span></button>
+<button type="button" data-skin="tactile_brutalism"><span class="sw" style="background:#ff3b30"></span><span data-i18n-skin="brutal">Брутал</span></button>
 </div></div>
-<div><div class="vsec-title" data-i18n-view="mode">Подача</div><div class="modepanel" id="modepanel" role="listbox" aria-label="Режим подачи">
-<button type="button" data-mode="reveal_scroll" role="option"><span class="mi">↑</span><span data-i18n-mode="reveal_scroll">Проявление при скролле</span></button>
-<button type="button" data-mode="kinetic_hero" role="option"><span class="mi">✶</span><span data-i18n-mode="kinetic_hero">Кинетический герой</span></button>
-<button type="button" data-mode="magnetic_cards" role="option"><span class="mi">◈</span><span data-i18n-mode="magnetic_cards">Живые карточки</span></button>
-<button type="button" data-mode="ambient_motion" role="option"><span class="mi">≈</span><span data-i18n-mode="ambient_motion">Живой фон</span></button>
-<button type="button" data-mode="classic" role="option"><span class="mi">●</span><span data-i18n-mode="classic">Классика</span></button>
+<div><div class="vsec-title" data-i18n-view="mode">Подача</div><div class="modepanel" id="modepanel" role="group" aria-label="Режим подачи">
+<button type="button" data-mode="reveal_scroll"><span class="mi">↑</span><span data-i18n-mode="reveal_scroll">Проявление при скролле</span></button>
+<button type="button" data-mode="kinetic_hero"><span class="mi">✶</span><span data-i18n-mode="kinetic_hero">Кинетический герой</span></button>
+<button type="button" data-mode="magnetic_cards"><span class="mi">◈</span><span data-i18n-mode="magnetic_cards">Живые карточки</span></button>
+<button type="button" data-mode="ambient_motion"><span class="mi">≈</span><span data-i18n-mode="ambient_motion">Живой фон</span></button>
+<button type="button" data-mode="classic"><span class="mi">●</span><span data-i18n-mode="classic">Классика</span></button>
 </div></div>
-<div><div class="vsec-title" data-i18n-view="hero">Герой</div><div class="heropanel" id="heropanel" role="listbox" aria-label="Главный предмет">
-<button type="button" data-hero="vinyl" role="option"><span class="hi">⬤</span><span data-i18n-hero="vinyl">Пластинка</span></button>
-<button type="button" data-hero="cd" role="option"><span class="hi">◎</span><span data-i18n-hero="cd">CD-диск</span></button>
-<button type="button" data-hero="amp" role="option"><span class="hi">▭</span><span data-i18n-hero="amp">Усилитель</span></button>
-<button type="button" data-hero="speaker" role="option"><span class="hi">◍</span><span data-i18n-hero="speaker">Колонка</span></button>
-<button type="button" data-hero="drum" role="option"><span class="hi">▦</span><span data-i18n-hero="drum">Драм-машина</span></button>
+<div><div class="vsec-title" data-i18n-view="hero">Герой</div><div class="heropanel" id="heropanel" role="group" aria-label="Главный предмет">
+<button type="button" data-hero="vinyl"><span class="hi">⬤</span><span data-i18n-hero="vinyl">Пластинка</span></button>
+<button type="button" data-hero="cd"><span class="hi">◎</span><span data-i18n-hero="cd">CD-диск</span></button>
+<button type="button" data-hero="amp"><span class="hi">▭</span><span data-i18n-hero="amp">Усилитель</span></button>
+<button type="button" data-hero="speaker"><span class="hi">◍</span><span data-i18n-hero="speaker">Колонка</span></button>
+<button type="button" data-hero="drum"><span class="hi">▦</span><span data-i18n-hero="drum">Драм-машина</span></button>
 </div></div>
 </div>
 </div>
@@ -1087,7 +1097,7 @@ html[data-skin="editorial_mono"] .reel-badge.out{color:#fff}
 <div class="grain"></div>
 
 <nav><div class="nav-in">
-  <a class="brand" href="#top"><img width="420" height="420" class="av-img brand-av" alt="Константин Захаров"><span class="brand-name">Константин <b>Захаров</b></span></a>
+  <a class="brand" href="#top"><img width="420" height="420" class="av-img brand-av" src="assets/avatar.webp" alt="Константин Захаров" decoding="async" loading="eager"><span class="brand-name">Константин <b>Захаров</b></span></a>
   <div class="nav-links">
     <a href="#releases" data-i18n="discog">Дискография</a>
     <a href="#reels" data-i18n="reels">Рилзы</a>
@@ -1130,7 +1140,7 @@ html[data-skin="editorial_mono"] .reel-badge.out{color:#fff}
         <div class="ep-addr">antksl2020@gmail.com</div>
         <button type="button" class="ep-copy" id="copyEmail">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-          <span id="copyTxt" data-i18n="copyBtn">Скопировать</span>
+          <span id="copyTxt" data-i18n="copyBtn" aria-live="polite">Скопировать</span>
         </button>
       </div>
     </div>
@@ -1140,12 +1150,12 @@ html[data-skin="editorial_mono"] .reel-badge.out{color:#fff}
         <span id="langCur">РУ</span>
       </button>
       <div class="nav-panel" id="langPanel">
-        <button type="button" class="lp-opt" data-lang="ru">🇷🇺 Русский</button>
-<button type="button" class="lp-opt" data-lang="uk">🇺🇦 Українська</button>
-        <button type="button" class="lp-opt" data-lang="en">🇬🇧 English</button>
-        <button type="button" class="lp-opt" data-lang="de">🇩🇪 Deutsch</button>
-        <button type="button" class="lp-opt" data-lang="ja">🇯🇵 日本語</button>
-        <button type="button" class="lp-opt" data-lang="zh">🇨🇳 中文</button>
+        <button type="button" class="lp-opt" data-lang="ru" aria-pressed="false">🇷🇺 Русский</button>
+<button type="button" class="lp-opt" data-lang="uk" aria-pressed="false">🇺🇦 Українська</button>
+        <button type="button" class="lp-opt" data-lang="en" aria-pressed="false">🇬🇧 English</button>
+        <button type="button" class="lp-opt" data-lang="de" aria-pressed="false">🇩🇪 Deutsch</button>
+        <button type="button" class="lp-opt" data-lang="ja" aria-pressed="false">🇯🇵 日本語</button>
+        <button type="button" class="lp-opt" data-lang="zh" aria-pressed="false">🇨🇳 中文</button>
       </div>
     </div>
   </div>
@@ -1324,7 +1334,7 @@ html[data-skin="editorial_mono"] .reel-badge.out{color:#fff}
 <section id="about" class="wrap">
   <div class="sec-head"><span class="sec-num">03</span><h2 class="sec-title" data-i18n="about">О себе</h2><span class="sec-line"></span></div>
   <div class="about">
-    <img width="420" height="420" class="av-img about-portrait" alt="Константин Захаров">
+    <img width="420" height="420" class="av-img about-portrait" src="assets/avatar.webp" alt="Константин Захаров" decoding="async" loading="lazy">
     <p id="aboutPara"><span class="drop">К</span>онстантин Захаров — автор-исполнитель. Городской романс и лирический поп — о любви, утрате и внутренней силе. Превращаю стихи в песни, а песни — в маленькие фильмы: музыка, клипы, визуальные истории. С 2026 года выпускаю треки под лейблом ANTKSL через дистрибьютора 682 Distribution — на всех крупных площадках: Яндекс Музыке, Apple Music, Spotify и ВКонтакте. Более 10 синглов с мая по август 2026 года.</p>
     <p style="font-size:0.75em;opacity:0.5;margin-top:0.5em;">Обновлено: август 2026</p>
   </div>
@@ -1335,7 +1345,7 @@ html[data-skin="editorial_mono"] .reel-badge.out{color:#fff}
   <p class="vsub" data-i18n-reels="sub">Короткие вертикальные истории — здесь живёт мелодия песни. Услышь её в рилзе, а потом слушай целиком: трек уже вышел или совсем скоро появится на всех площадках.</p>
   <div class="reel-grid">
 
-  <div class="video-card reel-card" data-clip="r13" data-yt="7pS4_fs9SwY" data-vk-oid="239543600" data-vk-id="456239064">
+  <div class="video-card reel-card" data-clip="r13" data-release-date="2026-08-27" data-yt="7pS4_fs9SwY" data-vk-oid="239543600" data-vk-id="456239064">
     <div class="video-frame">
       <button type="button" class="video-poster" aria-label="Смотреть рилз «Тургеневская женщина»"><span class="play"></span></button>
     </div>
@@ -1354,7 +1364,7 @@ html[data-skin="editorial_mono"] .reel-badge.out{color:#fff}
     </div>
   </div>
 
-  <div class="video-card reel-card" data-clip="r14" data-yt="_c-u7uvMuZc" data-vk-oid="239543600" data-vk-id="456239065">
+  <div class="video-card reel-card" data-clip="r14" data-release-date="2026-06-05" data-yt="_c-u7uvMuZc" data-vk-oid="239543600" data-vk-id="456239065">
     <div class="video-frame">
       <button type="button" class="video-poster" aria-label="Смотреть рилз «Glitch»"><span class="play"></span></button>
     </div>
@@ -1372,7 +1382,7 @@ html[data-skin="editorial_mono"] .reel-badge.out{color:#fff}
     </div>
   </div>
 
-  <div class="video-card reel-card" data-clip="r15" data-yt="2QjXaoWgMBU" data-vk-oid="239543600" data-vk-id="456239066">
+  <div class="video-card reel-card" data-clip="r15" data-release-date="2026-06-19" data-yt="2QjXaoWgMBU" data-vk-oid="239543600" data-vk-id="456239066">
     <div class="video-frame">
       <button type="button" class="video-poster" aria-label="Смотреть рилз «Мы встретились случайно»"><span class="play"></span></button>
     </div>
@@ -1390,7 +1400,7 @@ html[data-skin="editorial_mono"] .reel-badge.out{color:#fff}
     </div>
   </div>
 
-  <div class="video-card reel-card" data-clip="r11" data-yt="1FYPSE_ZJzc" data-vk-oid="239543600" data-vk-id="456239063">
+  <div class="video-card reel-card" data-clip="r11" data-release-date="2026-08-20" data-yt="1FYPSE_ZJzc" data-vk-oid="239543600" data-vk-id="456239063">
     <div class="video-frame">
       <button type="button" class="video-poster" aria-label="Смотреть рилз «Любимый, где ты?»"><span class="play"></span></button>
     </div>
@@ -1409,7 +1419,7 @@ html[data-skin="editorial_mono"] .reel-badge.out{color:#fff}
     </div>
   </div>
 
-  <div class="video-card reel-card" data-clip="r12" data-yt="-9MWGLhcum4" data-vk-oid="239543600" data-vk-id="456239062">
+  <div class="video-card reel-card" data-clip="r12" data-release-date="2026-08-12" data-yt="-9MWGLhcum4" data-vk-oid="239543600" data-vk-id="456239062">
     <div class="video-frame">
       <button type="button" class="video-poster" aria-label="Смотреть рилз «Нормм»"><span class="play"></span></button>
     </div>
@@ -1428,7 +1438,7 @@ html[data-skin="editorial_mono"] .reel-badge.out{color:#fff}
     </div>
   </div>
 
-  <div class="video-card reel-card" data-clip="r5" data-yt="A4tH1fK6K1k" data-vk-oid="239543600" data-vk-id="456239026">
+  <div class="video-card reel-card" data-clip="r5" data-release-date="2026-07-20" data-yt="A4tH1fK6K1k" data-vk-oid="239543600" data-vk-id="456239026">
     <div class="video-frame">
       <button type="button" class="video-poster" aria-label="Смотреть рилз «Из пепла»"><span class="play"></span></button>
     </div>
@@ -1447,7 +1457,7 @@ html[data-skin="editorial_mono"] .reel-badge.out{color:#fff}
     </div>
   </div>
 
-  <div class="video-card reel-card" data-clip="r4" data-yt="FuHsYcLZngY" data-vk-oid="239543600" data-vk-id="456239025">
+  <div class="video-card reel-card" data-clip="r4" data-release-date="2026-08-05" data-yt="FuHsYcLZngY" data-vk-oid="239543600" data-vk-id="456239025">
     <div class="video-frame">
       <button type="button" class="video-poster" aria-label="Смотреть рилз «Горсть песка»"><span class="play"></span></button>
     </div>
@@ -1466,7 +1476,7 @@ html[data-skin="editorial_mono"] .reel-badge.out{color:#fff}
     </div>
   </div>
 
-  <div class="video-card reel-card" data-clip="r9" data-yt="ltJh8pS8WiE" data-vk-oid="239543600" data-vk-id="456239058">
+  <div class="video-card reel-card" data-clip="r9" data-release-date="2026-06-04" data-yt="ltJh8pS8WiE" data-vk-oid="239543600" data-vk-id="456239058">
     <div class="video-frame">
       <button type="button" class="video-poster" aria-label="Смотреть рилз «Лунный загар»"><span class="play"></span></button>
     </div>
@@ -1485,7 +1495,7 @@ html[data-skin="editorial_mono"] .reel-badge.out{color:#fff}
     </div>
   </div>
 
-  <div class="video-card reel-card" data-clip="r8" data-yt="Cy4TQt3ePgs" data-vk-oid="239543600" data-vk-id="456239061">
+  <div class="video-card reel-card" data-clip="r8" data-release-date="2026-06-08" data-yt="Cy4TQt3ePgs" data-vk-oid="239543600" data-vk-id="456239061">
     <div class="video-frame">
       <button type="button" class="video-poster" aria-label="Смотреть рилз «Огонь гори»"><span class="play"></span></button>
     </div>
@@ -1504,7 +1514,7 @@ html[data-skin="editorial_mono"] .reel-badge.out{color:#fff}
     </div>
   </div>
 
-  <div class="video-card reel-card" data-clip="r6" data-yt="qSxnTcGtR9o" data-vk-oid="239543600" data-vk-id="456239028">
+  <div class="video-card reel-card" data-clip="r6" data-release-date="2026-06-11" data-yt="qSxnTcGtR9o" data-vk-oid="239543600" data-vk-id="456239028">
     <div class="video-frame">
       <button type="button" class="video-poster" aria-label="Смотреть рилз «Late-Night Blues»"><span class="play"></span></button>
     </div>
@@ -1523,7 +1533,7 @@ html[data-skin="editorial_mono"] .reel-badge.out{color:#fff}
     </div>
   </div>
 
-  <div class="video-card reel-card" data-clip="r7" data-yt="XRM3sHo3vXU" data-vk-oid="239543600" data-vk-id="456239027">
+  <div class="video-card reel-card" data-clip="r7" data-release-date="2026-06-15" data-yt="XRM3sHo3vXU" data-vk-oid="239543600" data-vk-id="456239027">
     <div class="video-frame">
       <button type="button" class="video-poster" aria-label="Смотреть рилз «Я вернулась к тебе»"><span class="play"></span></button>
     </div>
@@ -1542,7 +1552,7 @@ html[data-skin="editorial_mono"] .reel-badge.out{color:#fff}
     </div>
   </div>
 
-  <div class="video-card reel-card" data-clip="r10" data-yt="SdW7yV87Vro" data-vk-oid="239543600" data-vk-id="456239060">
+  <div class="video-card reel-card" data-clip="r10" data-release-date="2026-06-01" data-yt="SdW7yV87Vro" data-vk-oid="239543600" data-vk-id="456239060">
     <div class="video-frame">
       <button type="button" class="video-poster" aria-label="Смотреть рилз «Распутная весна»"><span class="play"></span></button>
     </div>
@@ -1561,7 +1571,7 @@ html[data-skin="editorial_mono"] .reel-badge.out{color:#fff}
     </div>
   </div>
 
-  <div class="video-card reel-card" data-clip="r0" data-yt="J_IQ1myP4PQ" data-vk-oid="239543600" data-vk-id="456239059">
+  <div class="video-card reel-card" data-clip="r0" data-release-date="2026-07-03" data-yt="J_IQ1myP4PQ" data-vk-oid="239543600" data-vk-id="456239059">
     <div class="video-frame">
       <button type="button" class="video-poster" aria-label="Смотреть рилз «The Cherry Orchard»"><span class="play"></span></button>
     </div>
@@ -1580,7 +1590,7 @@ html[data-skin="editorial_mono"] .reel-badge.out{color:#fff}
     </div>
   </div>
 
-  <div class="video-card reel-card" data-clip="r1" data-yt="xV5Y6ZOBg7s" data-vk-oid="239543600" data-vk-id="456239022">
+  <div class="video-card reel-card" data-clip="r1" data-release-date="2026-07-25" data-yt="xV5Y6ZOBg7s" data-vk-oid="239543600" data-vk-id="456239022">
     <div class="video-frame">
       <button type="button" class="video-poster" aria-label="Смотреть рилз «Наш поэт Владимир»"><span class="play"></span></button>
     </div>
@@ -1599,7 +1609,7 @@ html[data-skin="editorial_mono"] .reel-badge.out{color:#fff}
     </div>
   </div>
 
-  <div class="video-card reel-card" data-clip="r3" data-yt="qGRdFY4mmoI" data-vk-oid="239543600" data-vk-id="456239024">
+  <div class="video-card reel-card" data-clip="r3" data-release-date="2026-07-17" data-yt="qGRdFY4mmoI" data-vk-oid="239543600" data-vk-id="456239024">
     <div class="video-frame">
       <button type="button" class="video-poster" aria-label="Смотреть рилз «Moontan»"><span class="play"></span></button>
     </div>
@@ -1618,7 +1628,7 @@ html[data-skin="editorial_mono"] .reel-badge.out{color:#fff}
     </div>
   </div>
 
-  <div class="video-card reel-card" data-clip="r2" data-yt="iTvSCnLOydI" data-vk-oid="239543600" data-vk-id="456239021">
+  <div class="video-card reel-card" data-clip="r2" data-release-date="2026-05-29" data-yt="iTvSCnLOydI" data-vk-oid="239543600" data-vk-id="456239021">
     <div class="video-frame">
       <button type="button" class="video-poster" aria-label="Смотреть рилз «Плыли перед взором облака»"><span class="play"></span></button>
     </div>
@@ -1989,7 +1999,11 @@ function setLang(lang){
   if(ap) ap.innerHTML=t.aboutPara;
   const lc=document.getElementById('langCur');
   if(lc) lc.textContent=t.langLabel;
-  document.querySelectorAll('.lp-opt').forEach(btn=>btn.classList.toggle('active',btn.dataset.lang===lang));
+  document.querySelectorAll('.lp-opt').forEach(btn=>{
+    var active=btn.dataset.lang===lang;
+    btn.classList.toggle('active',active);
+    btn.setAttribute('aria-pressed',String(active));
+  });
   applyReelsI18N(lang);
   renderAll(false);
 }
@@ -2047,9 +2061,6 @@ document.querySelectorAll('#mobileNavPanel a').forEach(a=>{
 });
 
 
-
-  const AVATAR="assets/avatar.webp";
-  document.querySelectorAll(".av-img").forEach(i=>{i.src=AVATAR;});
 </script>
 <script>
 /* ANTKSL аналитика — анонимный сборщик. Без личных данных, без cookie-трекинга.
@@ -2311,8 +2322,20 @@ var base={
   function lang(){try{var l=(document.documentElement.lang||'ru').slice(0,2);var t=V[l]||V.ru;
     document.querySelectorAll('[data-i18n-view]').forEach(function(n){var k=n.getAttribute('data-i18n-view');if(t[k])n.textContent=t[k];});}catch(e){}}
   var btn=document.getElementById('viewbtn'),menu=document.getElementById('viewmenu');
-  btn.addEventListener('click',function(){var o=menu.classList.toggle('open');btn.setAttribute('aria-expanded',o);});
-  document.addEventListener('click',function(e){if(!e.target.closest('.viewbar')){menu.classList.remove('open');btn.setAttribute('aria-expanded','false');}});
+  function closeMenu(restoreFocus){
+    menu.classList.remove('open');
+    btn.setAttribute('aria-expanded','false');
+    if(restoreFocus)btn.focus();
+  }
+  btn.addEventListener('click',function(){
+    var opening=!menu.classList.contains('open');
+    if(opening){
+      menu.classList.add('open');btn.setAttribute('aria-expanded','true');
+      var first=menu.querySelector('button');if(first)first.focus();
+    }else closeMenu(false);
+  });
+  document.addEventListener('click',function(e){if(!e.target.closest('.viewbar'))closeMenu(false);});
+  menu.addEventListener('keydown',function(e){if(e.key==='Escape'){e.preventDefault();closeMenu(true);}});
   new MutationObserver(lang).observe(document.documentElement,{attributes:true,attributeFilter:['lang']});
   lang();
 })();</script>
@@ -2459,8 +2482,31 @@ var base={
     ja:{title:"リール",sub:"縦型のショートストーリー——曲のメロディーがここに。リールで聴いて、そのあとフルで。楽曲はすでに配信中、または間もなく各プラットフォームに登場します。",listen:"曲を聴く",b_out:"配信中",b_0307:"近日 · 7/3",b_1707:"近日 · 7/17",b_2507:"近日 · 7/25",b_0508:"近日 · 8/5",b_1208:"近日 · 8/12",b_2008:"近日 · 8/20",b_2708:"近日 · 8/27",b_2007:"近日 · 7/20",more:"もっと見る"},
     zh:{title:"短视频",sub:"竖屏短片——歌曲的旋律在这里。先在短视频里听见，再完整聆听：歌曲已上线，或即将登陆各大平台。",listen:"收听歌曲",b_out:"已发布",b_0307:"即将 · 7/3",b_1707:"即将 · 7/17",b_2507:"即将 · 7/25",b_0508:"即将 · 8/5",b_1208:"即将 · 8/12",b_2008:"即将 · 8/20",b_2708:"即将 · 8/27",b_2007:"即将 · 7/20",more:"显示更多"}
   };
+  function dateKey(){var d=new Date(),p=function(n){return(n<10?'0':'')+n;};return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate());}
+  function statusText(lang,date,released){
+    var t=R[lang]||R.ru;if(released)return t.b_out;
+    var p=date.split('-'),day=Number(p[2]),month=Number(p[1]);
+    if(lang==='en'){var months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];return 'Soon · '+months[month-1]+' '+day;}
+    if(lang==='ja')return '近日 · '+month+'/'+day;
+    if(lang==='zh')return '即将 · '+month+'/'+day;
+    if(lang==='uk')return 'Незабаром · '+String(day).padStart(2,'0')+'.'+String(month).padStart(2,'0');
+    if(lang==='de')return 'Bald · '+day+'.'+String(month).padStart(2,'0');
+    return 'Скоро · '+String(day).padStart(2,'0')+'.'+String(month).padStart(2,'0');
+  }
+  function refreshStatuses(lang){
+    var now=dateKey();
+    document.querySelectorAll('.reel-card[data-release-date]').forEach(function(card){
+      var date=card.getAttribute('data-release-date'),released=date<=now;
+      var badge=card.querySelector('.reel-badge');
+      if(!badge){badge=document.createElement('span');card.querySelector('.video-meta').insertBefore(badge,card.querySelector('.vt'));}
+      badge.className='reel-badge '+(released?'out':'soon');
+      badge.removeAttribute('data-i18n-reels');
+      badge.textContent=statusText(lang,date,released);
+    });
+  }
   function lang(){try{var l=(document.documentElement.lang||'ru').slice(0,2);var t=R[l]||R.ru;
-    document.querySelectorAll('[data-i18n-reels]').forEach(function(n){var k=n.getAttribute('data-i18n-reels');if(t[k])n.textContent=t[k];});}catch(e){}}
+    document.querySelectorAll('[data-i18n-reels]').forEach(function(n){var k=n.getAttribute('data-i18n-reels');if(t[k])n.textContent=t[k];});
+    refreshStatuses(l);}catch(e){}}
   // лимит видимых карточек + «Показать ещё» (на вырост: новые рилзы скрываются за 6-й автоматически)
   var LIMIT=6;
   var grid=document.querySelector('.reel-grid');
@@ -2529,8 +2575,10 @@ var base={
 <script>
 document.addEventListener('keydown',function(e){
   if(e.key!=='Escape')return;
-  document.querySelectorAll('.nav-panel.open,.viewmenu.open').forEach(function(p){p.classList.remove('open');});
-  document.querySelectorAll('[aria-expanded="true"]').forEach(function(b){b.setAttribute('aria-expanded','false');});
+  var view=document.getElementById('viewmenu'),viewBtn=document.getElementById('viewbtn');
+  if(view&&view.classList.contains('open')){view.classList.remove('open');if(viewBtn){viewBtn.setAttribute('aria-expanded','false');viewBtn.focus();}}
+  document.querySelectorAll('.nav-panel.open').forEach(function(p){p.classList.remove('open');});
+  document.querySelectorAll('.btn-nav[aria-expanded="true"]').forEach(function(b){b.setAttribute('aria-expanded','false');});
 });
 </script>
 
