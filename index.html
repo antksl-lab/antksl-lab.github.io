@@ -1,13 +1,42 @@
 <!doctype html>
 <html lang="ru">
 <head>
-<!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-EYGLP0P6W5"></script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1">
 <script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-  gtag('config', 'G-EYGLP0P6W5');
+/* Privacy-first analytics bootstrap: no Google or Supabase request before consent. */
+(function(){
+  var KEY='antksl_analytics_consent', GA_ID='G-EYGLP0P6W5';
+  window.dataLayer=window.dataLayer||[];
+  window.gtag=window.gtag||function(){window.dataLayer.push(arguments);};
+  window.gtag('consent','default',{
+    analytics_storage:'denied',ad_storage:'denied',ad_user_data:'denied',
+    ad_personalization:'denied',functionality_storage:'granted',security_storage:'granted',
+    wait_for_update:500
+  });
+  function read(){try{return localStorage.getItem(KEY)||'';}catch(e){return '';}}
+  function allowed(){return read()==='granted';}
+  function loadGoogle(){
+    if(!allowed()||document.getElementById('antksl-ga4'))return;
+    var js=document.createElement('script');
+    js.id='antksl-ga4';js.async=true;
+    js.src='https://www.googletagmanager.com/gtag/js?id='+encodeURIComponent(GA_ID);
+    document.head.appendChild(js);
+    window.gtag('consent','update',{analytics_storage:'granted'});
+    window.gtag('js',new Date());
+    window.gtag('config',GA_ID,{anonymize_ip:true,allow_google_signals:false,allow_ad_personalization_signals:false});
+  }
+  function set(value){
+    try{localStorage.setItem(KEY,value);}catch(e){}
+    if(value==='granted')loadGoogle();
+    else window.gtag('consent','update',{analytics_storage:'denied'});
+    try{document.dispatchEvent(new CustomEvent('antksl:analytics-consent',{detail:value}));}catch(e){}
+  }
+  window.ANTKSL_ANALYTICS={allowed:allowed,set:set,loadGoogle:loadGoogle,choice:read};
+  if(allowed())loadGoogle();
+})();
 </script>
 <script>/* skin anti-flash: ставим тему ДО отрисовки */(function(){try{var s=localStorage.getItem('antksl_skin');if(!s){s='aurora_soul';}document.documentElement.setAttribute('data-skin',s);}catch(e){document.documentElement.setAttribute('data-skin','aurora_soul');}})();</script>
 <script>(function(){try{var hr=localStorage.getItem('antksl_hero')||'vinyl';document.documentElement.setAttribute('data-hero',hr);}catch(e){document.documentElement.setAttribute('data-hero','vinyl');}})();</script>
@@ -23,12 +52,9 @@ window.antkslVT=function(update){
   if(!document.startViewTransition||reduce){update();return;}
   try{document.startViewTransition(update);}catch(e){update();}
 };</script>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Константин Захаров — официальный сайт</title>
+<meta name="site-fix-version" content="2026-08-02-restored-v3">
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
-<link rel="icon" type="image/png" sizes="120x120" href="/favicon.svg">
-<link rel="apple-touch-icon" href="/favicon.svg">
 <meta name="description" content="Константин Захаров — городской романс, лирический поп и R&amp;B. Превращаю стихи в песни, а песни — в маленькие фильмы. Музыка, клипы, визуальные истории.">
 <meta property="og:type" content="music.musician">
 <meta property="og:title" content="Константин Захаров">
@@ -48,96 +74,298 @@ window.antkslVT=function(update){
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="Константин Захаров — городской романс, лирический поп, R&amp;B">
 <meta name="twitter:image" content="https://antksl-lab.github.io/og.jpg">
-<!-- Schema.org JSON-LD — MusicGroup + MusicRecording (GEO_LAW v2.9.75, fix P0 SCHEMA_TYPE_VERIFICATION_LAW) -->
+<!-- Schema.org JSON-LD: WebSite + solo musician + full visible catalog. -->
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
-  "@type": "MusicGroup",
-  "name": "Константин Захаров",
-  "alternateName": "ANTKSL",
-  "description": "Константин Иванович Захаров — российский автор-исполнитель. Городской романс, R&B и лирический поп о любви, утрате и внутренней силе.",
-  "url": "https://antksl-lab.github.io/",
-  "image": "https://antksl-lab.github.io/og.jpg",
-  "genre": ["городской романс", "R&B", "лирический поп", "Soul", "Blues", "Alternative"],
-  "sameAs": [
-    "https://vk.com/zakharov_music",
-    "https://youtube.com/@Surtaiha",
-    "https://t.me/zakharov_antksl",
-    "https://band.link/konstantinzakharov",
-    "https://music.yandex.ru/artist/26082374"
-  ],
-  "record": [
+  "@graph": [
     {
-      "@type": "MusicRecording",
-      "name": "The Cherry Orchard",
-      "byArtist": {"@type": "MusicGroup", "name": "Константин Захаров"},
-      "genre": "Pop",
-      "datePublished": "2026-07-03",
-      "url": "https://band.link/cherryorchard"
+      "@type": "WebSite",
+      "@id": "https://antksl-lab.github.io/#website",
+      "url": "https://antksl-lab.github.io/",
+      "name": "Константин Захаров",
+      "alternateName": "ANTKSL",
+      "inLanguage": [
+        "ru",
+        "uk",
+        "en",
+        "de",
+        "ja",
+        "zh"
+      ]
     },
     {
-      "@type": "MusicRecording",
-      "name": "Мы встретились случайно",
-      "byArtist": {"@type": "MusicGroup", "name": "Константин Захаров"},
-      "genre": "Pop",
-      "datePublished": "2026-06-19",
-      "url": "https://band.link/mvstretilis"
-    },
-    {
-      "@type": "MusicRecording",
-      "name": "Я вернулась к тебе",
-      "byArtist": {"@type": "MusicGroup", "name": "Константин Захаров"},
-      "genre": "Blues",
-      "datePublished": "2026-06-15",
-      "url": "https://band.link/yavernulas"
-    },
-    {
-      "@type": "MusicRecording",
-      "name": "Late-Night Blues",
-      "byArtist": {"@type": "MusicGroup", "name": "Константин Захаров"},
-      "genre": "Blues",
-      "datePublished": "2026-06-11",
-      "url": "https://band.link/latenightblueskz"
-    },
-    {
-      "@type": "MusicRecording",
-      "name": "Огонь гори",
-      "byArtist": {"@type": "MusicGroup", "name": "Константин Захаров"},
-      "genre": "R&B/Soul",
-      "datePublished": "2026-06-08",
-      "url": "https://band.link/ogonygori"
-    },
-    {
-      "@type": "MusicRecording",
-      "name": "Glitch",
-      "byArtist": {"@type": "MusicGroup", "name": "Константин Захаров"},
-      "genre": "Alternative",
-      "datePublished": "2026-06-05",
-      "url": "https://band.link/glitchkz"
-    },
-    {
-      "@type": "MusicRecording",
-      "name": "Лунный загар мне подарит ночь",
-      "byArtist": {"@type": "MusicGroup", "name": "Константин Захаров"},
-      "genre": "R&B/Soul",
-      "datePublished": "2026-06-04",
-      "url": "https://band.link/lunnyzagar"
-    },
-    {
-      "@type": "MusicRecording",
-      "name": "Распутная весна",
-      "byArtist": {"@type": "MusicGroup", "name": "Константин Захаров"},
-      "genre": "Pop",
-      "datePublished": "2026-06-01",
-      "url": "https://band.link/rasputnavesna"
-    },
-    {
-      "@type": "MusicRecording",
-      "name": "Плыли перед взором облака",
-      "byArtist": {"@type": "MusicGroup", "name": "Константин Захаров"},
-      "genre": "R&B/Soul",
-      "datePublished": "2026-05-29",
-      "url": "https://band.link/plylioblaka"
+      "@type": "MusicGroup",
+      "@id": "https://antksl-lab.github.io/#artist",
+      "name": "Константин Захаров",
+      "alternateName": [
+        "ANTKSL",
+        "Серафим Наждак"
+      ],
+      "description": "Российский автор-исполнитель: городской романс, R&B и лирический поп о любви, утрате и внутренней силе.",
+      "url": "https://antksl-lab.github.io/",
+      "image": "https://antksl-lab.github.io/og.jpg",
+      "genre": [
+        "городской романс",
+        "R&B",
+        "лирический поп",
+        "Soul",
+        "Blues",
+        "Alternative"
+      ],
+      "sameAs": [
+        "https://band.link/konstantinzakharov",
+        "https://music.yandex.ru/artist/26082374",
+        "https://vk.com/artist/konstantinzakharov",
+        "https://t.me/+Of8YPr3Z6mdkOGVi",
+        "https://www.instagram.com/serafimnazhdak.music/"
+      ],
+      "track": {
+        "@type": "ItemList",
+        "numberOfItems": 16,
+        "itemListElement": [
+          {
+            "@type": "ListItem",
+            "position": 1,
+            "item": {
+              "@type": "MusicRecording",
+              "@id": "https://band.link/turgenevskaya#recording",
+              "name": "Тургеневская женщина",
+              "byArtist": {
+                "@id": "https://antksl-lab.github.io/#artist"
+              },
+              "genre": "R&B/Soul",
+              "datePublished": "2026-08-27",
+              "url": "https://band.link/turgenevskaya"
+            }
+          },
+          {
+            "@type": "ListItem",
+            "position": 2,
+            "item": {
+              "@type": "MusicRecording",
+              "@id": "https://band.link/lyubimygdety#recording",
+              "name": "Любимый, где ты?",
+              "byArtist": {
+                "@id": "https://antksl-lab.github.io/#artist"
+              },
+              "genre": "R&B/Soul",
+              "datePublished": "2026-08-20",
+              "url": "https://band.link/lyubimygdety"
+            }
+          },
+          {
+            "@type": "ListItem",
+            "position": 3,
+            "item": {
+              "@type": "MusicRecording",
+              "@id": "https://band.link/normm#recording",
+              "name": "Нормм",
+              "byArtist": {
+                "@id": "https://antksl-lab.github.io/#artist"
+              },
+              "genre": "Alternative",
+              "datePublished": "2026-08-12",
+              "url": "https://band.link/normm"
+            }
+          },
+          {
+            "@type": "ListItem",
+            "position": 4,
+            "item": {
+              "@type": "MusicRecording",
+              "@id": "https://band.link/gorstpeskaantksl#recording",
+              "name": "Горсть песка",
+              "byArtist": {
+                "@id": "https://antksl-lab.github.io/#artist"
+              },
+              "genre": "R&B/Soul",
+              "datePublished": "2026-08-05",
+              "url": "https://band.link/gorstpeskaantksl"
+            }
+          },
+          {
+            "@type": "ListItem",
+            "position": 5,
+            "item": {
+              "@type": "MusicRecording",
+              "@id": "https://band.link/nashpoet#recording",
+              "name": "Наш поэт Владимир",
+              "byArtist": {
+                "@id": "https://antksl-lab.github.io/#artist"
+              },
+              "genre": "R&B/Soul",
+              "datePublished": "2026-07-25",
+              "url": "https://band.link/nashpoet"
+            }
+          },
+          {
+            "@type": "ListItem",
+            "position": 6,
+            "item": {
+              "@type": "MusicRecording",
+              "@id": "https://band.link/izpeplaantksl#recording",
+              "name": "Из пепла",
+              "byArtist": {
+                "@id": "https://antksl-lab.github.io/#artist"
+              },
+              "genre": "R&B/Soul",
+              "datePublished": "2026-07-20",
+              "url": "https://band.link/izpeplaantksl"
+            }
+          },
+          {
+            "@type": "ListItem",
+            "position": 7,
+            "item": {
+              "@type": "MusicRecording",
+              "@id": "https://band.link/moontan#recording",
+              "name": "Moontan",
+              "byArtist": {
+                "@id": "https://antksl-lab.github.io/#artist"
+              },
+              "genre": "R&B/Soul",
+              "datePublished": "2026-07-17",
+              "url": "https://band.link/moontan"
+            }
+          },
+          {
+            "@type": "ListItem",
+            "position": 8,
+            "item": {
+              "@type": "MusicRecording",
+              "@id": "https://band.link/cherryorchard#recording",
+              "name": "The Cherry Orchard",
+              "byArtist": {
+                "@id": "https://antksl-lab.github.io/#artist"
+              },
+              "genre": "Pop",
+              "datePublished": "2026-07-03",
+              "url": "https://band.link/cherryorchard"
+            }
+          },
+          {
+            "@type": "ListItem",
+            "position": 9,
+            "item": {
+              "@type": "MusicRecording",
+              "@id": "https://band.link/mvstretilis#recording",
+              "name": "Мы встретились случайно",
+              "byArtist": {
+                "@id": "https://antksl-lab.github.io/#artist"
+              },
+              "genre": "Pop",
+              "datePublished": "2026-06-19",
+              "url": "https://band.link/mvstretilis"
+            }
+          },
+          {
+            "@type": "ListItem",
+            "position": 10,
+            "item": {
+              "@type": "MusicRecording",
+              "@id": "https://band.link/yavernulas#recording",
+              "name": "Я вернулась к тебе",
+              "byArtist": {
+                "@id": "https://antksl-lab.github.io/#artist"
+              },
+              "genre": "Blues",
+              "datePublished": "2026-06-15",
+              "url": "https://band.link/yavernulas"
+            }
+          },
+          {
+            "@type": "ListItem",
+            "position": 11,
+            "item": {
+              "@type": "MusicRecording",
+              "@id": "https://band.link/latenightblueskz#recording",
+              "name": "Late-Night Blues",
+              "byArtist": {
+                "@id": "https://antksl-lab.github.io/#artist"
+              },
+              "genre": "Blues",
+              "datePublished": "2026-06-11",
+              "url": "https://band.link/latenightblueskz"
+            }
+          },
+          {
+            "@type": "ListItem",
+            "position": 12,
+            "item": {
+              "@type": "MusicRecording",
+              "@id": "https://band.link/ogonygori#recording",
+              "name": "Огонь гори",
+              "byArtist": {
+                "@id": "https://antksl-lab.github.io/#artist"
+              },
+              "genre": "R&B/Soul",
+              "datePublished": "2026-06-08",
+              "url": "https://band.link/ogonygori"
+            }
+          },
+          {
+            "@type": "ListItem",
+            "position": 13,
+            "item": {
+              "@type": "MusicRecording",
+              "@id": "https://band.link/glitchkz#recording",
+              "name": "Glitch",
+              "byArtist": {
+                "@id": "https://antksl-lab.github.io/#artist"
+              },
+              "genre": "Alternative",
+              "datePublished": "2026-06-05",
+              "url": "https://band.link/glitchkz"
+            }
+          },
+          {
+            "@type": "ListItem",
+            "position": 14,
+            "item": {
+              "@type": "MusicRecording",
+              "@id": "https://band.link/lunnyzagar#recording",
+              "name": "Лунный загар мне подарит ночь",
+              "byArtist": {
+                "@id": "https://antksl-lab.github.io/#artist"
+              },
+              "genre": "R&B/Soul",
+              "datePublished": "2026-06-04",
+              "url": "https://band.link/lunnyzagar"
+            }
+          },
+          {
+            "@type": "ListItem",
+            "position": 15,
+            "item": {
+              "@type": "MusicRecording",
+              "@id": "https://band.link/rasputnavesna#recording",
+              "name": "Распутная весна",
+              "byArtist": {
+                "@id": "https://antksl-lab.github.io/#artist"
+              },
+              "genre": "Pop",
+              "datePublished": "2026-06-01",
+              "url": "https://band.link/rasputnavesna"
+            }
+          },
+          {
+            "@type": "ListItem",
+            "position": 16,
+            "item": {
+              "@type": "MusicRecording",
+              "@id": "https://band.link/plylioblaka#recording",
+              "name": "Плыли перед взором облака",
+              "byArtist": {
+                "@id": "https://antksl-lab.github.io/#artist"
+              },
+              "genre": "R&B/Soul",
+              "datePublished": "2026-05-29",
+              "url": "https://band.link/plylioblaka"
+            }
+          }
+        ]
+      }
     }
   ]
 }
@@ -155,9 +383,10 @@ window.antkslVT=function(update){
     --display:'Playfair Display',Georgia,serif; --body:'Spectral',Georgia,serif; --mono:'PT Mono','Courier New',monospace;
   }
   *{box-sizing:border-box}
+  .sr-only{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap!important;border:0!important;clip-path:inset(50%)!important}
   html{scroll-behavior:smooth}
   body{margin:0;color:var(--ink);font-family:var(--body);font-weight:400;font-size:18px;line-height:1.7;
-    -webkit-font-smoothing:antialiased;overflow-x:hidden;
+    -webkit-font-smoothing:antialiased;overflow-x:clip;
     background:radial-gradient(120% 90% at 50% -10%,#f3ead7,transparent 60%),radial-gradient(100% 80% at 50% 120%,#d9c9aa,transparent 55%),var(--paper)}
   .grain{position:fixed;inset:0;z-index:2;pointer-events:none;opacity:.07;mix-blend-mode:multiply;
     background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
@@ -259,14 +488,15 @@ window.antkslVT=function(update){
   @media(max-width:900px){.grid{grid-template-columns:repeat(2,1fr)}}
   @media(max-width:560px){.grid{grid-template-columns:1fr}}
   .card{display:block;text-decoration:none;color:inherit;background:var(--card);border:1px solid var(--line-2);border-radius:3px;padding:14px 14px 18px;
-    box-shadow:0 10px 26px rgba(40,28,16,.12);transition:transform .4s cubic-bezier(.22,.61,.36,1),box-shadow .4s;opacity:0;transform:translateY(24px)}
+    box-shadow:0 10px 26px rgba(40,28,16,.12);transition:transform .4s cubic-bezier(.22,.61,.36,1),box-shadow .4s;opacity:1;transform:none}
+  /* Карточки по умолчанию видимы. Скрытие разрешено только режиму reveal_scroll ниже. */
   .card.in{opacity:1;transform:none}
   .card:hover{transform:translateY(-6px) rotate(-.4deg);box-shadow:0 22px 50px rgba(40,28,16,.22)}
   .frame{position:relative;aspect-ratio:1/1;overflow:hidden;border:1px solid var(--line);background:#0d0a07}
   .cover-img{width:100%;height:100%;object-fit:cover;display:block;filter:sepia(.22) saturate(.95) contrast(1.03);transition:filter .5s}
   .card:hover .cover-img{filter:sepia(.08) saturate(1.03)}
   .cover-desc{position:absolute;left:0;right:0;bottom:0;padding:16px 14px 13px;background:linear-gradient(to top,rgba(24,16,9,.95),rgba(24,16,9,.7) 55%,transparent);
-    color:var(--ink-soft);font-style:italic;font-size:13.5px;line-height:1.45;transform:translateY(101%);opacity:0;transition:transform .5s cubic-bezier(.22,.61,.36,1),opacity .4s}
+    color:#f7f2e8;font-style:italic;font-size:13.5px;line-height:1.45;transform:translateY(101%);opacity:0;transition:transform .5s cubic-bezier(.22,.61,.36,1),opacity .4s}
   .card:hover .cover-desc,.card:focus-within .cover-desc{transform:translateY(0);opacity:1}
   .card-body{padding:14px 4px 0}
   .card-title{font-family:var(--display);font-weight:600;font-size:21px;line-height:1.15;margin:0 0 9px;color:var(--ink);transition:color .3s}
@@ -275,7 +505,7 @@ window.antkslVT=function(update){
   .chip{padding:3px 9px;border:1px solid var(--line-2);border-radius:2px;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.08em}
   .date{margin-left:auto}
   .badge{display:inline-block;margin-top:11px;font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;padding:4px 9px;border-radius:2px}
-  .badge.out{background:var(--amber);color:var(--ink)}
+  .badge.out{background:var(--amber);color:#10100c}
   .badge.soon{border:1px solid var(--amber);color:var(--amber)}
   .card-desc{display:block;margin:10px 0 0;font-style:italic;font-size:13px;line-height:1.5;color:var(--ink-soft)}
   @media(hover:none){.cover-desc{display:none}}
@@ -293,7 +523,8 @@ window.antkslVT=function(update){
   footer{position:relative;z-index:3;border-top:1px solid var(--line);padding:42px 0;text-align:center;font-family:var(--mono);font-size:12px;color:var(--muted);letter-spacing:.04em}
   footer .fname{font-family:var(--display);font-size:26px;color:var(--ink);margin-bottom:8px}
   footer a{color:var(--amber);text-decoration:none}
-  .reveal{opacity:0;transform:translateY(22px);transition:opacity .8s,transform .8s}
+  .reveal{opacity:1;transform:none;transition:opacity .8s,transform .8s}
+  /* Обычный контент по умолчанию видим; reveal-скрытие задаётся только для reveal_scroll. */
   .reveal.in{opacity:1;transform:none}
   a:focus-visible,.btn:focus-visible,.link-pill:focus-visible{outline:2px solid var(--amber);outline-offset:3px}
   @media(prefers-reduced-motion:reduce){.grain,.platter,.eyebrow,.hero-name,.hero-sub,.hero-tag,.hero-cta,.arm-body,.arm-shadow{animation:none}.card{transition:none}.card:hover{transform:none}}
@@ -388,7 +619,7 @@ html[data-skin="editorial_mono"]{--paper:#faf8f4;--card:#fffdf9;--ink:#1a1a1a;--
 html[data-skin="glass_depth"]{--paper:#0e1420;--card:rgba(28,40,64,.5);--ink:#eaf2ff;--ink-soft:#b9cbe8;--muted:#7e93b5;--amber:#6ea8fe;--amber-2:#8affd6;--vinyl:#070d16;--line:rgba(110,168,254,.2);--line-2:rgba(110,168,254,.38)}
 html[data-skin="grain_warmth"]{--paper:#1c1714;--card:#26201b;--ink:#f5ead8;--ink-soft:#d2c2a8;--muted:#9c876a;--amber:#e0a458;--amber-2:#c2603f;--vinyl:#120d0a;--line:rgba(224,164,88,.2);--line-2:rgba(224,164,88,.36)}
 html[data-skin="bento_showcase"]{--paper:#101114;--card:#181a1f;--ink:#f0f1f3;--ink-soft:#c3c6cc;--muted:#7c828c;--amber:#a8ff60;--amber-2:#6ea8fe;--vinyl:#0a0b0d;--line:rgba(168,255,96,.18);--line-2:rgba(168,255,96,.34)}
-body{background:var(--paper);color:var(--ink);position:relative;overflow-x:hidden}
+body{background:var(--paper);color:var(--ink);position:relative;overflow-x:clip}
 /* Aurora-слой только для aurora_soul */
 .skinfx{position:fixed;inset:0;z-index:-2;overflow:hidden;pointer-events:none;display:none}
 html[data-skin="aurora_soul"] .skinfx,html[data-skin="glass_depth"] .skinfx{display:block}
@@ -556,7 +787,7 @@ html[data-skin="tactile_brutalism"] .support-btn{border-radius:0}
 
 /* ===== РЕЖИМЫ ПОДАЧИ (data-mode на <html>) ===== */
 /* reveal_scroll: секции/карточки всплывают */
-html[data-mode="reveal_scroll"] .card,html[data-mode="reveal_scroll"] .reveal,html[data-mode="reveal_scroll"] section > h2{
+html.js-ready[data-mode="reveal_scroll"] .card,html.js-ready[data-mode="reveal_scroll"] .reveal,html.js-ready[data-mode="reveal_scroll"] section > h2{
   opacity:0;transform:translateY(28px);transition:opacity .7s cubic-bezier(.2,.7,.2,1),transform .7s cubic-bezier(.2,.7,.2,1)}
 html[data-mode="reveal_scroll"] .in{opacity:1!important;transform:none!important}
 /* kinetic_hero: пословное проявление заголовка + параллакс */
@@ -639,7 +870,7 @@ html[data-hero="cd"] .hero-obj[data-obj="cd"]{animation:spin 8s linear infinite}
 html[data-skin="tactile_brutalism"] .video-card{border-radius:0;border:2px solid var(--line-2)}
 .video-frame{position:relative;width:100%;aspect-ratio:16/9;background:var(--vinyl)}
 .video-frame iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
-.video-poster{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;cursor:pointer;background:linear-gradient(135deg,var(--amber),var(--amber-2));overflow:hidden}
+.video-poster{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;cursor:pointer;background:linear-gradient(135deg,var(--amber),var(--amber-2));overflow:hidden;border:0;padding:0;color:inherit;font:inherit;appearance:none;-webkit-appearance:none}
 .video-poster .play{width:64px;height:64px;border-radius:50%;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;transition:transform .15s}
 .video-poster:hover .play{transform:scale(1.12)}
 .video-poster .play::after{content:"";display:block;width:0;height:0;border-style:solid;border-width:13px 0 13px 22px;border-color:transparent transparent transparent #fff;margin-left:5px}
@@ -703,6 +934,32 @@ html[data-skin="tactile_brutalism"] .reel-more{border-radius:0}
   .totop.show{transform:none;}
   .totop:hover .tt-disc{transform:none;}
 }
+
+
+/* 2026-08-02 deep re-audit v2: reliability, mobile navigation, native media controls, contrast and consent fixes */
+button:focus-visible,[role="button"]:focus-visible{outline:2px solid var(--amber);outline-offset:3px}
+html[data-skin="editorial_mono"] .badge.out,
+html[data-skin="editorial_mono"] .reel-badge.out{color:#fff}
+.mobile-nav-wrap{display:none;position:relative}
+.mobile-nav-panel{min-width:210px}
+.mobile-nav-panel a{display:block;font-family:var(--mono);font-size:12px;text-decoration:none;color:var(--ink);padding:10px;border-radius:2px}
+.mobile-nav-panel a:hover,.mobile-nav-panel a:focus-visible{background:var(--amber);color:#10100c}
+@media(max-width:700px){
+  .mobile-nav-wrap{display:block}
+  .nav-right{margin-right:52px}
+}
+@media(max-width:480px){.nav-right{margin-right:48px}}
+.privacy-settings{margin-top:14px;border:0;background:transparent;color:var(--amber);font:inherit;text-decoration:underline;cursor:pointer}
+.consent-banner{position:fixed;left:16px;right:16px;bottom:16px;z-index:1000;max-width:760px;margin:auto;padding:18px;background:var(--card);color:var(--ink);border:1px solid var(--line-2);box-shadow:0 18px 60px rgba(0,0,0,.45);border-radius:10px;backdrop-filter:blur(12px)}
+.consent-banner[hidden]{display:none}
+.consent-banner p{margin:0 0 14px;font-size:15px;line-height:1.55;color:var(--ink-soft)}
+.consent-actions{display:flex;gap:10px;flex-wrap:wrap}
+.consent-actions button{padding:10px 16px;border:1px solid var(--line-2);border-radius:4px;font-family:var(--mono);cursor:pointer}
+#consentAccept{background:var(--amber);color:#10100c;border-color:var(--amber)}
+#consentDecline{background:transparent;color:var(--ink)}
+@media(max-width:560px){.consent-banner{left:10px;right:10px;bottom:10px}.consent-actions button{flex:1 1 100%}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+
 </style>
 <style id="decor-2026">
   /* ── Декор 2026 (web-verified находки) — в эстетике аналог-винила, additive ── */
@@ -778,29 +1035,29 @@ html[data-skin="tactile_brutalism"] .reel-more{border-radius:0}
 </head>
 <body>
 <div class="viewbar">
-<button class="viewbtn" id="viewbtn" aria-expanded="false" aria-controls="viewmenu"><span>✦</span><span data-i18n-view="label">Вид</span></button>
+<button type="button" class="viewbtn" id="viewbtn" aria-expanded="false" aria-controls="viewmenu"><span>✦</span><span data-i18n-view="label">Вид</span></button>
 <div class="viewmenu" id="viewmenu" role="menu">
 <div><div class="vsec-title" data-i18n-view="skin">Облик</div><div class="skinpanel" id="skinpanel" role="listbox" aria-label="Выбор облика сайта">
-<button data-skin="aurora_soul" role="option"><span class="sw" style="background:#7a4dff"></span><span data-i18n-skin="aurora">Северное сияние</span></button>
-<button data-skin="grain_warmth" role="option"><span class="sw" style="background:#e0a458"></span><span data-i18n-skin="grain">Тёплое зерно</span></button>
-<button data-skin="glass_depth" role="option"><span class="sw" style="background:#6ea8fe"></span><span data-i18n-skin="glass">Матовое стекло</span></button>
-<button data-skin="editorial_mono" role="option"><span class="sw" style="background:#b89b7a"></span><span data-i18n-skin="editorial">Светлый минимал</span></button>
-<button data-skin="bento_showcase" role="option"><span class="sw" style="background:#a8ff60"></span><span data-i18n-skin="bento">Бенто-витрина</span></button>
-<button data-skin="tactile_brutalism" role="option"><span class="sw" style="background:#ff3b30"></span><span data-i18n-skin="brutal">Брутал</span></button>
+<button type="button" data-skin="aurora_soul" role="option"><span class="sw" style="background:#7a4dff"></span><span data-i18n-skin="aurora">Северное сияние</span></button>
+<button type="button" data-skin="grain_warmth" role="option"><span class="sw" style="background:#e0a458"></span><span data-i18n-skin="grain">Тёплое зерно</span></button>
+<button type="button" data-skin="glass_depth" role="option"><span class="sw" style="background:#6ea8fe"></span><span data-i18n-skin="glass">Матовое стекло</span></button>
+<button type="button" data-skin="editorial_mono" role="option"><span class="sw" style="background:#b89b7a"></span><span data-i18n-skin="editorial">Светлый минимал</span></button>
+<button type="button" data-skin="bento_showcase" role="option"><span class="sw" style="background:#a8ff60"></span><span data-i18n-skin="bento">Бенто-витрина</span></button>
+<button type="button" data-skin="tactile_brutalism" role="option"><span class="sw" style="background:#ff3b30"></span><span data-i18n-skin="brutal">Брутал</span></button>
 </div></div>
 <div><div class="vsec-title" data-i18n-view="mode">Подача</div><div class="modepanel" id="modepanel" role="listbox" aria-label="Режим подачи">
-<button data-mode="reveal_scroll" role="option"><span class="mi">↑</span><span data-i18n-mode="reveal_scroll">Проявление при скролле</span></button>
-<button data-mode="kinetic_hero" role="option"><span class="mi">✶</span><span data-i18n-mode="kinetic_hero">Кинетический герой</span></button>
-<button data-mode="magnetic_cards" role="option"><span class="mi">◈</span><span data-i18n-mode="magnetic_cards">Живые карточки</span></button>
-<button data-mode="ambient_motion" role="option"><span class="mi">≈</span><span data-i18n-mode="ambient_motion">Живой фон</span></button>
-<button data-mode="classic" role="option"><span class="mi">●</span><span data-i18n-mode="classic">Классика</span></button>
+<button type="button" data-mode="reveal_scroll" role="option"><span class="mi">↑</span><span data-i18n-mode="reveal_scroll">Проявление при скролле</span></button>
+<button type="button" data-mode="kinetic_hero" role="option"><span class="mi">✶</span><span data-i18n-mode="kinetic_hero">Кинетический герой</span></button>
+<button type="button" data-mode="magnetic_cards" role="option"><span class="mi">◈</span><span data-i18n-mode="magnetic_cards">Живые карточки</span></button>
+<button type="button" data-mode="ambient_motion" role="option"><span class="mi">≈</span><span data-i18n-mode="ambient_motion">Живой фон</span></button>
+<button type="button" data-mode="classic" role="option"><span class="mi">●</span><span data-i18n-mode="classic">Классика</span></button>
 </div></div>
 <div><div class="vsec-title" data-i18n-view="hero">Герой</div><div class="heropanel" id="heropanel" role="listbox" aria-label="Главный предмет">
-<button data-hero="vinyl" role="option"><span class="hi">⬤</span><span data-i18n-hero="vinyl">Пластинка</span></button>
-<button data-hero="cd" role="option"><span class="hi">◎</span><span data-i18n-hero="cd">CD-диск</span></button>
-<button data-hero="amp" role="option"><span class="hi">▭</span><span data-i18n-hero="amp">Усилитель</span></button>
-<button data-hero="speaker" role="option"><span class="hi">◍</span><span data-i18n-hero="speaker">Колонка</span></button>
-<button data-hero="drum" role="option"><span class="hi">▦</span><span data-i18n-hero="drum">Драм-машина</span></button>
+<button type="button" data-hero="vinyl" role="option"><span class="hi">⬤</span><span data-i18n-hero="vinyl">Пластинка</span></button>
+<button type="button" data-hero="cd" role="option"><span class="hi">◎</span><span data-i18n-hero="cd">CD-диск</span></button>
+<button type="button" data-hero="amp" role="option"><span class="hi">▭</span><span data-i18n-hero="amp">Усилитель</span></button>
+<button type="button" data-hero="speaker" role="option"><span class="hi">◍</span><span data-i18n-hero="speaker">Колонка</span></button>
+<button type="button" data-hero="drum" role="option"><span class="hi">▦</span><span data-i18n-hero="drum">Драм-машина</span></button>
 </div></div>
 </div>
 </div>
@@ -839,8 +1096,20 @@ html[data-skin="tactile_brutalism"] .reel-more{border-radius:0}
     <a href="#listen" data-i18n="listen">Слушать</a>
   </div>
   <div class="nav-right">
+    <div class="mobile-nav-wrap">
+      <button type="button" class="btn-nav icon-only" id="mobileNavBtn" aria-label="Открыть навигацию" title="Навигация" aria-expanded="false" aria-controls="mobileNavPanel" aria-haspopup="true">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+      </button>
+      <div class="nav-panel mobile-nav-panel" id="mobileNavPanel">
+        <a href="#releases" data-i18n="discog">Дискография</a>
+        <a href="#reels" data-i18n="reels">Рилзы</a>
+        <a href="#soon" data-i18n="soon">Скоро</a>
+        <a href="#about" data-i18n="about">О себе</a>
+        <a href="#listen" data-i18n="listen">Слушать</a>
+      </div>
+    </div>
     <div class="listen-wrap">
-      <button class="btn-nav" id="listenBtn">
+      <button type="button" class="btn-nav" id="listenBtn" aria-expanded="false" aria-controls="listenPanel" aria-haspopup="true">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
         <span data-i18n="listen">Слушать</span>
       </button>
@@ -853,30 +1122,30 @@ html[data-skin="tactile_brutalism"] .reel-more{border-radius:0}
       </div>
     </div>
     <div class="email-wrap">
-      <button class="btn-nav icon-only" id="emailBtn" title="Email">
+      <button type="button" class="btn-nav icon-only" id="emailBtn" title="Email" aria-label="Написать по электронной почте" aria-expanded="false" aria-controls="emailPanel" aria-haspopup="true">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
       </button>
       <div class="nav-panel" id="emailPanel">
         <div class="ep-lbl" data-i18n="emailLabel">Написать мне</div>
         <div class="ep-addr">antksl2020@gmail.com</div>
-        <button class="ep-copy" id="copyEmail">
+        <button type="button" class="ep-copy" id="copyEmail">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
           <span id="copyTxt" data-i18n="copyBtn">Скопировать</span>
         </button>
       </div>
     </div>
     <div class="lang-wrap">
-      <button class="btn-nav icon-only" id="langBtn">
+      <button type="button" class="btn-nav icon-only" id="langBtn" aria-label="Выбрать язык" aria-expanded="false" aria-controls="langPanel" aria-haspopup="true">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
         <span id="langCur">РУ</span>
       </button>
       <div class="nav-panel" id="langPanel">
-        <button class="lp-opt" data-lang="ru">🇷🇺 Русский</button>
-<button class="lp-opt" data-lang="uk">🇺🇦 Українська</button>
-        <button class="lp-opt" data-lang="en">🇬🇧 English</button>
-        <button class="lp-opt" data-lang="de">🇩🇪 Deutsch</button>
-        <button class="lp-opt" data-lang="ja">🇯🇵 日本語</button>
-        <button class="lp-opt" data-lang="zh">🇨🇳 中文</button>
+        <button type="button" class="lp-opt" data-lang="ru">🇷🇺 Русский</button>
+<button type="button" class="lp-opt" data-lang="uk">🇺🇦 Українська</button>
+        <button type="button" class="lp-opt" data-lang="en">🇬🇧 English</button>
+        <button type="button" class="lp-opt" data-lang="de">🇩🇪 Deutsch</button>
+        <button type="button" class="lp-opt" data-lang="ja">🇯🇵 日本語</button>
+        <button type="button" class="lp-opt" data-lang="zh">🇨🇳 中文</button>
       </div>
     </div>
   </div>
@@ -967,6 +1236,7 @@ html[data-skin="tactile_brutalism"] .reel-more{border-radius:0}
       <circle cx="772" cy="150" r="5" fill="#3a3120"/>
     </svg>
   </div>
+  <h1 class="sr-only">Константин Захаров — официальный сайт музыканта</h1>
   <div class="eyebrow" data-i18n="eyebrow">Городской романс · лирический поп · R&amp;B</div>
   <p class="hero-tag" data-i18n="heroTag">Превращаю стихи в песни, а песни — в маленькие фильмы.</p>
   <div class="hero-cta">
@@ -977,20 +1247,86 @@ html[data-skin="tactile_brutalism"] .reel-more{border-radius:0}
 
 <section id="releases" class="wrap">
   <div class="sec-head"><span class="sec-num">01</span><h2 class="sec-title" data-i18n="discog">Дискография</h2><span class="sec-line"></span></div>
-  <div class="grid" id="grid"></div>
+  <div class="grid" id="grid">
+<a class="card in" href="https://band.link/nashpoet" target="_blank" rel="noopener">
+      <div class="frame"><img class="cover-img" loading="lazy" decoding="async" width="1000" height="1000" src="assets/covers/nash-poet-vladimir.webp" alt="Константин Захаров — Наш поэт Владимир — обложка сингла"></div>
+      <div class="card-body"><h3 class="card-title">Наш поэт Владимир</h3><div class="meta"><span class="chip">R&amp;B/Soul</span><span class="date">25.07.2026</span></div><span class="badge out">Вышел</span></div>
+    </a>
+<a class="card in" href="https://band.link/izpeplaantksl" target="_blank" rel="noopener">
+      <div class="frame"><img class="cover-img" loading="lazy" decoding="async" width="1000" height="1000" src="assets/covers/iz-pepla.webp" alt="Константин Захаров — Из пепла — обложка сингла"></div>
+      <div class="card-body"><h3 class="card-title">Из пепла</h3><div class="meta"><span class="chip">R&amp;B/Soul</span><span class="date">20.07.2026</span></div><span class="badge out">Вышел</span></div>
+    </a>
+<a class="card in" href="https://band.link/moontan" target="_blank" rel="noopener">
+      <div class="frame"><img class="cover-img" loading="lazy" decoding="async" width="1000" height="1000" src="assets/covers/moontan.webp" alt="Константин Захаров — Moontan — обложка сингла"></div>
+      <div class="card-body"><h3 class="card-title">Moontan</h3><div class="meta"><span class="chip">R&amp;B/Soul</span><span class="date">17.07.2026</span></div><span class="badge out">Вышел</span></div>
+    </a>
+<a class="card in" href="https://band.link/cherryorchard" target="_blank" rel="noopener">
+      <div class="frame"><img class="cover-img" loading="lazy" decoding="async" width="1000" height="1000" src="assets/covers/the-cherry-orchard.webp" alt="Константин Захаров — The Cherry Orchard — обложка сингла"></div>
+      <div class="card-body"><h3 class="card-title">The Cherry Orchard</h3><div class="meta"><span class="chip">Pop</span><span class="date">03.07.2026</span></div><span class="badge out">Вышел</span></div>
+    </a>
+<a class="card in" href="https://band.link/mvstretilis" target="_blank" rel="noopener">
+      <div class="frame"><img class="cover-img" loading="lazy" decoding="async" width="1000" height="1000" src="assets/covers/my-vstretilis.webp" alt="Константин Захаров — Мы встретились случайно — обложка сингла"></div>
+      <div class="card-body"><h3 class="card-title">Мы встретились случайно</h3><div class="meta"><span class="chip">Pop</span><span class="date">19.06.2026</span></div><span class="badge out">Вышел</span></div>
+    </a>
+<a class="card in" href="https://band.link/yavernulas" target="_blank" rel="noopener">
+      <div class="frame"><img class="cover-img" loading="lazy" decoding="async" width="1000" height="1000" src="assets/covers/ya-vernulas.webp" alt="Константин Захаров — Я вернулась к тебе — обложка сингла"></div>
+      <div class="card-body"><h3 class="card-title">Я вернулась к тебе</h3><div class="meta"><span class="chip">Blues</span><span class="date">15.06.2026</span></div><span class="badge out">Вышел</span></div>
+    </a>
+<a class="card in" href="https://band.link/latenightblueskz" target="_blank" rel="noopener">
+      <div class="frame"><img class="cover-img" loading="lazy" decoding="async" width="1000" height="1000" src="assets/covers/late-night-blues.webp" alt="Константин Захаров — Late-Night Blues — обложка сингла"></div>
+      <div class="card-body"><h3 class="card-title">Late-Night Blues</h3><div class="meta"><span class="chip">Blues</span><span class="date">11.06.2026</span></div><span class="badge out">Вышел</span></div>
+    </a>
+<a class="card in" href="https://band.link/ogonygori" target="_blank" rel="noopener">
+      <div class="frame"><img class="cover-img" loading="lazy" decoding="async" width="1000" height="1000" src="assets/covers/ogon-gori.webp" alt="Константин Захаров — Огонь гори — обложка сингла"></div>
+      <div class="card-body"><h3 class="card-title">Огонь гори</h3><div class="meta"><span class="chip">R&amp;B/Soul</span><span class="date">08.06.2026</span></div><span class="badge out">Вышел</span></div>
+    </a>
+<a class="card in" href="https://band.link/glitchkz" target="_blank" rel="noopener">
+      <div class="frame"><img class="cover-img" loading="lazy" decoding="async" width="1000" height="1000" src="assets/covers/glitch.webp" alt="Константин Захаров — Glitch — обложка сингла"></div>
+      <div class="card-body"><h3 class="card-title">Glitch</h3><div class="meta"><span class="chip">Alternative</span><span class="date">05.06.2026</span></div><span class="badge out">Вышел</span></div>
+    </a>
+<a class="card in" href="https://band.link/lunnyzagar" target="_blank" rel="noopener">
+      <div class="frame"><img class="cover-img" loading="lazy" decoding="async" width="1000" height="1000" src="assets/covers/lunnyy-zagar.webp" alt="Константин Захаров — Лунный загар мне подарит ночь — обложка сингла"></div>
+      <div class="card-body"><h3 class="card-title">Лунный загар мне подарит ночь</h3><div class="meta"><span class="chip">R&amp;B/Soul</span><span class="date">04.06.2026</span></div><span class="badge out">Вышел</span></div>
+    </a>
+<a class="card in" href="https://band.link/rasputnavesna" target="_blank" rel="noopener">
+      <div class="frame"><img class="cover-img" loading="lazy" decoding="async" width="1000" height="1000" src="assets/covers/rasputnaya-vesna.webp" alt="Константин Захаров — Распутная весна — обложка сингла"></div>
+      <div class="card-body"><h3 class="card-title">Распутная весна</h3><div class="meta"><span class="chip">Pop</span><span class="date">01.06.2026</span></div><span class="badge out">Вышел</span></div>
+    </a>
+<a class="card in" href="https://band.link/plylioblaka" target="_blank" rel="noopener">
+      <div class="frame"><img class="cover-img" loading="lazy" decoding="async" width="1000" height="1000" src="assets/covers/plyyli-oblaka.webp" alt="Константин Захаров — Плыли перед взором облака — обложка сингла"></div>
+      <div class="card-body"><h3 class="card-title">Плыли перед взором облака</h3><div class="meta"><span class="chip">R&amp;B/Soul</span><span class="date">29.05.2026</span></div><span class="badge out">Вышел</span></div>
+    </a>
+  </div>
 </section>
 
 <section id="soon" class="wrap">
   <div class="sec-head"><span class="sec-num">02</span><h2 class="sec-title" data-i18n="soon">Скоро</h2><span class="sec-line"></span></div>
-  <div class="grid" id="soonList"></div>
+  <div class="grid" id="soonList">
+<a class="card in" href="https://band.link/gorstpeskaantksl" target="_blank" rel="noopener">
+      <div class="frame"><img class="cover-img" loading="lazy" decoding="async" width="1000" height="1000" src="assets/covers/gorst-peska.webp" alt="Константин Захаров — Горсть песка — обложка сингла"></div>
+      <div class="card-body"><h3 class="card-title">Горсть песка</h3><div class="meta"><span class="chip">R&amp;B/Soul</span><span class="date">05.08.2026</span></div><span class="badge soon">Скоро · 05.08</span></div>
+    </a>
+<a class="card in" href="https://band.link/normm" target="_blank" rel="noopener">
+      <div class="frame"><img class="cover-img" loading="lazy" decoding="async" width="1000" height="1000" src="assets/covers/normm.webp" alt="Константин Захаров — Нормм — обложка сингла"></div>
+      <div class="card-body"><h3 class="card-title">Нормм</h3><div class="meta"><span class="chip">Alternative</span><span class="date">12.08.2026</span></div><span class="badge soon">Скоро · 12.08</span></div>
+    </a>
+<a class="card in" href="https://band.link/lyubimygdety" target="_blank" rel="noopener">
+      <div class="frame"><img class="cover-img" loading="lazy" decoding="async" width="1000" height="1000" src="assets/covers/lyubimy-gde-ty.webp" alt="Константин Захаров — Любимый, где ты? — обложка сингла"></div>
+      <div class="card-body"><h3 class="card-title">Любимый, где ты?</h3><div class="meta"><span class="chip">R&amp;B/Soul</span><span class="date">20.08.2026</span></div><span class="badge soon">Скоро · 20.08</span></div>
+    </a>
+<a class="card in" href="https://band.link/turgenevskaya" target="_blank" rel="noopener">
+      <div class="frame"><img class="cover-img" loading="lazy" decoding="async" width="1000" height="1000" src="assets/covers/turgenevskaya.webp" alt="Константин Захаров — Тургеневская женщина — обложка сингла"></div>
+      <div class="card-body"><h3 class="card-title">Тургеневская женщина</h3><div class="meta"><span class="chip">R&amp;B/Soul</span><span class="date">27.08.2026</span></div><span class="badge soon">Скоро · 27.08</span></div>
+    </a>
+  </div>
 </section>
 
 <section id="about" class="wrap">
   <div class="sec-head"><span class="sec-num">03</span><h2 class="sec-title" data-i18n="about">О себе</h2><span class="sec-line"></span></div>
   <div class="about">
     <img width="420" height="420" class="av-img about-portrait" alt="Константин Захаров">
-    <p id="aboutPara"><span class="drop">К</span>онстантин Захаров — автор-исполнитель. Городской романс и лирический поп — о любви, утрате и внутренней силе. Превращаю стихи в песни, а песни — в маленькие фильмы: музыка, клипы, визуальные истории. С 2026 года выпускаю треки под лейблом ANTKSL через дистрибьютора 682 Distribution — на всех крупных площадках: Яндекс Музыке, Apple Music, Spotify и ВКонтакте. Более 10 синглов с мая по июль 2026 года.</p>
-    <p style="font-size:0.75em;opacity:0.5;margin-top:0.5em;">Обновлено: июль 2026</p>
+    <p id="aboutPara"><span class="drop">К</span>онстантин Захаров — автор-исполнитель. Городской романс и лирический поп — о любви, утрате и внутренней силе. Превращаю стихи в песни, а песни — в маленькие фильмы: музыка, клипы, визуальные истории. С 2026 года выпускаю треки под лейблом ANTKSL через дистрибьютора 682 Distribution — на всех крупных площадках: Яндекс Музыке, Apple Music, Spotify и ВКонтакте. Более 10 синглов с мая по август 2026 года.</p>
+    <p style="font-size:0.75em;opacity:0.5;margin-top:0.5em;">Обновлено: август 2026</p>
   </div>
 </section>
 
@@ -1001,15 +1337,15 @@ html[data-skin="tactile_brutalism"] .reel-more{border-radius:0}
 
   <div class="video-card reel-card" data-clip="r13" data-yt="7pS4_fs9SwY" data-vk-oid="239543600" data-vk-id="456239064">
     <div class="video-frame">
-      <div class="video-poster" role="button" tabindex="0" aria-label="Смотреть рилз «Тургеневская женщина»"><span class="play"></span></div>
+      <button type="button" class="video-poster" aria-label="Смотреть рилз «Тургеневская женщина»"><span class="play"></span></button>
     </div>
     <div class="video-meta">
       <span class="reel-badge soon" data-i18n-reels="b_2708">Скоро · 27.08</span>
       <h3 class="vt">Тургеневская женщина</h3>
       <p class="reel-cap">Та, кого не разглядели тысячи слепых. Она не ждёт — она выбирает, кого впустить.</p>
       <div class="video-src">
-        <button data-src="vk" aria-pressed="true">VK Видео</button>
-        <button data-src="yt" aria-pressed="false">YouTube</button>
+        <button type="button" data-src="vk" aria-pressed="true">VK Видео</button>
+        <button type="button" data-src="yt" aria-pressed="false">YouTube</button>
       </div>
       <a class="reel-listen" href="https://band.link/turgenevskaya" target="_blank" rel="noopener">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
@@ -1020,14 +1356,14 @@ html[data-skin="tactile_brutalism"] .reel-more{border-radius:0}
 
   <div class="video-card reel-card" data-clip="r14" data-yt="_c-u7uvMuZc" data-vk-oid="239543600" data-vk-id="456239065">
     <div class="video-frame">
-      <div class="video-poster" role="button" tabindex="0" aria-label="Смотреть рилз «Glitch»"><span class="play"></span></div>
+      <button type="button" class="video-poster" aria-label="Смотреть рилз «Glitch»"><span class="play"></span></button>
     </div>
     <div class="video-meta">
       <h3 class="vt">Glitch</h3>
       <p class="reel-cap">Сбой в системе, где чувство прорывается сквозь помехи.</p>
       <div class="video-src">
-        <button data-src="vk" aria-pressed="true">VK Видео</button>
-        <button data-src="yt" aria-pressed="false">YouTube</button>
+        <button type="button" data-src="vk" aria-pressed="true">VK Видео</button>
+        <button type="button" data-src="yt" aria-pressed="false">YouTube</button>
       </div>
       <a class="reel-listen" href="https://band.link/glitchkz" target="_blank" rel="noopener">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
@@ -1038,14 +1374,14 @@ html[data-skin="tactile_brutalism"] .reel-more{border-radius:0}
 
   <div class="video-card reel-card" data-clip="r15" data-yt="2QjXaoWgMBU" data-vk-oid="239543600" data-vk-id="456239066">
     <div class="video-frame">
-      <div class="video-poster" role="button" tabindex="0" aria-label="Смотреть рилз «Мы встретились случайно»"><span class="play"></span></div>
+      <button type="button" class="video-poster" aria-label="Смотреть рилз «Мы встретились случайно»"><span class="play"></span></button>
     </div>
     <div class="video-meta">
       <h3 class="vt">Мы встретились случайно</h3>
       <p class="reel-cap">Случайная встреча, за которой — целая несбывшаяся жизнь.</p>
       <div class="video-src">
-        <button data-src="vk" aria-pressed="true">VK Видео</button>
-        <button data-src="yt" aria-pressed="false">YouTube</button>
+        <button type="button" data-src="vk" aria-pressed="true">VK Видео</button>
+        <button type="button" data-src="yt" aria-pressed="false">YouTube</button>
       </div>
       <a class="reel-listen" href="https://band.link/mvstretilis" target="_blank" rel="noopener">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
@@ -1056,15 +1392,15 @@ html[data-skin="tactile_brutalism"] .reel-more{border-radius:0}
 
   <div class="video-card reel-card" data-clip="r11" data-yt="1FYPSE_ZJzc" data-vk-oid="239543600" data-vk-id="456239063">
     <div class="video-frame">
-      <div class="video-poster" role="button" tabindex="0" aria-label="Смотреть рилз «Любимый, где ты?»"><span class="play"></span></div>
+      <button type="button" class="video-poster" aria-label="Смотреть рилз «Любимый, где ты?»"><span class="play"></span></button>
     </div>
     <div class="video-meta">
       <span class="reel-badge soon" data-i18n-reels="b_2008">Скоро · 20.08</span>
       <h3 class="vt">Любимый, где ты?</h3>
       <p class="reel-cap">Ты как айсберг. Я — Титаник. И то «нет», что приходит слишком поздно, чтобы ранить.</p>
       <div class="video-src">
-        <button data-src="vk" aria-pressed="true">VK Видео</button>
-        <button data-src="yt" aria-pressed="false">YouTube</button>
+        <button type="button" data-src="vk" aria-pressed="true">VK Видео</button>
+        <button type="button" data-src="yt" aria-pressed="false">YouTube</button>
       </div>
       <a class="reel-listen" href="https://band.link/lyubimygdety" target="_blank" rel="noopener">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
@@ -1075,15 +1411,15 @@ html[data-skin="tactile_brutalism"] .reel-more{border-radius:0}
 
   <div class="video-card reel-card" data-clip="r12" data-yt="-9MWGLhcum4" data-vk-oid="239543600" data-vk-id="456239062">
     <div class="video-frame">
-      <div class="video-poster" role="button" tabindex="0" aria-label="Смотреть рилз «Нормм»"><span class="play"></span></div>
+      <button type="button" class="video-poster" aria-label="Смотреть рилз «Нормм»"><span class="play"></span></button>
     </div>
     <div class="video-meta">
       <span class="reel-badge soon" data-i18n-reels="b_1208">Скоро · 12.08</span>
       <h3 class="vt">Нормм</h3>
       <p class="reel-cap">«Нормм» — это броня. За ней тревога, которую не говорят вслух.</p>
       <div class="video-src">
-        <button data-src="vk" aria-pressed="true">VK Видео</button>
-        <button data-src="yt" aria-pressed="false">YouTube</button>
+        <button type="button" data-src="vk" aria-pressed="true">VK Видео</button>
+        <button type="button" data-src="yt" aria-pressed="false">YouTube</button>
       </div>
       <a class="reel-listen" href="https://band.link/normm" target="_blank" rel="noopener">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
@@ -1094,15 +1430,15 @@ html[data-skin="tactile_brutalism"] .reel-more{border-radius:0}
 
   <div class="video-card reel-card" data-clip="r5" data-yt="A4tH1fK6K1k" data-vk-oid="239543600" data-vk-id="456239026">
     <div class="video-frame">
-      <div class="video-poster" role="button" tabindex="0" aria-label="Смотреть рилз «Из пепла»"><span class="play"></span></div>
+      <button type="button" class="video-poster" aria-label="Смотреть рилз «Из пепла»"><span class="play"></span></button>
     </div>
     <div class="video-meta">
-      <span class="reel-badge soon" data-i18n-reels="b_2007">Скоро · 20.07</span>
+      <span class="reel-badge out" data-i18n-reels="b_out">Уже вышел</span>
       <h3 class="vt">Из пепла</h3>
       <p class="reel-cap">Разорви письмо. Восстань из пепла.</p>
       <div class="video-src">
-        <button data-src="vk" aria-pressed="true">VK Видео</button>
-        <button data-src="yt" aria-pressed="false">YouTube</button>
+        <button type="button" data-src="vk" aria-pressed="true">VK Видео</button>
+        <button type="button" data-src="yt" aria-pressed="false">YouTube</button>
       </div>
       <a class="reel-listen" href="https://band.link/izpeplaantksl" target="_blank" rel="noopener">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
@@ -1113,15 +1449,15 @@ html[data-skin="tactile_brutalism"] .reel-more{border-radius:0}
 
   <div class="video-card reel-card" data-clip="r4" data-yt="FuHsYcLZngY" data-vk-oid="239543600" data-vk-id="456239025">
     <div class="video-frame">
-      <div class="video-poster" role="button" tabindex="0" aria-label="Смотреть рилз «Горсть песка»"><span class="play"></span></div>
+      <button type="button" class="video-poster" aria-label="Смотреть рилз «Горсть песка»"><span class="play"></span></button>
     </div>
     <div class="video-meta">
       <span class="reel-badge soon" data-i18n-reels="b_0508">Скоро · 05.08</span>
       <h3 class="vt">Горсть песка</h3>
       <p class="reel-cap">Время сквозь пальцы — как горсть песка. Не горечь — принятие.</p>
       <div class="video-src">
-        <button data-src="vk" aria-pressed="true">VK Видео</button>
-        <button data-src="yt" aria-pressed="false">YouTube</button>
+        <button type="button" data-src="vk" aria-pressed="true">VK Видео</button>
+        <button type="button" data-src="yt" aria-pressed="false">YouTube</button>
       </div>
       <a class="reel-listen" href="https://band.link/gorstpeskaantksl" target="_blank" rel="noopener">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
@@ -1132,15 +1468,15 @@ html[data-skin="tactile_brutalism"] .reel-more{border-radius:0}
 
   <div class="video-card reel-card" data-clip="r9" data-yt="ltJh8pS8WiE" data-vk-oid="239543600" data-vk-id="456239058">
     <div class="video-frame">
-      <div class="video-poster" role="button" tabindex="0" aria-label="Смотреть рилз «Лунный загар»"><span class="play"></span></div>
+      <button type="button" class="video-poster" aria-label="Смотреть рилз «Лунный загар»"><span class="play"></span></button>
     </div>
     <div class="video-meta">
       <span class="reel-badge out" data-i18n-reels="b_out">Уже вышел</span>
       <h3 class="vt">Лунный загар</h3>
       <p class="reel-cap">Зимняя ночь, лунный свет и тишина января.</p>
       <div class="video-src">
-        <button data-src="vk" aria-pressed="true">VK Видео</button>
-        <button data-src="yt" aria-pressed="false">YouTube</button>
+        <button type="button" data-src="vk" aria-pressed="true">VK Видео</button>
+        <button type="button" data-src="yt" aria-pressed="false">YouTube</button>
       </div>
       <a class="reel-listen" href="https://band.link/lunnyzagar" target="_blank" rel="noopener">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
@@ -1151,15 +1487,15 @@ html[data-skin="tactile_brutalism"] .reel-more{border-radius:0}
 
   <div class="video-card reel-card" data-clip="r8" data-yt="Cy4TQt3ePgs" data-vk-oid="239543600" data-vk-id="456239061">
     <div class="video-frame">
-      <div class="video-poster" role="button" tabindex="0" aria-label="Смотреть рилз «Огонь гори»"><span class="play"></span></div>
+      <button type="button" class="video-poster" aria-label="Смотреть рилз «Огонь гори»"><span class="play"></span></button>
     </div>
     <div class="video-meta">
       <span class="reel-badge out" data-i18n-reels="b_out">Уже вышел</span>
       <h3 class="vt">Огонь гори</h3>
       <p class="reel-cap">Боль носит красивое платье и уходит молча.</p>
       <div class="video-src">
-        <button data-src="vk" aria-pressed="true">VK Видео</button>
-        <button data-src="yt" aria-pressed="false">YouTube</button>
+        <button type="button" data-src="vk" aria-pressed="true">VK Видео</button>
+        <button type="button" data-src="yt" aria-pressed="false">YouTube</button>
       </div>
       <a class="reel-listen" href="https://band.link/ogonygori" target="_blank" rel="noopener">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
@@ -1170,15 +1506,15 @@ html[data-skin="tactile_brutalism"] .reel-more{border-radius:0}
 
   <div class="video-card reel-card" data-clip="r6" data-yt="qSxnTcGtR9o" data-vk-oid="239543600" data-vk-id="456239028">
     <div class="video-frame">
-      <div class="video-poster" role="button" tabindex="0" aria-label="Смотреть рилз «Late-Night Blues»"><span class="play"></span></div>
+      <button type="button" class="video-poster" aria-label="Смотреть рилз «Late-Night Blues»"><span class="play"></span></button>
     </div>
     <div class="video-meta">
       <span class="reel-badge out" data-i18n-reels="b_out">Уже вышел</span>
       <h3 class="vt">Late-Night Blues</h3>
       <p class="reel-cap">Нью-Йорк спит, Петербург не отпускает. Поздний блюз между двух берегов.</p>
       <div class="video-src">
-        <button data-src="vk" aria-pressed="true">VK Видео</button>
-        <button data-src="yt" aria-pressed="false">YouTube</button>
+        <button type="button" data-src="vk" aria-pressed="true">VK Видео</button>
+        <button type="button" data-src="yt" aria-pressed="false">YouTube</button>
       </div>
       <a class="reel-listen" href="https://band.link/latenightblueskz" target="_blank" rel="noopener">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
@@ -1189,15 +1525,15 @@ html[data-skin="tactile_brutalism"] .reel-more{border-radius:0}
 
   <div class="video-card reel-card" data-clip="r7" data-yt="XRM3sHo3vXU" data-vk-oid="239543600" data-vk-id="456239027">
     <div class="video-frame">
-      <div class="video-poster" role="button" tabindex="0" aria-label="Смотреть рилз «Я вернулась к тебе»"><span class="play"></span></div>
+      <button type="button" class="video-poster" aria-label="Смотреть рилз «Я вернулась к тебе»"><span class="play"></span></button>
     </div>
     <div class="video-meta">
       <span class="reel-badge out" data-i18n-reels="b_out">Уже вышел</span>
       <h3 class="vt">Я вернулась к тебе</h3>
       <p class="reel-cap">Она вернулась сама — без зова, по первому снегу.</p>
       <div class="video-src">
-        <button data-src="vk" aria-pressed="true">VK Видео</button>
-        <button data-src="yt" aria-pressed="false">YouTube</button>
+        <button type="button" data-src="vk" aria-pressed="true">VK Видео</button>
+        <button type="button" data-src="yt" aria-pressed="false">YouTube</button>
       </div>
       <a class="reel-listen" href="https://band.link/yavernulas" target="_blank" rel="noopener">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
@@ -1208,15 +1544,15 @@ html[data-skin="tactile_brutalism"] .reel-more{border-radius:0}
 
   <div class="video-card reel-card" data-clip="r10" data-yt="SdW7yV87Vro" data-vk-oid="239543600" data-vk-id="456239060">
     <div class="video-frame">
-      <div class="video-poster" role="button" tabindex="0" aria-label="Смотреть рилз «Распутная весна»"><span class="play"></span></div>
+      <button type="button" class="video-poster" aria-label="Смотреть рилз «Распутная весна»"><span class="play"></span></button>
     </div>
     <div class="video-meta">
       <span class="reel-badge out" data-i18n-reels="b_out">Уже вышел</span>
       <h3 class="vt">Распутная весна</h3>
       <p class="reel-cap">Весна, которая всё переворачивает. Не спрашивая разрешения.</p>
       <div class="video-src">
-        <button data-src="vk" aria-pressed="true">VK Видео</button>
-        <button data-src="yt" aria-pressed="false">YouTube</button>
+        <button type="button" data-src="vk" aria-pressed="true">VK Видео</button>
+        <button type="button" data-src="yt" aria-pressed="false">YouTube</button>
       </div>
       <a class="reel-listen" href="https://band.link/rasputnavesna" target="_blank" rel="noopener">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
@@ -1227,15 +1563,15 @@ html[data-skin="tactile_brutalism"] .reel-more{border-radius:0}
 
   <div class="video-card reel-card" data-clip="r0" data-yt="J_IQ1myP4PQ" data-vk-oid="239543600" data-vk-id="456239059">
     <div class="video-frame">
-      <div class="video-poster" role="button" tabindex="0" aria-label="Смотреть рилз «The Cherry Orchard»"><span class="play"></span></div>
+      <button type="button" class="video-poster" aria-label="Смотреть рилз «The Cherry Orchard»"><span class="play"></span></button>
     </div>
     <div class="video-meta">
       <span class="reel-badge out" data-i18n-reels="b_out">Уже вышел</span>
       <h3 class="vt">The Cherry Orchard</h3>
       <p class="reel-cap">Вишнёвый сад, где когда-то учились любить, не забывается. Даже в чужой стране.</p>
       <div class="video-src">
-        <button data-src="vk" aria-pressed="true">VK Видео</button>
-        <button data-src="yt" aria-pressed="false">YouTube</button>
+        <button type="button" data-src="vk" aria-pressed="true">VK Видео</button>
+        <button type="button" data-src="yt" aria-pressed="false">YouTube</button>
       </div>
       <a class="reel-listen" href="https://band.link/cherryorchard" target="_blank" rel="noopener">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
@@ -1246,15 +1582,15 @@ html[data-skin="tactile_brutalism"] .reel-more{border-radius:0}
 
   <div class="video-card reel-card" data-clip="r1" data-yt="xV5Y6ZOBg7s" data-vk-oid="239543600" data-vk-id="456239022">
     <div class="video-frame">
-      <div class="video-poster" role="button" tabindex="0" aria-label="Смотреть рилз «Наш поэт Владимир»"><span class="play"></span></div>
+      <button type="button" class="video-poster" aria-label="Смотреть рилз «Наш поэт Владимир»"><span class="play"></span></button>
     </div>
     <div class="video-meta">
-      <span class="reel-badge soon" data-i18n-reels="b_2507">Скоро · 25.07</span>
+      <span class="reel-badge out" data-i18n-reels="b_out">Уже вышел</span>
       <h3 class="vt">Наш поэт Владимир</h3>
       <p class="reel-cap">Посвящение Владимиру Высоцкому. Не мессия и не бог — а поэт от Бога.</p>
       <div class="video-src">
-        <button data-src="vk" aria-pressed="true">VK Видео</button>
-        <button data-src="yt" aria-pressed="false">YouTube</button>
+        <button type="button" data-src="vk" aria-pressed="true">VK Видео</button>
+        <button type="button" data-src="yt" aria-pressed="false">YouTube</button>
       </div>
       <a class="reel-listen" href="https://band.link/nashpoet" target="_blank" rel="noopener">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
@@ -1265,15 +1601,15 @@ html[data-skin="tactile_brutalism"] .reel-more{border-radius:0}
 
   <div class="video-card reel-card" data-clip="r3" data-yt="qGRdFY4mmoI" data-vk-oid="239543600" data-vk-id="456239024">
     <div class="video-frame">
-      <div class="video-poster" role="button" tabindex="0" aria-label="Смотреть рилз «Moontan»"><span class="play"></span></div>
+      <button type="button" class="video-poster" aria-label="Смотреть рилз «Moontan»"><span class="play"></span></button>
     </div>
     <div class="video-meta">
-      <span class="reel-badge soon" data-i18n-reels="b_1707">Скоро · 17.07</span>
+      <span class="reel-badge out" data-i18n-reels="b_out">Уже вышел</span>
       <h3 class="vt">Moontan</h3>
       <p class="reel-cap">Ночной свет меняет всё. Луна — как лейбл на коже, который не смыть.</p>
       <div class="video-src">
-        <button data-src="vk" aria-pressed="true">VK Видео</button>
-        <button data-src="yt" aria-pressed="false">YouTube</button>
+        <button type="button" data-src="vk" aria-pressed="true">VK Видео</button>
+        <button type="button" data-src="yt" aria-pressed="false">YouTube</button>
       </div>
       <a class="reel-listen" href="https://band.link/moontan" target="_blank" rel="noopener">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
@@ -1284,15 +1620,15 @@ html[data-skin="tactile_brutalism"] .reel-more{border-radius:0}
 
   <div class="video-card reel-card" data-clip="r2" data-yt="iTvSCnLOydI" data-vk-oid="239543600" data-vk-id="456239021">
     <div class="video-frame">
-      <div class="video-poster" role="button" tabindex="0" aria-label="Смотреть рилз «Плыли перед взором облака»"><span class="play"></span></div>
+      <button type="button" class="video-poster" aria-label="Смотреть рилз «Плыли перед взором облака»"><span class="play"></span></button>
     </div>
     <div class="video-meta">
       <span class="reel-badge out" data-i18n-reels="b_out">Уже вышел</span>
       <h3 class="vt">Плыли перед взором облака</h3>
       <p class="reel-cap">Музыка, которая остаётся после — как облака за окном поезда. Тихая. Настоящая.</p>
       <div class="video-src">
-        <button data-src="vk" aria-pressed="true">VK Видео</button>
-        <button data-src="yt" aria-pressed="false">YouTube</button>
+        <button type="button" data-src="vk" aria-pressed="true">VK Видео</button>
+        <button type="button" data-src="yt" aria-pressed="false">YouTube</button>
       </div>
       <a class="reel-listen" href="https://band.link/plylioblaka" target="_blank" rel="noopener">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
@@ -1311,37 +1647,37 @@ html[data-skin="tactile_brutalism"] .reel-more{border-radius:0}
   <div class="video-grid">
   <div class="video-card" data-clip="0" data-yt="3FLJU-kOQog" data-vk-oid="239543600" data-vk-id="456239017">
     <div class="video-frame">
-      <div class="video-poster" role="button" tabindex="0" aria-label="Смотреть «Осень плакса»"><span class="play"></span></div>
+      <button type="button" class="video-poster" aria-label="Смотреть «Осень плакса»"><span class="play"></span></button>
     </div>
     <div class="video-meta">
       <h3 class="vt">Осень плакса</h3>
       <div class="video-src">
-        <button data-src="vk" aria-pressed="true">VK Видео</button>
-        <button data-src="yt" aria-pressed="false">YouTube</button>
+        <button type="button" data-src="vk" aria-pressed="true">VK Видео</button>
+        <button type="button" data-src="yt" aria-pressed="false">YouTube</button>
       </div>
     </div>
   </div>
   <div class="video-card" data-clip="1" data-yt="tDTLzhXXNAw" data-vk-oid="239543600" data-vk-id="456239018">
     <div class="video-frame">
-      <div class="video-poster" role="button" tabindex="0" aria-label="Смотреть «И часто вспоминается Есенин»"><span class="play"></span></div>
+      <button type="button" class="video-poster" aria-label="Смотреть «И часто вспоминается Есенин»"><span class="play"></span></button>
     </div>
     <div class="video-meta">
       <h3 class="vt">И часто вспоминается Есенин</h3>
       <div class="video-src">
-        <button data-src="vk" aria-pressed="true">VK Видео</button>
-        <button data-src="yt" aria-pressed="false">YouTube</button>
+        <button type="button" data-src="vk" aria-pressed="true">VK Видео</button>
+        <button type="button" data-src="yt" aria-pressed="false">YouTube</button>
       </div>
     </div>
   </div>
   <div class="video-card" data-clip="2" data-yt="IiDo6Gnc1G0" data-vk-oid="239543600" data-vk-id="456239019">
     <div class="video-frame">
-      <div class="video-poster" role="button" tabindex="0" aria-label="Смотреть «Переживи девятый вал»"><span class="play"></span></div>
+      <button type="button" class="video-poster" aria-label="Смотреть «Переживи девятый вал»"><span class="play"></span></button>
     </div>
     <div class="video-meta">
       <h3 class="vt">Переживи девятый вал</h3>
       <div class="video-src">
-        <button data-src="vk" aria-pressed="true">VK Видео</button>
-        <button data-src="yt" aria-pressed="false">YouTube</button>
+        <button type="button" data-src="vk" aria-pressed="true">VK Видео</button>
+        <button type="button" data-src="yt" aria-pressed="false">YouTube</button>
       </div>
     </div>
   </div>
@@ -1378,6 +1714,7 @@ html[data-skin="tactile_brutalism"] .reel-more{border-radius:0}
 <footer>
   <div class="fname">Константин Захаров</div>
   <div>© <span id="yr"></span> Константин Захаров · Label ANTKSL · <a href="https://vk.com/zakharov_music" target="_blank" rel="noopener">vk.com/zakharov_music</a></div>
+  <button class="privacy-settings" id="consentSettings" type="button">Настройки аналитики</button>
 </footer>
 <script>
   // ---- data (твой реальный каталог) ----
@@ -1611,7 +1948,8 @@ const COVER_WORD={ru:"обложка сингла",uk:"\u043e\u0431\u043a\u043b\
 
 const rel=tracks.filter(r=>r.date<=today).sort((a,b)=>b.date.localeCompare(a.date));
 const up=tracks.filter(r=>r.date>today).sort((a,b)=>a.date.localeCompare(b.date));
-let currentLang=(function(){try{return localStorage.getItem('lang');}catch(e){return null;}})()||null;
+let currentLang=(function(){try{var v=localStorage.getItem('lang');return ['ru','uk','en','de','ja','zh'].includes(v)?v:null;}catch(e){return null;}})();
+document.documentElement.classList.add('js-ready');
 const io=(typeof IntersectionObserver!=='undefined')?new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target);}});},{threshold:.12}):{observe:function(n){n.classList.add('in');},unobserve:function(){}};
 function card(r,released,animate){
   const cover=COVERS[r.t]||'';
@@ -1622,7 +1960,7 @@ function card(r,released,animate){
   const t=I18N[currentLang];
   const badge=released?'<span class="badge out">'+t.outBadge+'</span>':'<span class="badge soon">'+t.soonBadge+' \u00b7 '+r.date.split('-')[2]+'.'+r.date.split('-')[1]+'</span>';
   return '<a class="card" href="'+r.url+'" target="_blank" rel="noopener">'+
-    '<div class="frame"><img class="cover-img" loading="lazy" decoding="async" src="'+cover+'" alt="'+artist+' \u2014 '+title+' \u2014 '+pickI18N(COVER_WORD,currentLang,'cover')+'" loading="lazy">'+
+    '<div class="frame"><img class="cover-img" loading="lazy" decoding="async" width="1000" height="1000" src="'+cover+'" alt="'+artist+' \u2014 '+title+' \u2014 '+pickI18N(COVER_WORD,currentLang,'cover')+'">'+
     '<div class="cover-desc"><span>'+desc+'</span></div></div>'+
     '<div class="card-body"><h3 class="card-title">'+title+'</h3>'+
     '<div class="meta"><span class="chip">'+r.g+'</span><span class="date">'+human(r.date)+'</span></div>'+
@@ -1638,6 +1976,7 @@ function renderAll(animate){
   });
 }
 function setLang(lang){
+  if(!I18N[lang])lang='ru';
   currentLang=lang;
   try{localStorage.setItem('lang',lang);}catch(e){}
   document.documentElement.lang=lang;
@@ -1672,8 +2011,11 @@ function setLang(lang){
   renderAll(true);setLang(currentLang);
 })();
 const yr=document.getElementById('yr');if(yr) yr.textContent=new Date().getFullYear();
-function closeAllPanels(){document.querySelectorAll('.nav-panel').forEach(p=>{p.classList.remove('open');});}
-['listenBtn','emailBtn','langBtn'].forEach(btnId=>{
+function closeAllPanels(){
+  document.querySelectorAll('.nav-panel').forEach(p=>{p.classList.remove('open');});
+  document.querySelectorAll('.btn-nav[aria-expanded]').forEach(b=>b.setAttribute('aria-expanded','false'));
+}
+['mobileNavBtn','listenBtn','emailBtn','langBtn'].forEach(btnId=>{
   const btn=document.getElementById(btnId);
   if(!btn) return;
   const panelId=btnId.replace('Btn','Panel');
@@ -1684,7 +2026,8 @@ function closeAllPanels(){document.querySelectorAll('.nav-panel').forEach(p=>{p.
     const open=panel.classList.contains('open');
     closeAllPanels();
     document.querySelectorAll('.btn-nav').forEach(b=>b.classList.remove('active'));
-    if(!open){panel.classList.add('open');btn.classList.add('active');}
+    if(!open){panel.classList.add('open');btn.classList.add('active');btn.setAttribute('aria-expanded','true');}
+    else{btn.setAttribute('aria-expanded','false');}
   });
   panel.addEventListener('click',e=>e.stopPropagation());
 });
@@ -1698,6 +2041,9 @@ if(cpBtn) cpBtn.addEventListener('click',()=>{
 });
 document.querySelectorAll('.lp-opt').forEach(btn=>{
   btn.addEventListener('click',()=>{setLang(btn.dataset.lang);closeAllPanels();document.querySelectorAll('.btn-nav').forEach(b=>b.classList.remove('active'));});
+});
+document.querySelectorAll('#mobileNavPanel a').forEach(a=>{
+  a.addEventListener('click',()=>{closeAllPanels();document.querySelectorAll('.btn-nav').forEach(b=>b.classList.remove('active'));});
 });
 
 
@@ -1751,7 +2097,7 @@ var base={
     session:sid()
   };
   function send(ev){
-    if(BOT) return;
+    if(BOT || !window.ANTKSL_ANALYTICS || !window.ANTKSL_ANALYTICS.allowed()) return;
     try{
       var body=JSON.stringify(Object.assign({},base,ev));
       // sendBeacon не блокирует уход со страницы; fallback на fetch
@@ -1813,7 +2159,7 @@ var base={
   new MutationObserver(apply).observe(document.documentElement,{attributes:true,attributeFilter:['lang']});
   // аналитика кликов поддержки (в общий сборщик)
   document.querySelectorAll('.support-btn').forEach(function(b){b.addEventListener('click',function(){
-    try{if(window.__ANTKSL_BOT)return;var SB="https://qhxhdzwtcjzdinbicjxl.supabase.co",K="sb_publishable_6giNbAp4HJTGo_FQCLV6AA_WtwMQlFP";
+    try{if(window.__ANTKSL_BOT||!window.ANTKSL_ANALYTICS||!window.ANTKSL_ANALYTICS.allowed())return;var SB="https://qhxhdzwtcjzdinbicjxl.supabase.co",K="sb_publishable_6giNbAp4HJTGo_FQCLV6AA_WtwMQlFP";
       if(typeof fetch==="function")fetch(SB+"/rest/v1/events",{method:"POST",keepalive:true,
         headers:{"Content-Type":"application/json","apikey":K,"Authorization":"Bearer "+K,"Prefer":"return=minimal"},
         body:JSON.stringify({type:"click_support",detail:b.getAttribute("data-support"),path:location.pathname})}).catch(function(){});
@@ -1976,7 +2322,7 @@ var base={
         en:{title:"Music videos",sub:"Little films for the songs. Pick a platform and watch right here."},de:{title:"Musikvideos",sub:"Kleine Filme zu den Liedern. Wähle eine Plattform und schau direkt hier."}};
   function lang(){try{var l=(document.documentElement.lang||'ru').slice(0,2);var t=T[l]||T.ru;
     document.querySelectorAll('[data-i18n-videos]').forEach(function(n){var k=n.getAttribute('data-i18n-videos');if(t[k])n.textContent=t[k];});}catch(e){}}
-  function track(title,src,kind){try{if(window.__ANTKSL_BOT)return;var SB="https://qhxhdzwtcjzdinbicjxl.supabase.co",K="sb_publishable_6giNbAp4HJTGo_FQCLV6AA_WtwMQlFP";
+  function track(title,src,kind){try{if(window.__ANTKSL_BOT||!window.ANTKSL_ANALYTICS||!window.ANTKSL_ANALYTICS.allowed())return;var SB="https://qhxhdzwtcjzdinbicjxl.supabase.co",K="sb_publishable_6giNbAp4HJTGo_FQCLV6AA_WtwMQlFP";
     if(typeof fetch==="function")fetch(SB+"/rest/v1/events",{method:"POST",keepalive:true,
       headers:{"Content-Type":"application/json","apikey":K,"Authorization":"Bearer "+K,"Prefer":"return=minimal"},
       body:JSON.stringify({type:kind||"click_video",release:title,detail:src,path:location.pathname})}).catch(function(){});}catch(e){}}
@@ -1994,9 +2340,10 @@ var base={
       return;
     }
     var url = src==='yt'
-      ? 'https://www.youtube.com/embed/'+card.getAttribute('data-yt')+'?autoplay=1&rel=0'
+      ? 'https://www.youtube-nocookie.com/embed/'+card.getAttribute('data-yt')+'?autoplay=1&rel=0'
       : 'https://vkvideo.ru/video_ext.php?oid=-'+card.getAttribute('data-vk-oid')+'&id='+card.getAttribute('data-vk-id')+'&hd=2&autoplay=1';
-    frame.innerHTML='<iframe src="'+url+'" allow="autoplay; encrypted-media; fullscreen; picture-in-picture" allowfullscreen></iframe>';
+    var ttl=(card.querySelector('.vt')||{}).textContent||'Видео';
+    frame.innerHTML='<iframe src="'+url+'" title="'+ttl.replace(/"/g,'&quot;')+'" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="autoplay; encrypted-media; fullscreen; picture-in-picture" allowfullscreen></iframe>';
     track(card.querySelector('.vt').textContent, src, card.classList.contains('reel-card')?'click_reel':'click_video');
   }
   document.querySelectorAll('.video-card').forEach(function(card){
@@ -2015,7 +2362,7 @@ var base={
   new MutationObserver(lang).observe(document.documentElement,{attributes:true,attributeFilter:['lang']});
   lang();
 })();</script>
-<button class="totop" id="toTop" aria-label="Наверх" title="Наверх">
+<button type="button" class="totop" id="toTop" aria-label="Наверх" title="Наверх">
   <svg class="tt-ring" viewBox="0 0 52 52" aria-hidden="true">
     <circle class="tt-track" cx="26" cy="26" r="24"></circle>
     <circle class="tt-prog" id="ttProg" cx="26" cy="26" r="24"></circle>
@@ -2132,7 +2479,7 @@ var base={
   applyLimit();
   // трекинг кликов по «Слушать песню» (band.link) — видно по каким рилзам уходят слушать
   var SB="https://qhxhdzwtcjzdinbicjxl.supabase.co",K="sb_publishable_6giNbAp4HJTGo_FQCLV6AA_WtwMQlFP";
-  function trk(type,release,detail){try{if(window.__ANTKSL_BOT)return;
+  function trk(type,release,detail){try{if(window.__ANTKSL_BOT||!window.ANTKSL_ANALYTICS||!window.ANTKSL_ANALYTICS.allowed())return;
     if(typeof fetch==="function")fetch(SB+"/rest/v1/events",{method:"POST",keepalive:true,
       headers:{"Content-Type":"application/json","apikey":K,"Authorization":"Bearer "+K,"Prefer":"return=minimal"},
       body:JSON.stringify({type:type,release:release,detail:detail,path:location.pathname})}).catch(function(){});}catch(e){}}
@@ -2146,5 +2493,46 @@ var base={
   new MutationObserver(lang).observe(document.documentElement,{attributes:true,attributeFilter:['lang']});
   lang();
 })();</script>
+
+<div class="consent-banner" id="consentBanner" role="dialog" aria-modal="false" aria-labelledby="consentTitle" hidden>
+  <p id="consentTitle"><strong data-consent="title">Аналитика сайта</strong><br><span data-consent="text">Сайт не отправляет статистику в Google Analytics и Supabase без вашего разрешения. Выбор можно изменить внизу страницы.</span></p>
+  <div class="consent-actions">
+    <button id="consentAccept" type="button" data-consent="accept">Разрешить аналитику</button>
+    <button id="consentDecline" type="button" data-consent="decline">Только необходимые функции</button>
+  </div>
+</div>
+<script>
+(function(){
+  var b=document.getElementById('consentBanner'),a=document.getElementById('consentAccept'),d=document.getElementById('consentDecline'),st=document.getElementById('consentSettings');
+  if(!b||!window.ANTKSL_ANALYTICS)return;
+  var T={
+    ru:{title:'Аналитика сайта',text:'Сайт не отправляет статистику в Google Analytics и Supabase без вашего разрешения. Выбор можно изменить внизу страницы.',accept:'Разрешить аналитику',decline:'Только необходимые функции',settings:'Настройки аналитики'},
+    uk:{title:'Аналітика сайту',text:'Сайт не надсилає статистику до Google Analytics і Supabase без вашого дозволу. Вибір можна змінити внизу сторінки.',accept:'Дозволити аналітику',decline:'Лише необхідні функції',settings:'Налаштування аналітики'},
+    en:{title:'Site analytics',text:'The site does not send statistics to Google Analytics or Supabase without your permission. You can change this choice at the bottom of the page.',accept:'Allow analytics',decline:'Necessary functions only',settings:'Analytics settings'},
+    de:{title:'Website-Analyse',text:'Die Website sendet ohne Ihre Erlaubnis keine Statistiken an Google Analytics oder Supabase. Sie können die Auswahl unten auf der Seite ändern.',accept:'Analyse erlauben',decline:'Nur notwendige Funktionen',settings:'Analyse-Einstellungen'},
+    ja:{title:'サイト解析',text:'許可なく Google Analytics や Supabase に統計情報を送信しません。ページ下部で選択を変更できます。',accept:'解析を許可',decline:'必要な機能のみ',settings:'解析設定'},
+    zh:{title:'网站分析',text:'未经您的许可，网站不会向 Google Analytics 或 Supabase 发送统计信息。您可以在页面底部更改选择。',accept:'允许分析',decline:'仅必要功能',settings:'分析设置'}
+  };
+  function apply(){var l=(document.documentElement.lang||'ru').slice(0,2),t=T[l]||T.ru;document.querySelectorAll('[data-consent]').forEach(function(n){var k=n.getAttribute('data-consent');if(t[k])n.textContent=t[k];});if(st)st.textContent=t.settings;}
+  function open(){apply();b.hidden=false;setTimeout(function(){(a||d).focus();},0);}
+  function close(){b.hidden=true;}
+  if(!window.ANTKSL_ANALYTICS.choice())open();
+  a&&a.addEventListener('click',function(){window.ANTKSL_ANALYTICS.set('granted');close();});
+  d&&d.addEventListener('click',function(){window.ANTKSL_ANALYTICS.set('denied');close();});
+  st&&st.addEventListener('click',open);
+  document.addEventListener('keydown',function(e){if(e.key==='Escape'&&!b.hidden)close();});
+  new MutationObserver(apply).observe(document.documentElement,{attributes:true,attributeFilter:['lang']});
+  apply();
+})();
+</script>
+
+<script>
+document.addEventListener('keydown',function(e){
+  if(e.key!=='Escape')return;
+  document.querySelectorAll('.nav-panel.open,.viewmenu.open').forEach(function(p){p.classList.remove('open');});
+  document.querySelectorAll('[aria-expanded="true"]').forEach(function(b){b.setAttribute('aria-expanded','false');});
+});
+</script>
+
 </body>
 </html>
