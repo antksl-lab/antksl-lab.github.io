@@ -3,14 +3,14 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>ANTKSL · VK Bridge Publisher 1.4</title>
+  <title>ANTKSL · VK Bridge Publisher 1.5</title>
   <script src="https://unpkg.com/@vkontakte/vk-bridge@2.15.0/dist/browser.min.js"></script>
   <style>
     :root{font-family:Arial,sans-serif;color:#162133;background:#eef2f7}
     *{box-sizing:border-box}body{margin:0;padding:24px}
     main{max-width:780px;margin:24px auto;background:#fff;border-radius:20px;padding:28px;box-shadow:0 12px 40px #0002}
     h1{font-size:27px;margin:0 0 10px}.muted{color:#657084;line-height:1.55}
-    .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:18px 0}
+    .grid{display:grid;grid-template-columns:1fr;gap:12px;margin:18px 0}
     label{font-weight:700;color:#39465a}input{display:block;width:100%;margin-top:7px;padding:12px;border:1px solid #cbd4e1;border-radius:10px;font-size:16px}
     button{border:0;border-radius:12px;padding:14px 18px;font-size:16px;font-weight:700;cursor:pointer;background:#2688eb;color:#fff;margin:8px 8px 8px 0}
     button.secondary{background:#e9eef6;color:#17223b}button:disabled{opacity:.45;cursor:not-allowed}
@@ -22,13 +22,10 @@
 <body>
 <main>
   <h1>ANTKSL · публикация через VK Bridge</h1>
-  <p class="muted">Python хранит очередь и файлы только на вашем компьютере. Эта страница получает временный токен внутри VK, передаёт записи в отложенную очередь VK и не сохраняет токен.</p>
+  <p class="muted">Python хранит очередь и файлы только на вашем компьютере. Одноразовый HTTPS-туннель действует лишь пока открыто окно запуска. Эта страница получает временный токен внутри VK, передаёт записи в отложенную очередь VK и не сохраняет токен.</p>
   <div class="grid">
-    <label>Локальный адрес Python
-      <input id="server" value="http://127.0.0.1:8765" autocomplete="off">
-    </label>
-    <label>Код сессии из PowerShell
-      <input id="session" type="password" autocomplete="off" placeholder="Вставьте одноразовый код">
+    <label>Код подключения из чёрного окна
+      <input id="connection" type="password" autocomplete="off" placeholder="Вставьте всю строку после «Код подключения:»">
     </label>
   </div>
   <button id="connect">1. Подключиться к Python</button>
@@ -56,12 +53,22 @@
   function errorText(e){
     return e?.error_data?.error_reason || e?.error_data?.error_msg || e?.message || String(e);
   }
-  function normalizeServer(value){
-    const url = new URL(value.trim());
-    if (url.protocol !== 'http:' || url.hostname !== '127.0.0.1') {
-      throw new Error('Разрешён только адрес http://127.0.0.1:ПОРТ');
+  function parseConnection(value){
+    const raw = value.trim();
+    const separator = raw.lastIndexOf('|');
+    if (separator < 1) throw new Error('Вставьте полный код подключения из чёрного окна.');
+    const url = new URL(raw.slice(0, separator));
+    const key = raw.slice(separator + 1);
+    const labels = url.hostname.toLowerCase().split('.');
+    const validHost = labels.length === 3 && labels[0] && labels[1] === 'trycloudflare' && labels[2] === 'com';
+    if (url.protocol !== 'https:' || !validHost || url.username || url.password ||
+        (url.pathname !== '/' && url.pathname !== '') || url.search || url.hash) {
+      throw new Error('Код не содержит допустимый одноразовый HTTPS-адрес.');
     }
-    return url.origin;
+    if (!/^[A-Za-z0-9_-]{20,100}$/.test(key)) {
+      throw new Error('Код сессии повреждён или скопирован не полностью.');
+    }
+    return {base:url.origin, key};
   }
   async function local(path, options={}){
     const headers = {...(options.headers || {}), 'X-ANTKSL-Session': sessionKey};
@@ -90,7 +97,7 @@
         appId = Number(launch.vk_app_id || 0);
       }
       if (!appId) throw new Error('Не найден vk_app_id. Откройте страницу внутри VK Mini App.');
-      resetLog(`VK Bridge готов. App ID: ${appId}\nЗапустите Python-команду vk-bridge-server и выполните шаг 1.`);
+      resetLog(`VK Bridge готов. App ID: ${appId}\nЗапустите start_vk_bridge.bat, вставьте код подключения и выполните шаг 1.`);
     } catch(e) {
       resetLog('Ошибка инициализации: ' + errorText(e));
       connectBtn.disabled = true;
@@ -100,10 +107,10 @@
   connectBtn.onclick = async () => {
     try {
       connectBtn.disabled = true;
-      resetLog('Подключение к локальному Python…');
-      base = normalizeServer($('server').value);
-      sessionKey = $('session').value.trim();
-      if (sessionKey.length < 20) throw new Error('Вставьте полный одноразовый код сессии из PowerShell.');
+      resetLog('Подключение к локальному Python через одноразовый HTTPS-туннель…');
+      const connection = parseConnection($('connection').value);
+      base = connection.base;
+      sessionKey = connection.key;
       config = await local('/config');
       const queue = await local('/jobs');
       jobs = Array.isArray(queue.jobs) ? queue.jobs : [];
