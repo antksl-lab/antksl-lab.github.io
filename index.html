@@ -1182,8 +1182,8 @@ html[data-skin="editorial_mono"] .reel-badge.out{color:#fff}
     }
   }
 
-  /* FIX 2026-08-02 v15: desktop hero composition.
-     Текстовый блок поднят ещё выше в спокойную верхнюю треть кадра, имя стало компактнее,
+  /* FIX 2026-08-02 v16: desktop hero composition.
+     Текстовый блок поднят ещё выше в спокойную верхнюю треть кадра, имя стало компактнее, а пластинка на десктопе поднята до уровня заголовка,
      а CTA стоят сразу под авторской строкой. Центральная часть студии и микшерный
      пульт остаются визуально открытыми. Мобильная композиция v9–v11 не затронута. */
   @media(min-width:769px){
@@ -1222,6 +1222,10 @@ html[data-skin="editorial_mono"] .reel-badge.out{color:#fff}
     .hero .hero-cta .btn{
       padding:12px 20px!important;
       font-size:11px!important;
+    }
+    html[data-hero="vinyl"] .hero-obj[data-obj="vinyl"]{
+      top:210px!important;
+      right:-130px!important;
     }
   }
 </style>
