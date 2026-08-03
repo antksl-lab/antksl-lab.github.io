@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>ANTKSL · VK Bridge Publisher 1.5.4</title>
+  <title>ANTKSL · VK Bridge Publisher 1.5.5</title>
   <script src="https://unpkg.com/@vkontakte/vk-bridge@2.15.0/dist/browser.min.js"></script>
   <style>
     :root{font-family:Arial,sans-serif;color:#162133;background:#eef2f7}
@@ -23,7 +23,7 @@
 </head>
 <body>
 <main>
-  <h1>ANTKSL · публикация через VK Bridge 1.5.4</h1>
+  <h1>ANTKSL · публикация через VK Bridge 1.5.5</h1>
   <p class="muted">
     Python хранит очередь и файлы только на вашем компьютере. Одноразовый HTTPS-туннель
     действует лишь пока открыто окно запуска. Страница получает временный токен внутри VK,
@@ -70,15 +70,31 @@
   }
 
   function errorText(error) {
-    if (error?.error_data) {
-      return String(
-        error.error_data.error_reason ||
-        error.error_data.error_msg ||
-        error.error_data.error_type ||
-        JSON.stringify(error.error_data)
-      );
+    const data = error?.error_data || error?.errorData || {};
+    const parts = [];
+
+    if (error?.error_type) parts.push(`type=${error.error_type}`);
+    if (data?.error_code != null) parts.push(`code=${data.error_code}`);
+    if (data?.error_reason) parts.push(`reason=${data.error_reason}`);
+    if (data?.error_msg) parts.push(`message=${data.error_msg}`);
+    if (data?.error_description) {
+      const description = Array.isArray(data.error_description)
+        ? data.error_description.join('; ')
+        : String(data.error_description);
+      parts.push(`description=${description}`);
     }
-    return String(error?.message || error);
+    if (error?.message && error.message !== 'Unknown error') {
+      parts.push(`js=${error.message}`);
+    }
+
+    if (parts.length) return parts.join(' | ');
+
+    try {
+      const raw = JSON.stringify(error);
+      return raw && raw !== '{}' ? raw : String(error?.message || error);
+    } catch (_) {
+      return String(error?.message || error);
+    }
   }
 
   function parseConnection(value) {
@@ -333,7 +349,6 @@
 
     const params = {
       owner_id: Number(config.owner_id),
-      from_group: 1,
       message: job.message,
       attachments: attachment
     };
@@ -353,6 +368,19 @@
       прямого вызова API wall.post — VK возвращает ошибку 20 для non-standalone
       applications. Публикация выполняется официальным событием VK Bridge.
     */
+    if (typeof vkBridge.supportsAsync === 'function') {
+      const supported = await vkBridge.supportsAsync('VKWebAppShowWallPostBox');
+      if (!supported) {
+        throw new Error('VKWebAppShowWallPostBox не поддерживается текущей платформой VK.');
+      }
+    }
+
+    log(
+      `Параметры диалога: owner_id=${params.owner_id}; ` +
+      `attachment=${params.attachments}; ` +
+      `publish_date=${params.publish_date || 'нет'}; from_group не передаётся.`
+    );
+
     const response = await vkBridge.send('VKWebAppShowWallPostBox', params);
 
     const postId = response?.post_id;
