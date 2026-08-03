@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>ANTKSL · VK Bridge Publisher 1.5.6</title>
+  <title>ANTKSL · VK Bridge Publisher 1.5.7</title>
   <script src="https://unpkg.com/@vkontakte/vk-bridge@2.15.0/dist/browser.min.js"></script>
   <style>
     :root{font-family:Arial,sans-serif;color:#162133;background:#eef2f7}
@@ -23,7 +23,7 @@
 </head>
 <body>
 <main>
-  <h1>ANTKSL · публикация через VK Bridge 1.5.6</h1>
+  <h1>ANTKSL · публикация через VK Bridge 1.5.7</h1>
   <p class="muted">
     Python хранит очередь и файлы только на вашем компьютере. Одноразовый HTTPS-туннель
     действует лишь пока открыто окно запуска. Страница получает внутри VK два временных токена: пользовательский — только для загрузки вложения,
@@ -192,43 +192,33 @@
   }
 
   async function requestCommunityToken() {
-    const methods = [
-      'VKWebAppCommunityAccessToken',
-      'VKWebAppCommunityToken',
-      'VKWebAppGetCommunityAuthToken',
-      'VKWebAppGetCommunityToken'
-    ];
+    const method = 'VKWebAppGetCommunityToken';
 
-    let selected = '';
-
-    for (const method of methods) {
-      try {
-        if (await bridgeSupports(method)) {
-          selected = method;
-          break;
-        }
-      } catch (_) {}
+    if (!(await bridgeSupports(method))) {
+      throw new Error(
+        'Текущая платформа VK не поддерживает официальный метод ' + method + '.'
+      );
     }
 
-    if (!selected) {
-      throw new Error('Текущая платформа VK не поддерживает получение токена сообщества.');
-    }
+    log(`VK запрашивает временный токен сообщества через ${method}…`);
 
-    log(`VK запрашивает временный токен сообщества через ${selected}…`);
-
-    const data = await vkBridge.send(selected, {
+    const data = await vkBridge.send(method, {
       app_id: appId,
       group_id: Number(config.group_id),
-      scope: 'wall,manage'
+      scope: 'manage'
     });
 
     const value = String(data?.access_token || '');
+    const grantedScope = String(data?.scope || '');
 
     if (!value) {
       throw new Error('VK не вернул токен сообщества.');
     }
 
-    return value;
+    return {
+      accessToken: value,
+      scope: grantedScope
+    };
   }
 
   async function saveResult(value) {
@@ -312,39 +302,18 @@
       log(`USER TOKEN TEST: PASS. User ID: ${user.id}.`);
       log(`Права пользователя: ${String(data.scope || '')}.`);
 
-      communityToken = await requestCommunityToken();
-
-      const permissionInfo = await api(
-        'groups.getTokenPermissions',
-        {},
-        communityToken
-      );
-
-      const permissions = Array.isArray(permissionInfo?.permissions)
-        ? permissionInfo.permissions
-            .map(item => String(item?.name || '').trim())
-            .filter(Boolean)
-        : [];
-
-      if (permissions.length) {
-        log(`Права токена сообщества: ${permissions.join(',')}.`);
-
-        if (!permissions.includes('wall')) {
-          throw new Error(
-            'Токен сообщества получен, но право wall отсутствует: ' +
-            permissions.join(',')
-          );
-        }
-      } else {
-        log(
-          'Токен сообщества получен. VK не вернул читаемый список прав; ' +
-          'право wall будет проверено вызовом wall.post.'
-        );
-      }
+      const communityAuth = await requestCommunityToken();
+      communityToken = communityAuth.accessToken;
 
       log(
-        'COMMUNITY TOKEN TEST: PASS. Оба токена находятся только в памяти страницы.'
+        `COMMUNITY TOKEN RECEIVED: PASS. ` +
+        `Выданный VK scope: ${communityAuth.scope || 'не указан'}.`
       );
+      log(
+        'Лишняя проверка groups.getTokenPermissions не выполняется: ' +
+        'окончательная проверка права будет сделана самим wall.post.'
+      );
+      log('Оба токена находятся только в памяти страницы.');
 
       syncBtn.disabled = jobs.length === 0;
 
@@ -448,7 +417,7 @@
 
   async function publish(job) {
     if (!userToken || !communityToken) {
-      throw new Error('Сначала получите и проверьте оба временных токена.');
+      throw new Error('Сначала получите оба временных токена.');
     }
 
     log(`Задание ${job.job_id}: загрузка ${job.media_name} пользовательским токеном…`);
@@ -463,7 +432,7 @@
 
     const params = {
       owner_id: Number(config.owner_id),
-      from_group: true,
+      from_group: 1,
       message: job.message,
       attachments: attachment,
       guid: String(job.job_id)
@@ -475,7 +444,7 @@
 
     log(
       `Задание ${job.job_id}: wall.post временным токеном сообщества; ` +
-      `owner_id=${params.owner_id}; from_group=true; ` +
+      `owner_id=${params.owner_id}; from_group=1; ` +
       `attachment=${attachment}; publish_date=${params.publish_date || 'нет'}.`
     );
 
