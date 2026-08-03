@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>ANTKSL · VK Bridge Publisher 1.5.5</title>
+  <title>ANTKSL · VK Bridge Publisher 1.5.6</title>
   <script src="https://unpkg.com/@vkontakte/vk-bridge@2.15.0/dist/browser.min.js"></script>
   <style>
     :root{font-family:Arial,sans-serif;color:#162133;background:#eef2f7}
@@ -23,11 +23,11 @@
 </head>
 <body>
 <main>
-  <h1>ANTKSL · публикация через VK Bridge 1.5.5</h1>
+  <h1>ANTKSL · публикация через VK Bridge 1.5.6</h1>
   <p class="muted">
     Python хранит очередь и файлы только на вашем компьютере. Одноразовый HTTPS-туннель
-    действует лишь пока открыто окно запуска. Страница получает временный токен внутри VK,
-    загружает вложение и открывает официальный диалог публикации VK. Токен нигде не сохраняется.
+    действует лишь пока открыто окно запуска. Страница получает внутри VK два временных токена: пользовательский — только для загрузки вложения,
+    токен сообщества — только для создания записи. Оба токена нигде не сохраняются.
   </p>
 
   <div class="grid">
@@ -38,7 +38,7 @@
   </div>
 
   <button id="connect">1. Подключиться к Python</button>
-  <button id="auth" class="secondary" disabled>2. Получить и проверить токен</button>
+  <button id="auth" class="secondary" disabled>2. Получить и проверить токены</button>
   <button id="sync" disabled>3. Передать очередь в VK</button>
   <p id="status">Инициализация VK Bridge…</p>
 </main>
@@ -56,7 +56,8 @@
   let sessionKey = '';
   let config = null;
   let jobs = [];
-  let token = '';
+  let userToken = '';
+  let communityToken = '';
   let lines = [];
 
   function resetLog(text) {
@@ -161,17 +162,73 @@
     return data;
   }
 
-  async function api(method, params = {}) {
+  async function api(method, params = {}, accessToken = userToken) {
+    if (!accessToken) {
+      throw new Error(`Нет временного токена для вызова ${method}.`);
+    }
+
     const data = await vkBridge.send('VKWebAppCallAPIMethod', {
       method,
       params: {
         ...params,
-        access_token: token,
+        access_token: accessToken,
         v: config.api_version
       }
     });
 
     return data.response;
+  }
+
+  async function bridgeSupports(method) {
+    if (typeof vkBridge.supportsAsync === 'function') {
+      return Boolean(await vkBridge.supportsAsync(method));
+    }
+
+    if (typeof vkBridge.supports === 'function') {
+      return Boolean(vkBridge.supports(method));
+    }
+
+    return true;
+  }
+
+  async function requestCommunityToken() {
+    const methods = [
+      'VKWebAppCommunityAccessToken',
+      'VKWebAppCommunityToken',
+      'VKWebAppGetCommunityAuthToken',
+      'VKWebAppGetCommunityToken'
+    ];
+
+    let selected = '';
+
+    for (const method of methods) {
+      try {
+        if (await bridgeSupports(method)) {
+          selected = method;
+          break;
+        }
+      } catch (_) {}
+    }
+
+    if (!selected) {
+      throw new Error('Текущая платформа VK не поддерживает получение токена сообщества.');
+    }
+
+    log(`VK запрашивает временный токен сообщества через ${selected}…`);
+
+    const data = await vkBridge.send(selected, {
+      app_id: appId,
+      group_id: Number(config.group_id),
+      scope: 'wall,manage'
+    });
+
+    const value = String(data?.access_token || '');
+
+    if (!value) {
+      throw new Error('VK не вернул токен сообщества.');
+    }
+
+    return value;
   }
 
   async function saveResult(value) {
@@ -228,28 +285,66 @@
   authBtn.onclick = async () => {
     try {
       authBtn.disabled = true;
-      log('VK запрашивает права photos, wall, video, groups…');
+      syncBtn.disabled = true;
+      userToken = '';
+      communityToken = '';
+
+      log('VK запрашивает пользовательские права photos, wall, video, groups…');
 
       const data = await vkBridge.send('VKWebAppGetAuthToken', {
         app_id: appId,
         scope: 'photos,wall,video,groups'
       });
 
-      token = String(data.access_token || '');
+      userToken = String(data.access_token || '');
 
-      if (!token) {
-        throw new Error('VK не вернул access_token.');
+      if (!userToken) {
+        throw new Error('VK не вернул пользовательский access_token.');
       }
 
       const users = await api('users.get');
       const user = Array.isArray(users) ? users[0] : null;
 
       if (!user?.id) {
-        throw new Error('users.get не подтвердил токен.');
+        throw new Error('users.get не подтвердил пользовательский токен.');
       }
 
-      log(`VK BRIDGE TEST: PASS. User ID: ${user.id}.`);
-      log(`Права: ${String(data.scope || '')}. Токен остаётся только в памяти страницы.`);
+      log(`USER TOKEN TEST: PASS. User ID: ${user.id}.`);
+      log(`Права пользователя: ${String(data.scope || '')}.`);
+
+      communityToken = await requestCommunityToken();
+
+      const permissionInfo = await api(
+        'groups.getTokenPermissions',
+        {},
+        communityToken
+      );
+
+      const permissions = Array.isArray(permissionInfo?.permissions)
+        ? permissionInfo.permissions
+            .map(item => String(item?.name || '').trim())
+            .filter(Boolean)
+        : [];
+
+      if (permissions.length) {
+        log(`Права токена сообщества: ${permissions.join(',')}.`);
+
+        if (!permissions.includes('wall')) {
+          throw new Error(
+            'Токен сообщества получен, но право wall отсутствует: ' +
+            permissions.join(',')
+          );
+        }
+      } else {
+        log(
+          'Токен сообщества получен. VK не вернул читаемый список прав; ' +
+          'право wall будет проверено вызовом wall.post.'
+        );
+      }
+
+      log(
+        'COMMUNITY TOKEN TEST: PASS. Оба токена находятся только в памяти страницы.'
+      );
 
       syncBtn.disabled = jobs.length === 0;
 
@@ -257,8 +352,9 @@
         log('Очередь VK пуста.');
       }
     } catch (error) {
-      token = '';
-      log('ОШИБКА ТОКЕНА: ' + errorText(error));
+      userToken = '';
+      communityToken = '';
+      log('ОШИБКА ТОКЕНОВ: ' + errorText(error));
       authBtn.disabled = false;
     }
   };
@@ -296,7 +392,21 @@
       throw new Error('photos.saveWallPhoto не вернул фотографию.');
     }
 
-    return `photo${photo.owner_id}_${photo.id}`;
+    const attachment = `photo${photo.owner_id}_${photo.id}`;
+
+    log(
+      `Фотография сохранена VK: ${attachment}; ` +
+      `ожидаемая стена сообщества: ${config.owner_id}.`
+    );
+
+    if (Number(photo.owner_id) !== Number(config.owner_id)) {
+      log(
+        'ПРИМЕЧАНИЕ: VK вернул фотографию с владельцем-пользователем. ' +
+        'Это допустимо как внешнее вложение, но теперь явно фиксируется в диагностике.'
+      );
+    }
+
+    return attachment;
   }
 
   async function uploadVideo(job) {
@@ -337,7 +447,11 @@
   }
 
   async function publish(job) {
-    log(`Задание ${job.job_id}: загрузка ${job.media_name}…`);
+    if (!userToken || !communityToken) {
+      throw new Error('Сначала получите и проверьте оба временных токена.');
+    }
+
+    log(`Задание ${job.job_id}: загрузка ${job.media_name} пользовательским токеном…`);
 
     const attachment =
       job.media_type === 'video'
@@ -349,8 +463,10 @@
 
     const params = {
       owner_id: Number(config.owner_id),
+      from_group: true,
       message: job.message,
-      attachments: attachment
+      attachments: attachment,
+      guid: String(job.job_id)
     };
 
     if (scheduled) {
@@ -358,35 +474,16 @@
     }
 
     log(
-      `Задание ${job.job_id}: открываю официальный диалог VK. ` +
-      'Проверьте карточку и подтвердите публикацию.'
+      `Задание ${job.job_id}: wall.post временным токеном сообщества; ` +
+      `owner_id=${params.owner_id}; from_group=true; ` +
+      `attachment=${attachment}; publish_date=${params.publish_date || 'нет'}.`
     );
 
-    /*
-      ВАЖНО:
-      Пользовательский токен, выданный VK Mini App, нельзя использовать для
-      прямого вызова API wall.post — VK возвращает ошибку 20 для non-standalone
-      applications. Публикация выполняется официальным событием VK Bridge.
-    */
-    if (typeof vkBridge.supportsAsync === 'function') {
-      const supported = await vkBridge.supportsAsync('VKWebAppShowWallPostBox');
-      if (!supported) {
-        throw new Error('VKWebAppShowWallPostBox не поддерживается текущей платформой VK.');
-      }
-    }
-
-    log(
-      `Параметры диалога: owner_id=${params.owner_id}; ` +
-      `attachment=${params.attachments}; ` +
-      `publish_date=${params.publish_date || 'нет'}; from_group не передаётся.`
-    );
-
-    const response = await vkBridge.send('VKWebAppShowWallPostBox', params);
-
+    const response = await api('wall.post', params, communityToken);
     const postId = response?.post_id;
 
     if (postId == null || String(postId).trim() === '') {
-      throw new Error('VKWebAppShowWallPostBox не вернул post_id.');
+      throw new Error('wall.post не вернул post_id.');
     }
 
     await saveResult({
@@ -400,7 +497,7 @@
 
     log(
       `PASS ${job.job_id}: ` +
-      `${scheduled ? 'передано в отложенную очередь VK' : 'опубликовано'}, ` +
+      `${scheduled ? 'создана отложенная запись VK' : 'опубликовано'}, ` +
       `post_id ${postId}.`
     );
   }
@@ -432,10 +529,11 @@
       }
     }
 
-    token = '';
+    userToken = '';
+    communityToken = '';
     log(
       `ГОТОВО. Успешно: ${ok}. Ошибок: ${failed}. ` +
-      'Токен удалён из памяти страницы.'
+      'Оба токена удалены из памяти страницы.'
     );
 
     authBtn.disabled = false;
