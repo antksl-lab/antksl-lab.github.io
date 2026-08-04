@@ -3,61 +3,76 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>ANTKSL · VK Bridge Publisher 1.5.7</title>
+  <title>ANTKSL · Hybrid Photo Probe 1.0</title>
   <script src="https://unpkg.com/@vkontakte/vk-bridge@2.15.0/dist/browser.min.js"></script>
   <style>
     :root{font-family:Arial,sans-serif;color:#162133;background:#eef2f7}
-    *{box-sizing:border-box}body{margin:0;padding:24px}
+    *{box-sizing:border-box}
+    body{margin:0;padding:24px}
     main{max-width:780px;margin:24px auto;background:#fff;border-radius:20px;padding:28px;box-shadow:0 12px 40px #0002}
-    h1{font-size:27px;margin:0 0 10px}.muted{color:#657084;line-height:1.55}
-    .grid{display:grid;grid-template-columns:1fr;gap:12px;margin:18px 0}
-    label{font-weight:700;color:#39465a}
+    h1{font-size:27px;margin:0 0 10px}
+    .muted{color:#657084;line-height:1.55}
+    label{display:block;font-weight:700;color:#39465a;margin:18px 0}
     input{display:block;width:100%;margin-top:7px;padding:12px;border:1px solid #cbd4e1;border-radius:10px;font-size:16px}
     button{border:0;border-radius:12px;padding:14px 18px;font-size:16px;font-weight:700;cursor:pointer;background:#2688eb;color:#fff;margin:8px 8px 8px 0}
     button.secondary{background:#e9eef6;color:#17223b}
     button:disabled{opacity:.45;cursor:not-allowed}
-    #status{padding:15px;border-radius:12px;background:#f3f6fa;white-space:pre-wrap;line-height:1.48;min-height:90px}
+    #status{padding:15px;border-radius:12px;background:#f3f6fa;white-space:pre-wrap;line-height:1.48;min-height:120px}
+    #attachmentBox{display:none;margin-top:16px;padding:14px;border:1px solid #b9c8da;border-radius:12px;background:#f8fbff}
+    #attachment{word-break:break-all;font-family:Consolas,monospace}
     code{background:#edf1f6;padding:2px 6px;border-radius:5px}
-    @media(max-width:650px){body{padding:10px}main{padding:20px}}
   </style>
 </head>
 <body>
 <main>
-  <h1>ANTKSL · публикация через VK Bridge 1.5.7</h1>
+  <h1>ANTKSL · гибридная проверка фотографии</h1>
   <p class="muted">
-    Python хранит очередь и файлы только на вашем компьютере. Одноразовый HTTPS-туннель
-    действует лишь пока открыто окно запуска. Страница получает внутри VK два временных токена: пользовательский — только для загрузки вложения,
-    токен сообщества — только для создания записи. Оба токена нигде не сохраняются.
+    Эта страница создаёт одну тестовую фотографию в альбоме стены сообщества
+    <b>239543600</b>. Она не вызывает <code>wall.post</code>, не публикует запись
+    и не меняет <code>queue.json</code>.
   </p>
 
-  <div class="grid">
-    <label>Код подключения из чёрного окна
-      <input id="connection" type="password" autocomplete="off"
-             placeholder="Вставьте всю строку после «Код подключения:»">
-    </label>
-  </div>
+  <label>Код подключения из чёрного окна
+    <input id="connection" type="password" autocomplete="off"
+           placeholder="Вставьте всю строку после «Код подключения:»">
+  </label>
 
   <button id="connect">1. Подключиться к Python</button>
-  <button id="auth" class="secondary" disabled>2. Получить и проверить токены</button>
-  <button id="sync" disabled>3. Передать очередь в VK</button>
+  <button id="auth" class="secondary" disabled>2. Получить токен VK</button>
+  <button id="upload" disabled>3. Загрузить карточку в сообщество</button>
+
+  <div id="attachmentBox">
+    <b>Готовый идентификатор вложения:</b>
+    <p id="attachment"></p>
+    <button id="copy" class="secondary">Скопировать идентификатор</button>
+  </div>
+
   <p id="status">Инициализация VK Bridge…</p>
 </main>
 
 <script>
 (() => {
+  'use strict';
+
+  const EXPECTED_GROUP_ID = 239543600;
+  const PROTECTED_JOB_ID = '3313ccfb1ca4';
+
   const $ = id => document.getElementById(id);
   const status = $('status');
   const connectBtn = $('connect');
   const authBtn = $('auth');
-  const syncBtn = $('sync');
+  const uploadBtn = $('upload');
+  const copyBtn = $('copy');
+  const attachmentBox = $('attachmentBox');
+  const attachmentText = $('attachment');
 
   let appId = Number(new URLSearchParams(location.search).get('vk_app_id') || 0);
   let base = '';
   let sessionKey = '';
   let config = null;
-  let jobs = [];
-  let userToken = '';
-  let communityToken = '';
+  let job = null;
+  let token = '';
+  let attachment = '';
   let lines = [];
 
   function resetLog(text) {
@@ -71,37 +86,15 @@
   }
 
   function errorText(error) {
-    const data = error?.error_data || error?.errorData || {};
-    const parts = [];
-
-    if (error?.error_type) parts.push(`type=${error.error_type}`);
-    if (data?.error_code != null) parts.push(`code=${data.error_code}`);
-    if (data?.error_reason) parts.push(`reason=${data.error_reason}`);
-    if (data?.error_msg) parts.push(`message=${data.error_msg}`);
-    if (data?.error_description) {
-      const description = Array.isArray(data.error_description)
-        ? data.error_description.join('; ')
-        : String(data.error_description);
-      parts.push(`description=${description}`);
-    }
-    if (error?.message && error.message !== 'Unknown error') {
-      parts.push(`js=${error.message}`);
-    }
-
-    if (parts.length) return parts.join(' | ');
-
-    try {
-      const raw = JSON.stringify(error);
-      return raw && raw !== '{}' ? raw : String(error?.message || error);
-    } catch (_) {
-      return String(error?.message || error);
-    }
+    return error?.error_data?.error_reason ||
+           error?.error_data?.error_msg ||
+           error?.message ||
+           String(error);
   }
 
   function parseConnection(value) {
     const raw = value.trim();
     const separator = raw.lastIndexOf('|');
-
     if (separator < 1) {
       throw new Error('Вставьте полный код подключения из чёрного окна.');
     }
@@ -111,7 +104,7 @@
     const labels = url.hostname.toLowerCase().split('.');
     const validHost =
       labels.length === 3 &&
-      Boolean(labels[0]) &&
+      labels[0] &&
       labels[1] === 'trycloudflare' &&
       labels[2] === 'com';
 
@@ -139,10 +132,7 @@
       ...(options.headers || {}),
       'X-ANTKSL-Session': sessionKey
     };
-
-    if (options.body) {
-      headers['Content-Type'] = 'application/json';
-    }
+    if (options.body) headers['Content-Type'] = 'application/json';
 
     const response = await fetch(base + path, {
       ...options,
@@ -162,70 +152,19 @@
     return data;
   }
 
-  async function api(method, params = {}, accessToken = userToken) {
-    if (!accessToken) {
-      throw new Error(`Нет временного токена для вызова ${method}.`);
-    }
+  async function api(method, params = {}) {
+    if (!token) throw new Error('Сначала получи токен VK.');
 
     const data = await vkBridge.send('VKWebAppCallAPIMethod', {
       method,
       params: {
         ...params,
-        access_token: accessToken,
-        v: config.api_version
+        access_token: token,
+        v: String(config.api_version || '5.199')
       }
     });
 
     return data.response;
-  }
-
-  async function bridgeSupports(method) {
-    if (typeof vkBridge.supportsAsync === 'function') {
-      return Boolean(await vkBridge.supportsAsync(method));
-    }
-
-    if (typeof vkBridge.supports === 'function') {
-      return Boolean(vkBridge.supports(method));
-    }
-
-    return true;
-  }
-
-  async function requestCommunityToken() {
-    const method = 'VKWebAppGetCommunityToken';
-
-    if (!(await bridgeSupports(method))) {
-      throw new Error(
-        'Текущая платформа VK не поддерживает официальный метод ' + method + '.'
-      );
-    }
-
-    log(`VK запрашивает временный токен сообщества через ${method}…`);
-
-    const data = await vkBridge.send(method, {
-      app_id: appId,
-      group_id: Number(config.group_id),
-      scope: 'manage'
-    });
-
-    const value = String(data?.access_token || '');
-    const grantedScope = String(data?.scope || '');
-
-    if (!value) {
-      throw new Error('VK не вернул токен сообщества.');
-    }
-
-    return {
-      accessToken: value,
-      scope: grantedScope
-    };
-  }
-
-  async function saveResult(value) {
-    return local('/result', {
-      method: 'POST',
-      body: JSON.stringify(value)
-    });
   }
 
   async function init() {
@@ -238,15 +177,17 @@
       }
 
       if (!appId) {
-        throw new Error('Не найден vk_app_id. Откройте страницу внутри VK Mini App.');
+        throw new Error(
+          'Не найден vk_app_id. Открой страницу именно внутри VK Mini App.'
+        );
       }
 
       resetLog(
         `VK Bridge готов. App ID: ${appId}\n` +
-        'Запустите start_vk_bridge.bat, вставьте код подключения и выполните шаг 1.'
+        'Запусти локальный мост и вставь код подключения.'
       );
     } catch (error) {
-      resetLog('Ошибка инициализации: ' + errorText(error));
+      resetLog('ОШИБКА ИНИЦИАЛИЗАЦИИ: ' + errorText(error));
       connectBtn.disabled = true;
     }
   }
@@ -254,20 +195,39 @@
   connectBtn.onclick = async () => {
     try {
       connectBtn.disabled = true;
-      resetLog('Подключение к локальному Python через одноразовый HTTPS-туннель…');
+      resetLog('Подключение к локальному Python…');
 
       const connection = parseConnection($('connection').value);
       base = connection.base;
       sessionKey = connection.key;
 
       config = await local('/config');
-      const queue = await local('/jobs');
-      jobs = Array.isArray(queue.jobs) ? queue.jobs : [];
+      if (Number(config.group_id) !== EXPECTED_GROUP_ID) {
+        throw new Error(
+          `Ожидалась группа ${EXPECTED_GROUP_ID}, получена ${config.group_id}.`
+        );
+      }
 
-      log(`Подключено. Группа: ${config.group_id}. Заданий VK: ${jobs.length}.`);
+      const queue = await local('/jobs');
+      const jobs = Array.isArray(queue.jobs) ? queue.jobs : [];
+      job = jobs.find(item => String(item.job_id) === PROTECTED_JOB_ID);
+
+      if (!job) {
+        throw new Error(
+          `В локальной очереди не найдено защищённое задание ${PROTECTED_JOB_ID}.`
+        );
+      }
+
+      if (String(job.media_type) !== 'photo') {
+        throw new Error('Защищённое задание не является фотографией.');
+      }
+
+      log(`Подключено. Группа: ${config.group_id}.`);
+      log(`Карточка найдена: ${job.media_name || job.story_id || job.job_id}.`);
+      log('Очередь будет только прочитана; статус задания не изменится.');
       authBtn.disabled = false;
     } catch (error) {
-      log('ОШИБКА: ' + errorText(error));
+      log('ОШИБКА ПОДКЛЮЧЕНИЯ: ' + errorText(error));
       connectBtn.disabled = false;
     }
   };
@@ -275,237 +235,111 @@
   authBtn.onclick = async () => {
     try {
       authBtn.disabled = true;
-      syncBtn.disabled = true;
-      userToken = '';
-      communityToken = '';
-
-      log('VK запрашивает пользовательские права photos, wall, video, groups…');
+      log('VK запрашивает пользовательские права photos и groups…');
 
       const data = await vkBridge.send('VKWebAppGetAuthToken', {
         app_id: appId,
-        scope: 'photos,wall,video,groups'
+        scope: 'photos,groups'
       });
 
-      userToken = String(data.access_token || '');
-
-      if (!userToken) {
-        throw new Error('VK не вернул пользовательский access_token.');
-      }
+      token = String(data.access_token || '');
+      if (!token) throw new Error('VK не вернул access_token.');
 
       const users = await api('users.get');
       const user = Array.isArray(users) ? users[0] : null;
+      if (!user?.id) throw new Error('users.get не подтвердил токен.');
 
-      if (!user?.id) {
-        throw new Error('users.get не подтвердил пользовательский токен.');
-      }
-
-      log(`USER TOKEN TEST: PASS. User ID: ${user.id}.`);
-      log(`Права пользователя: ${String(data.scope || '')}.`);
-
-      const communityAuth = await requestCommunityToken();
-      communityToken = communityAuth.accessToken;
-
-      log(
-        `COMMUNITY TOKEN RECEIVED: PASS. ` +
-        `Выданный VK scope: ${communityAuth.scope || 'не указан'}.`
-      );
-      log(
-        'Лишняя проверка groups.getTokenPermissions не выполняется: ' +
-        'окончательная проверка права будет сделана самим wall.post.'
-      );
-      log('Оба токена находятся только в памяти страницы.');
-
-      syncBtn.disabled = jobs.length === 0;
-
-      if (!jobs.length) {
-        log('Очередь VK пуста.');
-      }
+      log(`Токен подтверждён. User ID: ${user.id}.`);
+      log('Токен остаётся только в памяти страницы.');
+      uploadBtn.disabled = false;
     } catch (error) {
-      userToken = '';
-      communityToken = '';
-      log('ОШИБКА ТОКЕНОВ: ' + errorText(error));
+      token = '';
+      log('ОШИБКА ТОКЕНА: ' + errorText(error));
       authBtn.disabled = false;
     }
   };
 
-  async function uploadPhoto(job) {
-    const server = await api('photos.getWallUploadServer', {
-      group_id: config.group_id
-    });
+  uploadBtn.onclick = async () => {
+    try {
+      uploadBtn.disabled = true;
+      attachment = '';
+      attachmentBox.style.display = 'none';
 
-    if (!server?.upload_url) {
-      throw new Error('photos.getWallUploadServer не вернул upload_url.');
-    }
+      log('Запрашиваю сервер загрузки для стены сообщества…');
+      const server = await api('photos.getWallUploadServer', {
+        group_id: EXPECTED_GROUP_ID
+      });
 
-    const sent = await local('/upload', {
-      method: 'POST',
-      body: JSON.stringify({
-        job_id: job.job_id,
-        media_type: 'photo',
-        upload_url: server.upload_url
-      })
-    });
-
-    const up = sent.upload || {};
-
-    const saved = await api('photos.saveWallPhoto', {
-      group_id: config.group_id,
-      photo: up.photo || '',
-      server: up.server || '',
-      hash: up.hash || ''
-    });
-
-    const photo = Array.isArray(saved) ? saved[0] : null;
-
-    if (photo?.owner_id == null || photo?.id == null) {
-      throw new Error('photos.saveWallPhoto не вернул фотографию.');
-    }
-
-    const attachment = `photo${photo.owner_id}_${photo.id}`;
-
-    log(
-      `Фотография сохранена VK: ${attachment}; ` +
-      `ожидаемая стена сообщества: ${config.owner_id}.`
-    );
-
-    if (Number(photo.owner_id) !== Number(config.owner_id)) {
-      log(
-        'ПРИМЕЧАНИЕ: VK вернул фотографию с владельцем-пользователем. ' +
-        'Это допустимо как внешнее вложение, но теперь явно фиксируется в диагностике.'
-      );
-    }
-
-    return attachment;
-  }
-
-  async function uploadVideo(job) {
-    const saved = await api('video.save', {
-      group_id: config.group_id,
-      name: job.video_title,
-      description: job.message.slice(0, 5000),
-      wallpost: 0,
-      is_private: 0,
-      repeat: 0,
-      compression: 1
-    });
-
-    if (!saved?.upload_url) {
-      throw new Error('video.save не вернул upload_url.');
-    }
-
-    await local('/upload', {
-      method: 'POST',
-      body: JSON.stringify({
-        job_id: job.job_id,
-        media_type: 'video',
-        upload_url: saved.upload_url
-      })
-    });
-
-    if (saved.owner_id == null || saved.video_id == null) {
-      throw new Error('video.save не вернул owner_id/video_id.');
-    }
-
-    let attachment = `video${saved.owner_id}_${saved.video_id}`;
-
-    if (saved.access_key) {
-      attachment += `_${saved.access_key}`;
-    }
-
-    return attachment;
-  }
-
-  async function publish(job) {
-    if (!userToken || !communityToken) {
-      throw new Error('Сначала получите оба временных токена.');
-    }
-
-    log(`Задание ${job.job_id}: загрузка ${job.media_name} пользовательским токеном…`);
-
-    const attachment =
-      job.media_type === 'video'
-        ? await uploadVideo(job)
-        : await uploadPhoto(job);
-
-    const now = Math.floor(Date.now() / 1000);
-    const scheduled = Number(job.publish_at) > now + 60;
-
-    const params = {
-      owner_id: Number(config.owner_id),
-      from_group: 1,
-      message: job.message,
-      attachments: attachment,
-      guid: String(job.job_id)
-    };
-
-    if (scheduled) {
-      params.publish_date = Number(job.publish_at);
-    }
-
-    log(
-      `Задание ${job.job_id}: wall.post временным токеном сообщества; ` +
-      `owner_id=${params.owner_id}; from_group=1; ` +
-      `attachment=${attachment}; publish_date=${params.publish_date || 'нет'}.`
-    );
-
-    const response = await api('wall.post', params, communityToken);
-    const postId = response?.post_id;
-
-    if (postId == null || String(postId).trim() === '') {
-      throw new Error('wall.post не вернул post_id.');
-    }
-
-    await saveResult({
-      job_id: job.job_id,
-      success: true,
-      scheduled,
-      post_id: postId,
-      attachment,
-      media_type: job.media_type
-    });
-
-    log(
-      `PASS ${job.job_id}: ` +
-      `${scheduled ? 'создана отложенная запись VK' : 'опубликовано'}, ` +
-      `post_id ${postId}.`
-    );
-  }
-
-  syncBtn.onclick = async () => {
-    syncBtn.disabled = true;
-    connectBtn.disabled = true;
-    authBtn.disabled = true;
-
-    let ok = 0;
-    let failed = 0;
-
-    for (const job of jobs) {
-      try {
-        await publish(job);
-        ok++;
-      } catch (error) {
-        failed++;
-        const message = errorText(error);
-        log(`FAIL ${job.job_id}: ${message}`);
-
-        try {
-          await saveResult({
-            job_id: job.job_id,
-            success: false,
-            error: message
-          });
-        } catch (_) {}
+      if (!server?.upload_url) {
+        throw new Error('photos.getWallUploadServer не вернул upload_url.');
       }
+
+      log('Передаю карточку из локального Python на upload-сервер VK…');
+      const sent = await local('/upload', {
+        method: 'POST',
+        body: JSON.stringify({
+          job_id: PROTECTED_JOB_ID,
+          media_type: 'photo',
+          upload_url: server.upload_url
+        })
+      });
+
+      const up = sent.upload || {};
+      if (!up.photo || up.server == null || !up.hash) {
+        throw new Error(
+          'Upload-сервер не вернул полный набор photo/server/hash.'
+        );
+      }
+
+      log('Сохраняю фотографию именно в сообщество 239543600…');
+      const saved = await api('photos.saveWallPhoto', {
+        group_id: EXPECTED_GROUP_ID,
+        photo: up.photo,
+        server: up.server,
+        hash: up.hash
+      });
+
+      const photo = Array.isArray(saved) ? saved[0] : null;
+      if (photo?.owner_id == null || photo?.id == null) {
+        throw new Error('photos.saveWallPhoto не вернул owner_id и id.');
+      }
+
+      const expectedOwner = -EXPECTED_GROUP_ID;
+      if (Number(photo.owner_id) !== expectedOwner) {
+        throw new Error(
+          `Фотография сохранилась не в сообщество: owner_id=${photo.owner_id}, ` +
+          `ожидался ${expectedOwner}.`
+        );
+      }
+
+      attachment = `photo${photo.owner_id}_${photo.id}`;
+      if (photo.access_key) attachment += `_${photo.access_key}`;
+
+      attachmentText.textContent = attachment;
+      attachmentBox.style.display = 'block';
+
+      log('PASS: фотография принадлежит сообществу.');
+      log(`owner_id: ${photo.owner_id}`);
+      log(`photo_id: ${photo.id}`);
+      log('wall.post НЕ вызывался. queue.json НЕ изменялся.');
+
+      token = '';
+      log('Временный пользовательский токен удалён из памяти страницы.');
+    } catch (error) {
+      token = '';
+      log('ОШИБКА ЗАГРУЗКИ: ' + errorText(error));
+      authBtn.disabled = false;
     }
+  };
 
-    userToken = '';
-    communityToken = '';
-    log(
-      `ГОТОВО. Успешно: ${ok}. Ошибок: ${failed}. ` +
-      'Оба токена удалены из памяти страницы.'
-    );
-
-    authBtn.disabled = false;
+  copyBtn.onclick = async () => {
+    if (!attachment) return;
+    try {
+      await navigator.clipboard.writeText(attachment);
+      log('Идентификатор вложения скопирован.');
+    } catch (error) {
+      log('Не удалось скопировать автоматически: ' + errorText(error));
+    }
   };
 
   init();
