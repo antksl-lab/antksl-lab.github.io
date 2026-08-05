@@ -1,349 +1,240 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>ANTKSL · Hybrid Photo Probe 1.0</title>
-  <script src="https://unpkg.com/@vkontakte/vk-bridge@2.15.0/dist/browser.min.js"></script>
-  <style>
-    :root{font-family:Arial,sans-serif;color:#162133;background:#eef2f7}
-    *{box-sizing:border-box}
-    body{margin:0;padding:24px}
-    main{max-width:780px;margin:24px auto;background:#fff;border-radius:20px;padding:28px;box-shadow:0 12px 40px #0002}
-    h1{font-size:27px;margin:0 0 10px}
-    .muted{color:#657084;line-height:1.55}
-    label{display:block;font-weight:700;color:#39465a;margin:18px 0}
-    input{display:block;width:100%;margin-top:7px;padding:12px;border:1px solid #cbd4e1;border-radius:10px;font-size:16px}
-    button{border:0;border-radius:12px;padding:14px 18px;font-size:16px;font-weight:700;cursor:pointer;background:#2688eb;color:#fff;margin:8px 8px 8px 0}
-    button.secondary{background:#e9eef6;color:#17223b}
-    button:disabled{opacity:.45;cursor:not-allowed}
-    #status{padding:15px;border-radius:12px;background:#f3f6fa;white-space:pre-wrap;line-height:1.48;min-height:120px}
-    #attachmentBox{display:none;margin-top:16px;padding:14px;border:1px solid #b9c8da;border-radius:12px;background:#f8fbff}
-    #attachment{word-break:break-all;font-family:Consolas,monospace}
-    code{background:#edf1f6;padding:2px 6px;border-radius:5px}
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ANTKSL — Студийные истории (альбом)</title>
+<script src="https://unpkg.com/@vkontakte/vk-bridge/dist/browser.min.js"></script>
+<style>
+ body{font-family:-apple-system,Segoe UI,Roboto,sans-serif;margin:0;padding:16px;background:#0f1116;color:#e8eaed}
+ h1{font-size:18px;margin:0 0 12px}
+ input,button{width:100%;box-sizing:border-box;font-size:15px;padding:12px;border-radius:10px;border:1px solid #2a2f3a}
+ input{background:#171a21;color:#e8eaed;margin-bottom:10px}
+ button{background:#2787f5;color:#fff;border:0;margin-bottom:10px}
+ button:disabled{background:#39404d}
+ pre{white-space:pre-wrap;background:#171a21;border-radius:10px;padding:12px;font-size:13px;line-height:1.45}
+ .job{background:#171a21;border-radius:10px;padding:12px;margin-bottom:10px}
+</style>
 </head>
 <body>
-<main>
-  <h1>ANTKSL · гибридная проверка фотографии</h1>
-  <p class="muted">
-    Эта страница создаёт одну тестовую фотографию в альбоме стены сообщества
-    <b>239543600</b>. Она не вызывает <code>wall.post</code>, не публикует запись
-    и не меняет <code>queue.json</code>.
-  </p>
-
-  <label>Код подключения из чёрного окна
-    <input id="connection" type="password" autocomplete="off"
-           placeholder="Вставьте всю строку после «Код подключения:»">
-  </label>
-
-  <button id="connect">1. Подключиться к Python</button>
-  <button id="auth" class="secondary" disabled>2. Получить токен VK</button>
-  <button id="upload" disabled>3. Загрузить карточку в сообщество</button>
-
-  <div id="attachmentBox">
-    <b>Готовый идентификатор вложения:</b>
-    <p id="attachment"></p>
-    <button id="copy" class="secondary">Скопировать идентификатор</button>
-  </div>
-
-  <p id="status">Инициализация VK Bridge…</p>
-</main>
-
+<h1>Студийные истории → фотоальбом</h1>
+<input id="code" placeholder="Код подключения из окна моста" autocomplete="off">
+<button id="connect">Подключиться к мосту</button>
+<button id="checkauth">Проверить право photos (без записи)</button>
+<div id="jobs"></div>
+<pre id="log">Готов.</pre>
 <script>
-(() => {
-  'use strict';
+const bridge = window.vkBridge;
+const INIT = bridge.send("VKWebAppInit", {});
+let BASE = "", KEY = "", CFG = null;
+const log = (m) => { const el = document.getElementById("log");
+  el.textContent = (new Date()).toLocaleTimeString() + "  " + m + "\n" + el.textContent; };
 
-  const EXPECTED_GROUP_ID = 239543600;
-  const PROTECTED_JOB_ID = '3313ccfb1ca4';
+function withTimeout(promise, ms, label){
+  let timer;
+  const timeout = new Promise((_, reject) => {
+    timer = setTimeout(() => reject(new Error(label + ": превышено время ожидания")), ms);
+  });
+  return Promise.race([promise, timeout]).finally(() => clearTimeout(timer));
+}
 
-  const $ = id => document.getElementById(id);
-  const status = $('status');
-  const connectBtn = $('connect');
-  const authBtn = $('auth');
-  const uploadBtn = $('upload');
-  const copyBtn = $('copy');
-  const attachmentBox = $('attachmentBox');
-  const attachmentText = $('attachment');
+function nonce(){ const a = new Uint8Array(16); crypto.getRandomValues(a);
+  return Array.from(a, b => b.toString(16).padStart(2,"0")).join(""); }
 
-  let appId = Number(new URLSearchParams(location.search).get('vk_app_id') || 0);
-  let base = '';
-  let sessionKey = '';
-  let config = null;
-  let job = null;
-  let token = '';
-  let attachment = '';
-  let lines = [];
+async function call(path, body){
+  const r = await withTimeout(fetch(BASE + path, {
+    method: body ? "POST" : "GET",
+    headers: {"Content-Type":"application/json","X-ANTKSL-Session":KEY},
+    body: body ? JSON.stringify(body) : undefined }), 30000, "Мост " + path);
+  const j = await r.json();
+  if(!j.ok) throw new Error(j.error || ("HTTP " + r.status));
+  return j;
+}
 
-  function resetLog(text) {
-    lines = [text];
-    status.textContent = lines.join('\n');
+// Пользовательский ключ живёт только в этой переменной и только в браузере.
+// Он не уходит на мост, не пишется в localStorage и не печатается в журнал.
+let USER_TOKEN = null;
+
+async function auth(){
+  if(USER_TOKEN) return USER_TOKEN;
+  await withTimeout(INIT, 30000, "VKWebAppInit");
+  const res = await withTimeout(bridge.send("VKWebAppGetAuthToken",
+    { app_id: CFG.app_id, scope: CFG.scope }), 90000, "Запрос права photos");
+  const granted = String(res.scope || "").split(",").filter(Boolean);
+  if(!granted.includes("photos"))
+    throw new Error("Право photos не выдано. Без него альбом недоступен.");
+  USER_TOKEN = res.access_token;
+  log("Право photos получено. Ключ остаётся в браузере.");
+  return USER_TOKEN;
+}
+
+async function api(method, params){
+  const token = await auth();
+  const res = await withTimeout(bridge.send("VKWebAppCallAPIMethod", {
+    method: method,
+    params: Object.assign({ v: CFG.api_version, access_token: token }, params) }),
+    90000, method);
+  if(res.error_type) throw new Error(method + ": " + JSON.stringify(res.error_data));
+  return res.response;
+}
+
+async function listAllAlbums(){
+  const all = [];
+  let offset = 0;
+  for(let page = 0; page < 20; page++){
+    const part = await api("photos.getAlbums", {
+      owner_id: -CFG.group_id, need_system: 0, count: 1000, offset: offset });
+    const items = (part && part.items) || [];
+    all.push(...items);
+    if(!items.length || items.length < 1000 ||
+       (Number(part.count || 0) > 0 && all.length >= Number(part.count))) break;
+    offset += items.length;
   }
+  return all;
+}
 
-  function log(text) {
-    lines.push(text);
-    status.textContent = lines.join('\n');
+async function ensureAlbum(){
+  const items = await listAllAlbums();
+  const norm = (s) => String(s || "").trim().toLocaleLowerCase("ru-RU");
+  if(CFG.album_id){
+    const known = items.find(a => Number(a.id) === Number(CFG.album_id));
+    if(!known) throw new Error("Сохранённый album_id не найден в сообществе.");
+    if(norm(known.title) !== norm(CFG.album_exact_title))
+      throw new Error("Сохранённый album_id принадлежит альбому с другим названием.");
+    if(Number(known.owner_id || -CFG.group_id) !== -Number(CFG.group_id))
+      throw new Error("Сохранённый album_id принадлежит другому владельцу.");
+    return { id: known.id, owner_id: known.owner_id || -CFG.group_id, created: false };
   }
-
-  function errorText(error) {
-    return error?.error_data?.error_reason ||
-           error?.error_data?.error_msg ||
-           error?.message ||
-           String(error);
-  }
-
-  function parseConnection(value) {
-    const raw = value.trim();
-    const separator = raw.lastIndexOf('|');
-    if (separator < 1) {
-      throw new Error('Вставьте полный код подключения из чёрного окна.');
+  let found = items.find(a => norm(a.title) === norm(CFG.album_exact_title));
+  let reservation = "";
+  if(found){ log("Альбом найден: " + found.id); }
+  else {
+    const reserved = await call("/album-reserve", { title: CFG.album_exact_title });
+    if(reserved.known_album_id){
+      throw new Error("Мост уже знает album_id; переподключитесь и повторите проверку.");
     }
-
-    const url = new URL(raw.slice(0, separator));
-    const key = raw.slice(separator + 1);
-    const labels = url.hostname.toLowerCase().split('.');
-    const validHost =
-      labels.length === 3 &&
-      labels[0] &&
-      labels[1] === 'trycloudflare' &&
-      labels[2] === 'com';
-
-    if (
-      url.protocol !== 'https:' ||
-      !validHost ||
-      url.username ||
-      url.password ||
-      (url.pathname !== '/' && url.pathname !== '') ||
-      url.search ||
-      url.hash
-    ) {
-      throw new Error('Код не содержит допустимый одноразовый HTTPS-адрес.');
-    }
-
-    if (!/^[A-Za-z0-9_-]{20,100}$/.test(key)) {
-      throw new Error('Код сессии повреждён или скопирован не полностью.');
-    }
-
-    return {base: url.origin, key};
+    reservation = reserved.reservation;
+    log("Альбом не найден — создание зарезервировано одной вкладкой.");
+    found = await api("photos.createAlbum", {
+      title: CFG.album_exact_title, group_id: CFG.group_id,
+      description: CFG.album_description, upload_by_admins_only: 1 });
+    found.created = true;
   }
+  const owner = found.owner_id || -CFG.group_id;
+  await call("/album", { album_id: found.id, owner_id: owner,
+    title: CFG.album_exact_title, created: !!found.created, reservation: reservation });
+  CFG.album_id = found.id;
+  return { id: found.id, owner_id: owner, created: !!found.created };
+}
 
-  async function local(path, options = {}) {
-    const headers = {
-      ...(options.headers || {}),
-      'X-ANTKSL-Session': sessionKey
-    };
-    if (options.body) headers['Content-Type'] = 'application/json';
+// Сохраняем только НЕСЕКРЕТНОЕ доказательство photo_id. Пользовательский
+// access_token никогда не попадает в localStorage. Это позволяет после
+// перезагрузки страницы дослать /result без повторной загрузки фотографии.
+const SAVED = {};
+function proofKey(jobId){ return "antksl_album_proof:" + CFG.app_id + ":" + CFG.group_id + ":" + jobId; }
+function loadProof(jobId){
+  try { return JSON.parse(localStorage.getItem(proofKey(jobId)) || "null"); }
+  catch(_){ return null; }
+}
+function saveProof(jobId, proof){
+  SAVED[jobId] = proof;
+  localStorage.setItem(proofKey(jobId), JSON.stringify(proof));
+}
+function clearProof(jobId){
+  delete SAVED[jobId];
+  localStorage.removeItem(proofKey(jobId));
+}
 
-    const response = await fetch(base + path, {
-      ...options,
-      headers,
-      cache: 'no-store'
+async function publish(job, button){
+  button.disabled = true;
+  const n = nonce();
+  try {
+    const prior = SAVED[job.job_id] || loadProof(job.job_id);
+    if(prior){
+      const s = prior;
+      log("Фотография уже сохранена, досылаю результат без повторной загрузки.");
+      await call("/result", Object.assign({ job_id: job.job_id, success: true }, s));
+      clearProof(job.job_id);
+      log("ГОТОВО (досыл). photo_id=" + s.photo_id);
+      button.textContent = "Загружено"; return;
+    }
+    const album = await ensureAlbum();
+    const srv = await api("photos.getUploadServer",
+      { album_id: album.id, group_id: CFG.group_id });
+    log("Сервер загрузки получен.");
+    const up = await call("/upload", { job_id: job.job_id, media_type: "photo",
+      upload_url: srv.upload_url, nonce: n });
+    log("Файл загружен мостом.");
+    const saved = await api("photos.save", {
+      album_id: album.id, group_id: CFG.group_id,
+      server: up.upload.server, photos_list: up.upload.photos_list,
+      hash: up.upload.hash, caption: job.caption });
+    const photo = Array.isArray(saved) ? saved[0] : (saved.items || [])[0];
+    if(!photo || !photo.id) throw new Error("photos.save не вернул фотографию.");
+    // Независимая проверка: где фотография оказалась на самом деле.
+    const back = await api("photos.getById",
+      { photos: photo.owner_id + "_" + photo.id, extended: 0 });
+    const got = Array.isArray(back) ? back[0] : (back.items || [])[0];
+    if(!got) throw new Error("photos.getById не нашёл сохранённую фотографию.");
+    const proof = { album_id: album.id, owner_id: photo.owner_id, photo_id: photo.id,
+      verified_album_id: got.album_id, verified_owner_id: got.owner_id };
+    saveProof(job.job_id, proof);
+    await call("/result", Object.assign({ job_id: job.job_id, success: true, nonce: n }, proof));
+    clearProof(job.job_id);
+    log("ГОТОВО. photo_id=" + photo.id + "; альбом подтверждён photos.getById; " +
+        "запись на стене не создавалась.");
+    button.textContent = "Загружено";
+  } catch(e){
+    log("ОШИБКА: " + e.message);
+    try { await call("/result", { job_id: job.job_id, success: false,
+      error: String(e.message), nonce: n }); } catch(_){}
+    button.disabled = false;
+  }
+}
+
+document.getElementById("checkauth").onclick = async () => {
+  try {
+    if(!CFG) throw new Error("Сначала подключитесь к мосту.");
+    const t = await auth();
+    const me = await api("photos.getAlbums",
+      { owner_id: -CFG.group_id, need_system: 0, count: 1 });
+    log("ПРОВЕРКА ПРОЙДЕНА: право photos действует, альбомы читаются (" +
+        (me.count === undefined ? "?" : me.count) + " шт.). Ничего не записано.");
+  } catch(e){ log("ПРОВЕРКА НЕ ПРОЙДЕНА: " + e.message); }
+};
+
+document.getElementById("connect").onclick = async () => {
+  try {
+    const raw = document.getElementById("code").value.trim();
+    const cut = raw.lastIndexOf("|");
+    if(cut < 0) throw new Error("Код подключения должен содержать символ |.");
+    BASE = raw.slice(0, cut); KEY = raw.slice(cut + 1);
+    while(BASE.endsWith("/")) BASE = BASE.slice(0, -1);
+    const bridgeUrl = new URL(BASE);
+    if(bridgeUrl.protocol !== "https:" ||
+       !bridgeUrl.hostname.endsWith(".trycloudflare.com") ||
+       bridgeUrl.pathname !== "/" || bridgeUrl.username || bridgeUrl.password)
+      throw new Error("Ожидается корневой HTTPS-адрес *.trycloudflare.com.");
+    CFG = await call("/config");
+    log("Мост " + CFG.engine_version + "; альбом «" + CFG.album_exact_title + "».");
+    if(CFG.probe_only) log("РЕЖИМ ПРОВЕРКИ: запись отключена мостом.");
+    const jobs = (await call("/jobs")).jobs || [];
+    const box = document.getElementById("jobs"); box.innerHTML = "";
+    if(!jobs.length) log("Заданий в состоянии queued нет.");
+    jobs.forEach(job => {
+      const d = document.createElement("div"); d.className = "job";
+      d.innerHTML = "<b>" + job.story_id + "</b><br>" + job.media_name +
+        " · " + job.media_size + " байт";
+      const b = document.createElement("button");
+      b.textContent = CFG.probe_only
+        ? "Режим проверки: загрузка отключена мостом"
+        : "Загрузить в альбом";
+      b.disabled = !!CFG.probe_only;
+      b.onclick = () => publish(job, b);
+      d.appendChild(b); box.appendChild(d);
     });
-
-    const data = await response.json().catch(() => ({
-      ok: false,
-      error: 'Python вернул не JSON'
-    }));
-
-    if (!response.ok || !data.ok) {
-      throw new Error(data.error || `HTTP ${response.status}`);
-    }
-
-    return data;
-  }
-
-  async function api(method, params = {}) {
-    if (!token) throw new Error('Сначала получи токен VK.');
-
-    const data = await vkBridge.send('VKWebAppCallAPIMethod', {
-      method,
-      params: {
-        ...params,
-        access_token: token,
-        v: String(config.api_version || '5.199')
-      }
-    });
-
-    return data.response;
-  }
-
-  async function init() {
-    try {
-      await vkBridge.send('VKWebAppInit');
-
-      if (!appId) {
-        const launch = await vkBridge.send('VKWebAppGetLaunchParams');
-        appId = Number(launch.vk_app_id || 0);
-      }
-
-      if (!appId) {
-        throw new Error(
-          'Не найден vk_app_id. Открой страницу именно внутри VK Mini App.'
-        );
-      }
-
-      resetLog(
-        `VK Bridge готов. App ID: ${appId}\n` +
-        'Запусти локальный мост и вставь код подключения.'
-      );
-    } catch (error) {
-      resetLog('ОШИБКА ИНИЦИАЛИЗАЦИИ: ' + errorText(error));
-      connectBtn.disabled = true;
-    }
-  }
-
-  connectBtn.onclick = async () => {
-    try {
-      connectBtn.disabled = true;
-      resetLog('Подключение к локальному Python…');
-
-      const connection = parseConnection($('connection').value);
-      base = connection.base;
-      sessionKey = connection.key;
-
-      config = await local('/config');
-      if (Number(config.group_id) !== EXPECTED_GROUP_ID) {
-        throw new Error(
-          `Ожидалась группа ${EXPECTED_GROUP_ID}, получена ${config.group_id}.`
-        );
-      }
-
-      const queue = await local('/jobs');
-      const jobs = Array.isArray(queue.jobs) ? queue.jobs : [];
-      job = jobs.find(item => String(item.job_id) === PROTECTED_JOB_ID);
-
-      if (!job) {
-        throw new Error(
-          `В локальной очереди не найдено защищённое задание ${PROTECTED_JOB_ID}.`
-        );
-      }
-
-      if (String(job.media_type) !== 'photo') {
-        throw new Error('Защищённое задание не является фотографией.');
-      }
-
-      log(`Подключено. Группа: ${config.group_id}.`);
-      log(`Карточка найдена: ${job.media_name || job.story_id || job.job_id}.`);
-      log('Очередь будет только прочитана; статус задания не изменится.');
-      authBtn.disabled = false;
-    } catch (error) {
-      log('ОШИБКА ПОДКЛЮЧЕНИЯ: ' + errorText(error));
-      connectBtn.disabled = false;
-    }
-  };
-
-  authBtn.onclick = async () => {
-    try {
-      authBtn.disabled = true;
-      log('VK запрашивает пользовательские права photos и groups…');
-
-      const data = await vkBridge.send('VKWebAppGetAuthToken', {
-        app_id: appId,
-        scope: 'photos,groups'
-      });
-
-      token = String(data.access_token || '');
-      if (!token) throw new Error('VK не вернул access_token.');
-
-      const users = await api('users.get');
-      const user = Array.isArray(users) ? users[0] : null;
-      if (!user?.id) throw new Error('users.get не подтвердил токен.');
-
-      log(`Токен подтверждён. User ID: ${user.id}.`);
-      log('Токен остаётся только в памяти страницы.');
-      uploadBtn.disabled = false;
-    } catch (error) {
-      token = '';
-      log('ОШИБКА ТОКЕНА: ' + errorText(error));
-      authBtn.disabled = false;
-    }
-  };
-
-  uploadBtn.onclick = async () => {
-    try {
-      uploadBtn.disabled = true;
-      attachment = '';
-      attachmentBox.style.display = 'none';
-
-      log('Запрашиваю сервер загрузки для стены сообщества…');
-      const server = await api('photos.getWallUploadServer', {
-        group_id: EXPECTED_GROUP_ID
-      });
-
-      if (!server?.upload_url) {
-        throw new Error('photos.getWallUploadServer не вернул upload_url.');
-      }
-
-      log('Передаю карточку из локального Python на upload-сервер VK…');
-      const sent = await local('/upload', {
-        method: 'POST',
-        body: JSON.stringify({
-          job_id: PROTECTED_JOB_ID,
-          media_type: 'photo',
-          upload_url: server.upload_url
-        })
-      });
-
-      const up = sent.upload || {};
-      if (!up.photo || up.server == null || !up.hash) {
-        throw new Error(
-          'Upload-сервер не вернул полный набор photo/server/hash.'
-        );
-      }
-
-      log('Сохраняю фотографию именно в сообщество 239543600…');
-      const saved = await api('photos.saveWallPhoto', {
-        group_id: EXPECTED_GROUP_ID,
-        photo: up.photo,
-        server: up.server,
-        hash: up.hash
-      });
-
-      const photo = Array.isArray(saved) ? saved[0] : null;
-      if (photo?.owner_id == null || photo?.id == null) {
-        throw new Error('photos.saveWallPhoto не вернул owner_id и id.');
-      }
-
-      const expectedOwner = -EXPECTED_GROUP_ID;
-      if (Number(photo.owner_id) !== expectedOwner) {
-        throw new Error(
-          `Фотография сохранилась не в сообщество: owner_id=${photo.owner_id}, ` +
-          `ожидался ${expectedOwner}.`
-        );
-      }
-
-      attachment = `photo${photo.owner_id}_${photo.id}`;
-      if (photo.access_key) attachment += `_${photo.access_key}`;
-
-      attachmentText.textContent = attachment;
-      attachmentBox.style.display = 'block';
-
-      log('PASS: фотография принадлежит сообществу.');
-      log(`owner_id: ${photo.owner_id}`);
-      log(`photo_id: ${photo.id}`);
-      log('wall.post НЕ вызывался. queue.json НЕ изменялся.');
-
-      token = '';
-      log('Временный пользовательский токен удалён из памяти страницы.');
-    } catch (error) {
-      token = '';
-      log('ОШИБКА ЗАГРУЗКИ: ' + errorText(error));
-      authBtn.disabled = false;
-    }
-  };
-
-  copyBtn.onclick = async () => {
-    if (!attachment) return;
-    try {
-      await navigator.clipboard.writeText(attachment);
-      log('Идентификатор вложения скопирован.');
-    } catch (error) {
-      log('Не удалось скопировать автоматически: ' + errorText(error));
-    }
-  };
-
-  init();
-})();
+  } catch(e){ log("ОШИБКА: " + e.message); }
+};
 </script>
 </body>
 </html>
