@@ -2744,5 +2744,286 @@ document.addEventListener('keydown',function(e){
 });
 </script>
 
+
+<!-- ======================================================================
+     ANTKSL VINYL LABEL ENGINE · SAFE EMBEDDED EDITION
+     Источник: реальный каталог tracks[] + реальные COVERS{} этого сайта.
+     Никаких чужих имён. Смена — строго по animationiteration тонарма.
+     ====================================================================== -->
+<script>
+(function(){
+  'use strict';
+
+  var PALETTES=[
+    {bg:'#d9c9a3',ink:'#2b1d10',rule:'#8a6a3a',veil:.76},
+    {bg:'#b8452f',ink:'#fbe7cf',rule:'#f0c99a',veil:.78},
+    {bg:'#1f4d3d',ink:'#e8dcc0',rule:'#9dbfa8',veil:.78},
+    {bg:'#1b2b4d',ink:'#e6e0cf',rule:'#93a8cc',veil:.80},
+    {bg:'#e8dcc0',ink:'#3a2a18',rule:'#a8875a',veil:.78},
+    {bg:'#5a2740',ink:'#f2dfd2',rule:'#c69bab',veil:.79}
+  ];
+
+  var canvas=document.createElement('canvas');
+  var ctx=canvas.getContext('2d');
+  var host=null,arm=null,catalog=[],idx=0;
+
+  function esc(s){
+    return String(s==null?'':s).replace(/[<>&"]/g,function(c){
+      return {'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c];
+    });
+  }
+
+  function textWidth(text,size,family,weight,spacing){
+    family=family||'Georgia';
+    weight=weight||'700';
+    spacing=Number(spacing||0);
+    ctx.font=weight+' '+size+'px '+family;
+    return ctx.measureText(text).width+Math.max(0,text.length-1)*spacing;
+  }
+
+  function combinations(words,parts,start,prefix,out){
+    if(parts===1){
+      out.push(prefix.concat([words.slice(start).join(' ')]));
+      return;
+    }
+    for(var i=start+1;i<=words.length-parts+1;i++){
+      combinations(words,parts-1,i,prefix.concat([words.slice(start,i).join(' ')]),out);
+    }
+  }
+
+  function bestTitle(text){
+    var words=String(text||'').trim().toUpperCase().split(/\s+/).filter(Boolean);
+    if(!words.length)return {size:56,lines:['']};
+
+    var MAX_W=600,MAX_LINES=3;
+    for(var size=64;size>=34;size-=2){
+      for(var count=1;count<=Math.min(MAX_LINES,words.length);count++){
+        var all=[];
+        combinations(words,count,0,[],all);
+        var best=null;
+        all.forEach(function(lines){
+          var widths=lines.map(function(line){
+            return textWidth(line,size,'Georgia','700',.7);
+          });
+          var max=Math.max.apply(Math,widths);
+          if(max<=MAX_W){
+            var min=Math.min.apply(Math,widths);
+            var score=max+(max-min)*.16+count*8;
+            if(!best||score<best.score)best={size:size,lines:lines,score:score};
+          }
+        });
+        if(best)return best;
+      }
+    }
+    return {size:34,lines:[words.join(' ')]};
+  }
+
+  function fitAttr(text,size,max,family,weight,spacing){
+    var w=textWidth(text,size,family,weight,spacing);
+    return w>max?' textLength="'+max.toFixed(1)+'" lengthAdjust="spacingAndGlyphs"':'';
+  }
+
+  function lang(){
+    return (document.documentElement.getAttribute('lang')||'ru').toLowerCase();
+  }
+
+  function localizedTitle(item){
+    try{
+      if(typeof TITLES!=='undefined' && typeof pickI18N==='function'){
+        return pickI18N(Object.assign({ru:item.baseTitle},TITLES[item.baseTitle]||{}),lang(),item.baseTitle);
+      }
+    }catch(e){}
+    return item.baseTitle;
+  }
+
+  function localizedArtist(){
+    try{
+      if(typeof ARTIST_NAME!=='undefined' && typeof pickI18N==='function'){
+        return pickI18N(ARTIST_NAME,lang(),'Константин Захаров');
+      }
+    }catch(e){}
+    return 'Константин Захаров';
+  }
+
+  function dateHuman(d){
+    if(!d)return '';
+    var p=String(d).split('-');
+    return p.length===3 ? p[2]+'.'+p[1]+'.'+p[0] : d;
+  }
+
+  function statusText(item){
+    try{
+      var t=(typeof today!=='undefined'?today:new Date().toISOString().slice(0,10));
+      return item.date>t ? 'СКОРО' : 'ВЫШЕЛ';
+    }catch(e){
+      return '';
+    }
+  }
+
+  function buildCatalog(){
+    var out=[];
+    try{
+      if(typeof tracks!=='undefined' && Array.isArray(tracks)){
+        out=tracks.map(function(r){
+          return {
+            baseTitle:r.t,
+            genre:r.g||'',
+            date:r.date||'',
+            cover:(typeof COVERS!=='undefined'&&COVERS[r.t])?COVERS[r.t]:''
+          };
+        });
+      }
+    }catch(e){}
+
+    if(!out.length){
+      document.querySelectorAll('#grid .card,#soonList .card').forEach(function(card){
+        var title=card.querySelector('.card-title');
+        var image=card.querySelector('.cover-img');
+        var genre=card.querySelector('.chip');
+        var date=card.querySelector('.date');
+        if(title){
+          out.push({
+            baseTitle:(title.textContent||'').trim(),
+            genre:genre?(genre.textContent||'').trim():'',
+            date:date?(date.textContent||'').trim():'',
+            cover:image?(image.currentSrc||image.getAttribute('src')||''):''
+          });
+        }
+      });
+    }
+
+    out.sort(function(a,b){return String(b.date).localeCompare(String(a.date));});
+    return out;
+  }
+
+  function labelSvg(item,n){
+    var p=PALETTES[n%PALETTES.length];
+    var title=localizedTitle(item);
+    var artist=localizedArtist().toUpperCase();
+    var block=bestTitle(title);
+    var lh=block.size*1.04;
+    var centerY=374;
+    var startY=centerY-((block.lines.length-1)*lh/2);
+    var uid='lbl'+n+'x'+Date.now();
+
+    var s='';
+    s+='<svg class="label-art antksl-label-art" viewBox="0 0 1000 1000" aria-hidden="true">';
+    s+='<defs><clipPath id="'+uid+'"><circle cx="500" cy="500" r="500"/></clipPath></defs>';
+    s+='<g clip-path="url(#'+uid+')">';
+
+    if(item.cover){
+      s+='<image href="'+esc(item.cover)+'" x="0" y="0" width="1000" height="1000" preserveAspectRatio="xMidYMid slice" opacity=".58"/>';
+      s+='<circle cx="500" cy="500" r="500" fill="'+p.bg+'" opacity="'+p.veil+'"/>';
+    }else{
+      s+='<circle cx="500" cy="500" r="500" fill="'+p.bg+'"/>';
+    }
+
+    s+='<circle cx="500" cy="500" r="488" fill="none" stroke="rgba(0,0,0,.25)" stroke-width="18"/>';
+    s+='<circle cx="500" cy="500" r="455" fill="none" stroke="'+p.rule+'" stroke-width="5" opacity=".92"/>';
+    s+='<circle cx="500" cy="500" r="436" fill="none" stroke="'+p.rule+'" stroke-width="2" opacity=".62"/>';
+
+    s+='<text x="500" y="165" fill="'+p.ink+'" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-size="50" font-weight="700" letter-spacing="16">ANTKSL</text>';
+    s+='<text x="500" y="215" fill="'+p.ink+'" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-size="20" font-weight="600" letter-spacing="5">СТУДИЯ ЗВУКОЗАПИСИ · КЕМЕРОВО</text>';
+    s+='<line x1="250" y1="255" x2="750" y2="255" stroke="'+p.rule+'" stroke-width="3"/>';
+
+    var afit=fitAttr(artist,27,600,'Arial','600',3);
+    s+='<text x="500" y="300" fill="'+p.ink+'" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-size="27" font-weight="600" letter-spacing="3"'+afit+'>'+esc(artist)+'</text>';
+
+    block.lines.forEach(function(line,i){
+      var y=startY+i*lh;
+      var fit=fitAttr(line,block.size,600,'Georgia','700',.7);
+      s+='<text x="500" y="'+y.toFixed(1)+'" fill="'+p.ink+'" text-anchor="middle" font-family="Georgia,Times New Roman,serif" font-style="italic" font-size="'+block.size+'" font-weight="700" letter-spacing=".7"'+fit+'>'+esc(line)+'</text>';
+    });
+
+    /* Реальный шпиндель DOM лежит точно в центре; центр оставляем свободным. */
+    s+='<circle cx="500" cy="500" r="54" fill="none" stroke="'+p.rule+'" stroke-width="2" opacity=".68"/>';
+
+    s+='<line x1="270" y1="585" x2="730" y2="585" stroke="'+p.rule+'" stroke-width="2"/>';
+
+    var g=(item.genre||'').toUpperCase();
+    var date=dateHuman(item.date);
+    var stat=statusText(item);
+    s+='<text x="280" y="640" fill="'+p.ink+'" text-anchor="middle" font-family="PT Mono,Courier New,monospace" font-size="25" font-weight="700" letter-spacing="2">33⅓ ОБ/МИН</text>';
+    s+='<text x="720" y="640" fill="'+p.ink+'" text-anchor="middle" font-family="PT Mono,Courier New,monospace" font-size="25" font-weight="700" letter-spacing="2">'+esc(stat)+'</text>';
+
+    var gfit=fitAttr(g,22,330,'Courier New','400',1.6);
+    s+='<text x="280" y="687" fill="'+p.ink+'" text-anchor="middle" font-family="PT Mono,Courier New,monospace" font-size="22" letter-spacing="1.6"'+gfit+'>'+esc(g)+'</text>';
+    s+='<text x="720" y="687" fill="'+p.ink+'" text-anchor="middle" font-family="PT Mono,Courier New,monospace" font-size="22" letter-spacing="1.6">'+esc(date)+'</text>';
+
+    s+='<text x="500" y="760" fill="'+p.ink+'" text-anchor="middle" font-family="PT Mono,Courier New,monospace" font-size="19" letter-spacing="3">АВТОРСКАЯ СЕРИЯ · ANTKSL</text>';
+    s+='<text x="500" y="808" fill="'+p.ink+'" text-anchor="middle" font-family="PT Mono,Courier New,monospace" font-size="16" letter-spacing="2.2" opacity=".82">НЕ ИСТОРИЧЕСКОЕ ИЗДАНИЕ</text>';
+
+    s+='</g></svg>';
+    return s;
+  }
+
+  function ensureStyle(){
+    if(document.getElementById('antksl-label-engine-style'))return;
+    var st=document.createElement('style');
+    st.id='antksl-label-engine-style';
+    st.textContent=
+      '.label{overflow:hidden;background:none!important}'+
+      '.label .antksl-label-art{position:absolute;inset:0;width:100%;height:100%;display:block;transform-origin:50% 50%}'+
+      '.label.antksl-label-swap .antksl-label-art{animation:antkslLabelSwap .48s ease both}'+
+      '@keyframes antkslLabelSwap{from{opacity:0;transform:scale(.955)}to{opacity:1;transform:scale(1)}}'+
+      '@media(prefers-reduced-motion:reduce){.label.antksl-label-swap .antksl-label-art{animation:none}}';
+    document.head.appendChild(st);
+  }
+
+  function render(){
+    if(!host||!catalog.length)return;
+    var item=catalog[idx%catalog.length];
+    var spindle=host.querySelector('.spindle');
+    host.innerHTML=labelSvg(item,idx);
+    if(spindle)host.appendChild(spindle);
+    else{
+      spindle=document.createElement('span');
+      spindle.className='spindle';
+      host.appendChild(spindle);
+    }
+    host.setAttribute('aria-label','На проигрывателе: '+localizedTitle(item));
+    host.classList.remove('antksl-label-swap');
+    void host.offsetWidth;
+    host.classList.add('antksl-label-swap');
+  }
+
+  function next(){
+    if(!catalog.length)return;
+    idx=(idx+1)%catalog.length;
+    render();
+  }
+
+  function boot(){
+    host=document.querySelector('.deck .label');
+    arm=document.querySelector('.arm-body');
+    if(!host)return;
+
+    catalog=buildCatalog();
+    if(!catalog.length)return;
+
+    ensureStyle();
+    idx=Math.floor(Math.random()*catalog.length);
+    render();
+
+    if(arm){
+      arm.addEventListener('animationiteration',function(e){
+        if(e.animationName && e.animationName!=='armPlay')return;
+        next();
+      });
+    }
+
+    /* При смене языка перерисовываем текущую этикетку с локализованным названием. */
+    new MutationObserver(function(muts){
+      for(var i=0;i<muts.length;i++){
+        if(muts[i].attributeName==='lang'){render();break;}
+      }
+    }).observe(document.documentElement,{attributes:true,attributeFilter:['lang']});
+  }
+
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);
+  else boot();
+})();
+</script>
+
 </body>
 </html>
