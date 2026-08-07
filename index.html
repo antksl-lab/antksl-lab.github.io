@@ -22,17 +22,24 @@
     security_storage:'granted'
   });
   window.gtag('set','ads_data_redaction',true);
-  var js=document.createElement('script');
-  js.id='antksl-ga4';
-  js.async=true;
-  js.src='https://www.googletagmanager.com/gtag/js?id='+encodeURIComponent(GA_ID);
-  document.head.appendChild(js);
+  /* v2.0: очередь аналитики создаётся сразу, но сторонний JS не конкурирует
+     с критическим рендерингом. Сам gtag загружается после window.load. */
   window.gtag('js',new Date());
   window.gtag('config',GA_ID,{
     anonymize_ip:true,
     allow_google_signals:false,
     allow_ad_personalization_signals:false
   });
+  function loadGA(){
+    if(document.getElementById('antksl-ga4'))return;
+    var js=document.createElement('script');
+    js.id='antksl-ga4';
+    js.async=true;
+    js.src='https://www.googletagmanager.com/gtag/js?id='+encodeURIComponent(GA_ID);
+    document.head.appendChild(js);
+  }
+  if(document.readyState==='complete')setTimeout(loadGA,0);
+  else window.addEventListener('load',loadGA,{once:true});
   window.ANTKSL_ANALYTICS={
     allowed:function(){return true;},
     mode:'cookieless-no-banner'
@@ -54,11 +61,18 @@ window.antkslVT=function(update){
   try{document.startViewTransition(update);}catch(e){update();}
 };</script>
 <title>Константин Захаров — официальный сайт</title>
-<meta name="site-fix-version" content="2026-08-02-desktop-hero-composition-v13">
+<meta name="site-fix-version" content="2026-08-07-v14-measured-runtime">
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
 <meta name="description" content="Константин Захаров — городской романс, лирический поп и R&amp;B. Превращаю стихи в песни, а песни — в маленькие фильмы. Музыка, клипы, визуальные истории.">
 <meta name="color-scheme" content="dark light">
 <meta name="theme-color" content="#0d0b1a">
+<script>/* theme-color следует выбранному облику, включая светлый editorial */
+window.antkslSyncThemeColor=function(s){
+  var c={aurora_soul:'#0d0b1a',tactile_brutalism:'#0a0a0a',editorial_mono:'#faf8f4',glass_depth:'#0e1420',grain_warmth:'#1c1714',bento_showcase:'#101114'}[s]||'#0d0b1a';
+  var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute('content',c);
+};
+window.antkslSyncThemeColor(document.documentElement.getAttribute('data-skin')||'aurora_soul');
+</script>
 <meta property="og:type" content="music.musician">
 <meta property="og:title" content="Константин Захаров">
 <meta property="og:description" content="Городской романс, лирический поп и R&amp;B. Превращаю стихи в песни, а песни — в маленькие фильмы.">
@@ -1230,6 +1244,37 @@ html[data-skin="editorial_mono"] .reel-badge.out{color:#fff}
   }
 </style>
 
+
+<style id="antksl-runtime-performance-v2">
+/* WEB_DESIGN_ENGINE v2.0 · measured runtime pass · 2026-08-07
+   Нижние тяжёлые секции остаются в DOM/поиске/a11y, но браузер может не считать
+   их layout/paint до приближения к viewport. contain-intrinsic-size держит скролл
+   стабильным до первого реального измерения секции. */
+#about,#reels,#videos,#support,#listen{
+  content-visibility:auto;
+  contain-intrinsic-size:auto 900px;
+}
+#reels{contain-intrinsic-size:auto 1900px}
+#videos{contain-intrinsic-size:auto 1000px}
+@media(max-width:560px){
+  #reels{contain-intrinsic-size:auto 4300px}
+  #videos{contain-intrinsic-size:auto 1900px}
+}
+
+/* На узком экране EQ-полоска почти не читается, но держит десятки анимаций.
+   Убираем только декоративную полосу — фон/контент остаются прежними. */
+@media(max-width:760px){.studiofx .eq{display:none!important}}
+
+/* Медленные/энергосберегающие устройства: декоративная жизнь не должна
+   отнимать главный поток у навигации, карточек и медиакнопок. */
+@media(update:slow){
+  .skinfx b,.studiofx .flick,.studiofx .flick2,.studiofx .eq i,
+  html[data-skin="aurora_soul"] body::before,
+  html[data-skin="glass_depth"] body::before,
+  .platter,.arm-body,.arm-shadow{animation:none!important}
+}
+</style>
+
 </head>
 <body>
 <div class="viewbar">
@@ -1270,7 +1315,7 @@ html[data-skin="editorial_mono"] .reel-badge.out{color:#fff}
             en:{label:"Theme",aurora:"Aurora",grain:"Warm grain",glass:"Frosted glass",editorial:"Light minimal",bento:"Bento",brutal:"Brutal"},de:{label:"Erscheinungsbild",aurora:"Nordlicht",grain:"Warmes Korn",glass:"Mattglas",editorial:"Hell minimal",bento:"Bento",brutal:"Brutal"}};
   function cur(){return document.documentElement.getAttribute('data-skin')||'aurora_soul';}
   function mark(){document.querySelectorAll('.skinpanel button').forEach(function(b){b.setAttribute('aria-pressed',b.getAttribute('data-skin')===cur());});}
-  function setSkin(s){window.antkslVT(function(){document.documentElement.setAttribute('data-skin',s);});try{localStorage.setItem('antksl_skin',s);}catch(e){}mark();}
+  function setSkin(s){window.antkslVT(function(){document.documentElement.setAttribute('data-skin',s);});if(window.antkslSyncThemeColor)window.antkslSyncThemeColor(s);try{localStorage.setItem('antksl_skin',s);}catch(e){}mark();}
   function applyLang(){try{var l=(document.documentElement.lang||'ru').slice(0,2);var t=I18N[l]||I18N.ru;
     document.querySelectorAll('[data-i18n-skin]').forEach(function(n){var k=n.getAttribute('data-i18n-skin');if(t[k])n.textContent=t[k];});}catch(e){}}
   var panel=document.getElementById('skinpanel'),tog=document.getElementById('skintoggle');
@@ -1446,6 +1491,10 @@ html[data-skin="editorial_mono"] .reel-badge.out{color:#fff}
 <section id="releases" class="wrap">
   <div class="sec-head"><span class="sec-num">01</span><h2 class="sec-title" data-i18n="discog">Дискография</h2><span class="sec-line"></span></div>
   <div class="grid" id="grid">
+<a class="card in" href="https://band.link/gorstpeskaantksl" target="_blank" rel="noopener">
+      <div class="frame"><img class="cover-img" loading="lazy" decoding="async" width="1000" height="1000" src="assets/covers/gorst-peska.webp" alt="Константин Захаров — Горсть песка — обложка сингла"></div>
+      <div class="card-body"><h3 class="card-title">Горсть песка</h3><div class="meta"><span class="chip">R&amp;B/Soul</span><span class="date">05.08.2026</span></div><span class="badge out">Вышел</span></div>
+    </a>
 <a class="card in" href="https://band.link/nashpoet" target="_blank" rel="noopener">
       <div class="frame"><img class="cover-img" loading="lazy" decoding="async" width="1000" height="1000" src="assets/covers/nash-poet-vladimir.webp" alt="Константин Захаров — Наш поэт Владимир — обложка сингла"></div>
       <div class="card-body"><h3 class="card-title">Наш поэт Владимир</h3><div class="meta"><span class="chip">R&amp;B/Soul</span><span class="date">25.07.2026</span></div><span class="badge out">Вышел</span></div>
@@ -1500,10 +1549,6 @@ html[data-skin="editorial_mono"] .reel-badge.out{color:#fff}
 <section id="soon" class="wrap">
   <div class="sec-head"><span class="sec-num">02</span><h2 class="sec-title" data-i18n="soon">Скоро</h2><span class="sec-line"></span></div>
   <div class="grid" id="soonList">
-<a class="card in" href="https://band.link/gorstpeskaantksl" target="_blank" rel="noopener">
-      <div class="frame"><img class="cover-img" loading="lazy" decoding="async" width="1000" height="1000" src="assets/covers/gorst-peska.webp" alt="Константин Захаров — Горсть песка — обложка сингла"></div>
-      <div class="card-body"><h3 class="card-title">Горсть песка</h3><div class="meta"><span class="chip">R&amp;B/Soul</span><span class="date">05.08.2026</span></div><span class="badge soon">Скоро · 05.08</span></div>
-    </a>
 <a class="card in" href="https://band.link/normm" target="_blank" rel="noopener">
       <div class="frame"><img class="cover-img" loading="lazy" decoding="async" width="1000" height="1000" src="assets/covers/normm.webp" alt="Константин Захаров — Нормм — обложка сингла"></div>
       <div class="card-body"><h3 class="card-title">Нормм</h3><div class="meta"><span class="chip">Alternative</span><span class="date">12.08.2026</span></div><span class="badge soon">Скоро · 12.08</span></div>
@@ -1650,7 +1695,7 @@ html[data-skin="editorial_mono"] .reel-badge.out{color:#fff}
       <button type="button" class="video-poster" aria-label="Смотреть рилз «Горсть песка»"><span class="play"></span></button>
     </div>
     <div class="video-meta">
-      <span class="reel-badge soon" data-i18n-reels="b_0508">Скоро · 05.08</span>
+      <span class="reel-badge out" data-i18n-reels="b_out">Уже вышел</span>
       <h3 class="vt">Горсть песка</h3>
       <p class="reel-cap">Время сквозь пальцы — как горсть песка. Не горечь — принятие.</p>
       <div class="video-src">
@@ -3041,8 +3086,18 @@ document.addEventListener('keydown',function(e){
     }).observe(document.documentElement,{attributes:true,attributeFilter:['lang']});
   }
 
-  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);
-  else boot();
+  function scheduleBoot(){
+    /* Декоративный precision-label вообще не строим там, где сам проигрыватель
+       скрыт CSS. На десктопе отдаём работу idle-периоду после основного DOM. */
+    try{
+      if(window.matchMedia&&window.matchMedia('(max-width:1040px)').matches)return;
+    }catch(e){}
+    if('requestIdleCallback' in window)requestIdleCallback(boot,{timeout:1200});
+    else setTimeout(boot,0);
+  }
+
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',scheduleBoot,{once:true});
+  else scheduleBoot();
 })();
 </script>
 
