@@ -2746,21 +2746,21 @@ document.addEventListener('keydown',function(e){
 
 
 <!-- ======================================================================
-     ANTKSL VINYL LABEL ENGINE · SAFE EMBEDDED EDITION
-     Источник: реальный каталог tracks[] + реальные COVERS{} этого сайта.
-     Никаких чужих имён. Смена — строго по animationiteration тонарма.
+     ANTKSL VINYL LABEL ENGINE · PRECISION GRID v4
+     Реальные tracks[] + реальные COVERS{} сайта. Без чужих имён.
+     Жёсткая сетка исключает пересечения текста.
      ====================================================================== -->
 <script>
 (function(){
   'use strict';
 
   var PALETTES=[
-    {bg:'#d9c9a3',ink:'#2b1d10',rule:'#8a6a3a',veil:.76},
-    {bg:'#b8452f',ink:'#fbe7cf',rule:'#f0c99a',veil:.78},
-    {bg:'#1f4d3d',ink:'#e8dcc0',rule:'#9dbfa8',veil:.78},
-    {bg:'#1b2b4d',ink:'#e6e0cf',rule:'#93a8cc',veil:.80},
-    {bg:'#e8dcc0',ink:'#3a2a18',rule:'#a8875a',veil:.78},
-    {bg:'#5a2740',ink:'#f2dfd2',rule:'#c69bab',veil:.79}
+    {bg:'#d9c9a3',ink:'#2b1d10',rule:'#8a6a3a',veil:.80},
+    {bg:'#b8452f',ink:'#fbe7cf',rule:'#f0c99a',veil:.80},
+    {bg:'#1f4d3d',ink:'#e8dcc0',rule:'#9dbfa8',veil:.80},
+    {bg:'#1b2b4d',ink:'#e6e0cf',rule:'#93a8cc',veil:.82},
+    {bg:'#e8dcc0',ink:'#3a2a18',rule:'#a8875a',veil:.82},
+    {bg:'#5a2740',ink:'#f2dfd2',rule:'#c69bab',veil:.81}
   ];
 
   var canvas=document.createElement('canvas');
@@ -2793,29 +2793,40 @@ document.addEventListener('keydown',function(e){
 
   function bestTitle(text){
     var words=String(text||'').trim().toUpperCase().split(/\s+/).filter(Boolean);
-    if(!words.length)return {size:56,lines:['']};
+    if(!words.length)return {size:40,lines:[''],lineHeight:40};
 
-    var MAX_W=600,MAX_LINES=3;
-    for(var size=64;size>=34;size-=2){
+    var MAX_W=590;
+    var MAX_H=118;
+    var MAX_LINES=4;
+
+    for(var size=46;size>=23;size-=1){
       for(var count=1;count<=Math.min(MAX_LINES,words.length);count++){
         var all=[];
         combinations(words,count,0,[],all);
         var best=null;
+
         all.forEach(function(lines){
           var widths=lines.map(function(line){
-            return textWidth(line,size,'Georgia','700',.7);
+            return textWidth(line,size,'Georgia','700',.45);
           });
           var max=Math.max.apply(Math,widths);
-          if(max<=MAX_W){
-            var min=Math.min.apply(Math,widths);
-            var score=max+(max-min)*.16+count*8;
-            if(!best||score<best.score)best={size:size,lines:lines,score:score};
+          var min=Math.min.apply(Math,widths);
+          var lh=size*1.01;
+          var totalH=lh*lines.length;
+
+          if(max<=MAX_W && totalH<=MAX_H){
+            var score=max+(max-min)*.14+lines.length*5;
+            if(!best||score<best.score){
+              best={size:size,lines:lines,lineHeight:lh,score:score};
+            }
           }
         });
+
         if(best)return best;
       }
     }
-    return {size:34,lines:[words.join(' ')]};
+
+    return {size:23,lines:[words.join(' ')],lineHeight:23.2};
   }
 
   function fitAttr(text,size,max,family,weight,spacing){
@@ -2855,9 +2866,7 @@ document.addEventListener('keydown',function(e){
     try{
       var t=(typeof today!=='undefined'?today:new Date().toISOString().slice(0,10));
       return item.date>t ? 'СКОРО' : 'ВЫШЕЛ';
-    }catch(e){
-      return '';
-    }
+    }catch(e){return '';}
   }
 
   function buildCatalog(){
@@ -2901,57 +2910,70 @@ document.addEventListener('keydown',function(e){
     var title=localizedTitle(item);
     var artist=localizedArtist().toUpperCase();
     var block=bestTitle(title);
-    var lh=block.size*1.04;
-    var centerY=374;
-    var startY=centerY-((block.lines.length-1)*lh/2);
     var uid='lbl'+n+'x'+Date.now();
+
+    /* Жёсткие непересекающиеся зоны */
+    var TITLE_TOP=326;
+    var TITLE_BOTTOM=446;
+    var titleArea=TITLE_BOTTOM-TITLE_TOP;
+    var totalH=block.lineHeight*block.lines.length;
+    var startY=TITLE_TOP+Math.max(0,(titleArea-totalH)/2)+block.size*.80;
 
     var s='';
     s+='<svg class="label-art antksl-label-art" viewBox="0 0 1000 1000" aria-hidden="true">';
-    s+='<defs><clipPath id="'+uid+'"><circle cx="500" cy="500" r="500"/></clipPath></defs>';
+    s+='<defs>';
+    s+='<clipPath id="'+uid+'"><circle cx="500" cy="500" r="500"/></clipPath>';
+    s+='<path id="top-'+uid+'" d="M145,455 A355,355 0 0 1 855,455"/>';
+    s+='<path id="bot-'+uid+'" d="M170,555 A330,330 0 0 0 830,555"/>';
+    s+='</defs>';
     s+='<g clip-path="url(#'+uid+')">';
 
     if(item.cover){
-      s+='<image href="'+esc(item.cover)+'" x="0" y="0" width="1000" height="1000" preserveAspectRatio="xMidYMid slice" opacity=".58"/>';
+      s+='<image href="'+esc(item.cover)+'" x="0" y="0" width="1000" height="1000" preserveAspectRatio="xMidYMid slice" opacity=".46"/>';
       s+='<circle cx="500" cy="500" r="500" fill="'+p.bg+'" opacity="'+p.veil+'"/>';
     }else{
       s+='<circle cx="500" cy="500" r="500" fill="'+p.bg+'"/>';
     }
 
     s+='<circle cx="500" cy="500" r="488" fill="none" stroke="rgba(0,0,0,.25)" stroke-width="18"/>';
-    s+='<circle cx="500" cy="500" r="455" fill="none" stroke="'+p.rule+'" stroke-width="5" opacity=".92"/>';
-    s+='<circle cx="500" cy="500" r="436" fill="none" stroke="'+p.rule+'" stroke-width="2" opacity=".62"/>';
+    s+='<circle cx="500" cy="500" r="455" fill="none" stroke="'+p.rule+'" stroke-width="5" opacity=".90"/>';
+    s+='<circle cx="500" cy="500" r="436" fill="none" stroke="'+p.rule+'" stroke-width="2" opacity=".60"/>';
 
-    s+='<text x="500" y="165" fill="'+p.ink+'" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-size="50" font-weight="700" letter-spacing="16">ANTKSL</text>';
-    s+='<text x="500" y="215" fill="'+p.ink+'" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-size="20" font-weight="600" letter-spacing="5">СТУДИЯ ЗВУКОЗАПИСИ · КЕМЕРОВО</text>';
-    s+='<line x1="250" y1="255" x2="750" y2="255" stroke="'+p.rule+'" stroke-width="3"/>';
+    /* Верхняя дуга: только ANTKSL. */
+    s+='<text fill="'+p.ink+'" font-family="Arial,Helvetica,sans-serif" font-size="31" font-weight="700" letter-spacing="10">';
+    s+='<textPath href="#top-'+uid+'" startOffset="50%" text-anchor="middle">ANTKSL</textPath></text>';
 
-    var afit=fitAttr(artist,27,600,'Arial','600',3);
-    s+='<text x="500" y="300" fill="'+p.ink+'" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-size="27" font-weight="600" letter-spacing="3"'+afit+'>'+esc(artist)+'</text>';
+    /* Исполнитель: отдельная полоса 238–276. */
+    var afit=fitAttr(artist,23,570,'Arial','600',2.8);
+    s+='<text x="500" y="263" fill="'+p.ink+'" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-size="23" font-weight="600" letter-spacing="2.8"'+afit+'>'+esc(artist)+'</text>';
+    s+='<line x1="270" y1="300" x2="730" y2="300" stroke="'+p.rule+'" stroke-width="3"/>';
 
+    /* Название: строго 326–446, до четырёх строк. */
     block.lines.forEach(function(line,i){
-      var y=startY+i*lh;
-      var fit=fitAttr(line,block.size,600,'Georgia','700',.7);
-      s+='<text x="500" y="'+y.toFixed(1)+'" fill="'+p.ink+'" text-anchor="middle" font-family="Georgia,Times New Roman,serif" font-style="italic" font-size="'+block.size+'" font-weight="700" letter-spacing=".7"'+fit+'>'+esc(line)+'</text>';
+      var y=startY+i*block.lineHeight;
+      var fit=fitAttr(line,block.size,590,'Georgia','700',block.size>=34?.45:.20);
+      s+='<text x="500" y="'+y.toFixed(1)+'" fill="'+p.ink+'" text-anchor="middle" font-family="Georgia,Times New Roman,serif" font-style="italic" font-size="'+block.size+'" font-weight="700"'+fit+'>'+esc(line)+'</text>';
     });
 
-    /* Реальный шпиндель DOM лежит точно в центре; центр оставляем свободным. */
+    /* Шпиндель: центр 500; название заканчивается минимум за 54px до него. */
     s+='<circle cx="500" cy="500" r="54" fill="none" stroke="'+p.rule+'" stroke-width="2" opacity=".68"/>';
 
-    s+='<line x1="270" y1="585" x2="730" y2="585" stroke="'+p.rule+'" stroke-width="2"/>';
+    /* Служебный блок начинается только с 584. */
+    s+='<line x1="260" y1="584" x2="740" y2="584" stroke="'+p.rule+'" stroke-width="2"/>';
 
     var g=(item.genre||'').toUpperCase();
     var date=dateHuman(item.date);
     var stat=statusText(item);
-    s+='<text x="280" y="640" fill="'+p.ink+'" text-anchor="middle" font-family="PT Mono,Courier New,monospace" font-size="25" font-weight="700" letter-spacing="2">33⅓ ОБ/МИН</text>';
-    s+='<text x="720" y="640" fill="'+p.ink+'" text-anchor="middle" font-family="PT Mono,Courier New,monospace" font-size="25" font-weight="700" letter-spacing="2">'+esc(stat)+'</text>';
+    var speed='33⅓ ОБ/МИН';
 
-    var gfit=fitAttr(g,22,330,'Courier New','400',1.6);
-    s+='<text x="280" y="687" fill="'+p.ink+'" text-anchor="middle" font-family="PT Mono,Courier New,monospace" font-size="22" letter-spacing="1.6"'+gfit+'>'+esc(g)+'</text>';
-    s+='<text x="720" y="687" fill="'+p.ink+'" text-anchor="middle" font-family="PT Mono,Courier New,monospace" font-size="22" letter-spacing="1.6">'+esc(date)+'</text>';
+    s+='<text x="300" y="635" fill="'+p.ink+'" text-anchor="middle" font-family="PT Mono,Courier New,monospace" font-size="22" font-weight="700" letter-spacing="1.6"'+fitAttr(speed,22,250,'Courier New','700',1.6)+'>'+esc(speed)+'</text>';
+    s+='<text x="700" y="635" fill="'+p.ink+'" text-anchor="middle" font-family="PT Mono,Courier New,monospace" font-size="22" font-weight="700" letter-spacing="1.6"'+fitAttr(stat,22,250,'Courier New','700',1.6)+'>'+esc(stat)+'</text>';
+    s+='<text x="300" y="681" fill="'+p.ink+'" text-anchor="middle" font-family="PT Mono,Courier New,monospace" font-size="20" letter-spacing="1.3"'+fitAttr(g,20,250,'Courier New','400',1.3)+'>'+esc(g)+'</text>';
+    s+='<text x="700" y="681" fill="'+p.ink+'" text-anchor="middle" font-family="PT Mono,Courier New,monospace" font-size="20" letter-spacing="1.3"'+fitAttr(date,20,250,'Courier New','400',1.3)+'>'+esc(date)+'</text>';
 
-    s+='<text x="500" y="760" fill="'+p.ink+'" text-anchor="middle" font-family="PT Mono,Courier New,monospace" font-size="19" letter-spacing="3">АВТОРСКАЯ СЕРИЯ · ANTKSL</text>';
-    s+='<text x="500" y="808" fill="'+p.ink+'" text-anchor="middle" font-family="PT Mono,Courier New,monospace" font-size="16" letter-spacing="2.2" opacity=".82">НЕ ИСТОРИЧЕСКОЕ ИЗДАНИЕ</text>';
+    /* Нижняя дуга далеко от метаданных. */
+    s+='<text fill="'+p.ink+'" font-family="Arial,Helvetica,sans-serif" font-size="20" font-weight="600" letter-spacing="4">';
+    s+='<textPath href="#bot-'+uid+'" startOffset="50%" text-anchor="middle">СТУДИЯ ЗВУКОЗАПИСИ · КЕМЕРОВО</textPath></text>';
 
     s+='</g></svg>';
     return s;
@@ -3012,7 +3034,6 @@ document.addEventListener('keydown',function(e){
       });
     }
 
-    /* При смене языка перерисовываем текущую этикетку с локализованным названием. */
     new MutationObserver(function(muts){
       for(var i=0;i<muts.length;i++){
         if(muts[i].attributeName==='lang'){render();break;}
