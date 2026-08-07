@@ -3,188 +3,196 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>ANTKSL — Студийные истории / VK доступ</title>
-<meta name="antksl-build" content="ANTKSL_COMBINED_MINIAPP_3_8_3">
+<title>ANTKSL — VK Token Helper</title>
 <script src="https://unpkg.com/@vkontakte/vk-bridge/dist/browser.min.js"></script>
 <style>
 body{font-family:-apple-system,Segoe UI,Roboto,sans-serif;margin:0;padding:16px;background:#0f1116;color:#e8eaed}
-h1{font-size:21px;margin:0 0 8px}h2{font-size:16px;margin:22px 0 8px;color:#9fc4e8}h3{font-size:14px;margin:18px 0 8px;color:#b8c7d9}
+h1{font-size:20px;margin:0 0 10px}h2{font-size:15px;margin:22px 0 8px;color:#9fb3c8}
 p{color:#b9c0ca;line-height:1.45;font-size:14px}
-.section{border:1px solid #2a2f3a;border-radius:14px;padding:15px;margin:0 0 18px;background:#11141b}
-.album{border-color:#6b4aa5}.service{border-color:#34445a}
-.badge{display:inline-block;padding:4px 8px;border-radius:999px;background:#6b4aa5;color:#fff;font-size:12px;font-weight:700;margin-bottom:10px}
 input,button{width:100%;box-sizing:border-box;font-size:15px;padding:13px;border-radius:10px;border:1px solid #2a2f3a}
-input{background:#171a21;color:#e8eaed;margin:10px 0}
-button{background:#2787f5;color:#fff;border:0;margin-bottom:10px;font-weight:600;cursor:pointer}
-button.albumBtn{background:#6b4aa5}button.probe{background:#1f5f8b}button:disabled{background:#39404d;color:#9aa3ae;cursor:default}
+input{background:#171a21;color:#e8eaed;margin:12px 0 10px}
+button{background:#2787f5;color:#fff;border:0;margin-bottom:10px;font-weight:600}
+button.probe{background:#1f5f8b}
+button:disabled{background:#39404d;color:#9aa3ae}
 pre{white-space:pre-wrap;background:#171a21;border-radius:10px;padding:12px;font-size:13px;line-height:1.5;min-height:70px}
-.note{background:#171a21;border-radius:10px;padding:12px;margin:10px 0;color:#cbd1d8;font-size:13px}
-.job{background:#171a21;border-radius:10px;padding:12px;margin:10px 0}.job b{font-size:15px}
-small{color:#8f9baa}hr{border:0;border-top:1px solid #2a2f3a;margin:22px 0}
+.note{background:#171a21;border-radius:10px;padding:12px;margin:12px 0;color:#cbd1d8;font-size:13px}
+hr{border:0;border-top:1px solid #2a2f3a;margin:24px 0}
 </style>
 </head>
 <body>
-<h1>ANTKSL · Студийные истории</h1>
-<p>Одна VK Mini App для двух задач. Для обычной публикации истории используйте верхний блок <b>«Фотоальбом»</b>. Служебное обновление USER-token находится ниже.</p>
+<h1>ANTKSL · обновление VK-доступа</h1>
+<p>Страница нужна только для редких служебных операций. «Студийные истории» публикуются локальным движком напрямую.</p>
 
-<section class="section album" id="album-section">
-<div class="badge">РАБОЧИЙ МАРШРУТ</div>
-<h2>1. Студийные истории → фотоальбом</h2>
-<div class="note">После запуска <b>VK_ALBUM_BRIDGE.bat</b> или кнопки <b>«VK альбом (рабочий)»</b> код подключения уже лежит в буфере обмена. Вставьте его сюда и подключитесь.</div>
-<input id="album_code" placeholder="Вставьте код подключения из окна Album Bridge" autocomplete="off">
-<button id="album_connect" class="albumBtn">Подключиться к Album Bridge</button>
-<button id="album_checkauth" class="probe">Проверить право photos (без записи)</button>
-<div id="album_jobs"></div>
-<pre id="album_log">VK Bridge инициализируется…</pre>
-</section>
-
-<section class="section service" id="service-section">
-<h2>2. Служебная проверка прав — ничего не публикует</h2>
-<div class="note">Проверяет доступ Mini App к VK API. Этот блок не нужен для обычной альбомной публикации.</div>
-<button id="token_probe" class="probe">Проверить права (без публикации)</button>
-<pre id="token_plog">Готов к проверке.</pre>
+<h2>1. Проверка прав — ничего не публикует</h2>
+<div class="note">
+Выясняет главное: даёт ли токен мини-приложения право на <b>wall.post</b>.
+Проверка wall.post делается заведомо неполным запросом: если прав нет, VK
+ответит «доступ запрещён», если права есть — «не хватает параметров».
+Запись на стену при этом не создаётся ни в каком случае.
+</div>
+<button id="probe" class="probe">Проверить права (без публикации)</button>
+<pre id="plog">Готов к проверке.</pre>
 
 <hr>
-<h2>3. Редкое обновление USER token</h2>
-<div class="note">Используйте только если локальный движок прямо попросил запустить <b>VK_USER_AUTH.bat</b>.</div>
-<input id="token_code" placeholder="Код подключения из VK_USER_AUTH.bat" autocomplete="off">
-<button id="token_connect">Подключиться и обновить USER token</button>
-<pre id="token_log">Готов.</pre>
-</section>
+
+<h2>2. Выдать токен движку для VK-альбома</h2>
+<div class="note">
+Публикация в альбом сообщества работает на этом же ключе: <b>photos</b> у
+мини-приложения действует. Ключ показывается один раз, вставьте его в
+<b>VK_PHOTO_TOKEN.bat</b> на компьютере. Никуда, кроме вашего экрана и вашего
+диска, он не уходит: страница не отправляет его на сторонние адреса.
+Никому не пересылайте эту строку.
+</div>
+<button id="issue" class="probe">Выдать токен движку</button>
+<pre id="tlog">Ключ появится здесь.</pre>
+
+<hr>
+
+<h2>3. Обновление USER token</h2>
+<div class="note">Запустите <b>VK_USER_AUTH.bat</b> на компьютере. Он сам скопирует одноразовый код подключения.</div>
+<input id="code" placeholder="Вставьте код подключения из VK_USER_AUTH.bat" autocomplete="off">
+<button id="connect">Подключиться и обновить USER token</button>
+<pre id="log">VK Bridge инициализируется…</pre>
 
 <script>
-const ANTKSL_COMBINED_MINIAPP_3_8_3 = true;
-const bridge = window.vkBridge;
-const INIT = bridge.send('VKWebAppInit',{});
-const APP_ID = 54704500, V = '5.199';
-function withTimeout(p,ms,label){let t;const q=new Promise((_,r)=>t=setTimeout(()=>r(new Error(label+': превышено время ожидания')),ms));return Promise.race([p,q]).finally(()=>clearTimeout(t));}
-function mklog(id){const e=document.getElementById(id);return (m)=>{e.textContent=(new Date()).toLocaleTimeString()+'  '+m+'\n'+e.textContent;};}
-const albumLog=mklog('album_log'), tokenLog=mklog('token_log'), tokenPlog=mklog('token_plog');
+const bridge=window.vkBridge;
+const INIT=bridge.send('VKWebAppInit',{});
+const APP_ID=54704500, GROUP_ID=239543600, V='5.199', SCOPE='photos,wall,groups';
 
-/* ==================== ALBUM BRIDGE ==================== */
-let A_BASE='', A_KEY='', A_CFG=null, A_USER_TOKEN=null;
-function albumNonce(){const a=new Uint8Array(16);crypto.getRandomValues(a);return Array.from(a,b=>b.toString(16).padStart(2,'0')).join('');}
-async function albumCall(path,body){
-  const r=await withTimeout(fetch(A_BASE+path,{method:body?'POST':'GET',headers:{'Content-Type':'application/json','X-ANTKSL-Session':A_KEY},body:body?JSON.stringify(body):undefined}),30000,'Мост '+path);
+function mk(el){const e=document.getElementById(el);
+  return (m)=>{e.textContent=(new Date()).toLocaleTimeString()+'  '+m+'\n'+e.textContent;};}
+const log=mk('log'), plog=mk('plog');
+function withTimeout(p,ms,label){let t;const q=new Promise((_,r)=>t=setTimeout(()=>r(new Error(label+': превышено время ожидания')),ms));return Promise.race([p,q]).finally(()=>clearTimeout(t));}
+
+/* ---------- 1. НЕРАЗРУШАЮЩАЯ ДИАГНОСТИКА ПРАВ ---------- */
+/* VKWebAppCallAPIMethod сообщает об ошибке двумя разными способами: иногда
+   промис отклоняется, а иногда РЕЗОЛВИТСЯ объектом с error_type/error.
+   Обрабатываем оба, иначе половина отказов VK будет выглядеть как успех. */
+function normErr(o){
+  const d=(o&&o.error_data)||o||{};
+  const inner=d.error_data||d;
+  return {ok:false,
+          code:(inner.error_code!==undefined?inner.error_code:d.error_code),
+          msg:inner.error_msg||inner.error_reason||d.error_reason||d.error_msg||JSON.stringify(o)};
+}
+async function api(method, params, token){
+  try{
+    const r=await withTimeout(bridge.send('VKWebAppCallAPIMethod',
+      {method:method, params:Object.assign({v:V, access_token:token}, params||{})}),30000,method);
+    if(r&&r.error_type) return normErr(r);
+    if(r&&r.error) return normErr(r.error);
+    return {ok:true, response:(r?r.response:undefined)};
+  }catch(e){
+    return normErr(e);
+  }
+}
+
+document.getElementById('probe').onclick=async()=>{
+  const b=document.getElementById('probe'); b.disabled=true;
+  try{
+    await withTimeout(INIT,30000,'VKWebAppInit');
+    plog('Запрашиваю права у VK…');
+    const res=await withTimeout(bridge.send('VKWebAppGetAuthToken',{app_id:APP_ID, scope:SCOPE}),90000,'VKWebAppGetAuthToken');
+    let token=String(res.access_token||'');
+    if(!token){plog('ИТОГ: VK не выдал access_token.'); b.disabled=false; return;}
+    const granted=String(res.scope||'').split(',').map(x=>x.trim()).filter(Boolean);
+    plog('Выданные права: '+(granted.join(', ')||'(пусто)'));
+
+    // A. Тип токена
+    let uid='';
+    const a=await api('account.getProfileInfo',{},token);
+    if(a.ok){uid=String((a.response||{}).id||''); plog('A. Тип токена: ПОЛЬЗОВАТЕЛЬСКИЙ, id'+uid+' — ОК');}
+    else{plog('A. Тип токена: НЕ пользовательский. VK '+a.code+': '+a.msg);}
+
+    // B. Право photos — сервер загрузки выдаётся, но ничего не загружается
+    const p=await api('photos.getWallUploadServer',{},token);
+    plog(p.ok ? 'B. photos.getWallUploadServer: ОК — право photos есть'
+              : 'B. photos.getWallUploadServer: НЕТ. VK '+p.code+': '+p.msg);
+
+    // C. Главное. Заведомо неполный wall.post: без message и без attachments.
+    //    100 = «не хватает параметров» -> право wall ЕСТЬ.
+    //    15/27/203 = «доступ запрещён» -> права НЕТ.
+    const w=await api('wall.post', uid?{owner_id:uid}:{}, token);
+    if(w.ok){
+      plog('C. wall.post: ВНИМАНИЕ — VK принял пустой запрос. Проверьте стену.');
+    }else if(w.code===100){
+      plog('C. wall.post: ПРАВО ЕСТЬ (VK 100 — не хватает параметров, это и ожидалось).');
+    }else if(w.code===15||w.code===27||w.code===203||w.code===7){
+      plog('C. wall.post: ПРАВА НЕТ. VK '+w.code+': '+w.msg);
+    }else{
+      plog('C. wall.post: неоднозначно. VK '+w.code+': '+w.msg);
+    }
+
+    // D. Доступ к сообществам
+    const g=await api('groups.get',{filter:'admin',extended:0},token);
+    plog(g.ok ? 'D. groups.get(admin): ОК, сообществ: '+(((g.response||{}).items)||[]).length
+              : 'D. groups.get(admin): НЕТ. VK '+g.code+': '+g.msg);
+
+    token='';
+    plog('Проверка завершена. Ничего не опубликовано. Пришлите этот текст целиком.');
+  }catch(e){plog('ОШИБКА: '+(e&&e.message?e.message:JSON.stringify(e)));}
+  b.disabled=false;
+};
+
+/* ---------- 2. ВЫДАЧА ТОКЕНА ДЛЯ АЛЬБОМА ---------- */
+const tlog=mk('tlog');
+document.getElementById('issue').onclick=async()=>{
+  const b=document.getElementById('issue'); b.disabled=true;
+  try{
+    await withTimeout(INIT,30000,'VKWebAppInit');
+    const res=await withTimeout(bridge.send('VKWebAppGetAuthToken',{app_id:APP_ID, scope:'photos,groups'}),90000,'VKWebAppGetAuthToken');
+    const token=String(res.access_token||'');
+    if(!token){tlog('VK не выдал access_token.'); b.disabled=false; return;}
+    // Не отдаём ключ, не убедившись, что он вообще годен для альбома.
+    const check=await api('photos.getAlbums',{owner_id:'-'+GROUP_ID,need_system:0,count:1},token);
+    if(check.ok){
+      const n=((check.response||{}).count);
+      tlog('Проверка пройдена: альбомы сообщества читаются'+(n===undefined?'':' ('+n+' шт.)')+'.');
+    }else{
+      tlog('ВНИМАНИЕ: photos.getAlbums вернул VK '+check.code+': '+check.msg+
+           '. Ключ выдан, но альбом может не открыться.');
+    }
+    try{ await navigator.clipboard.writeText(token); tlog('Ключ скопирован в буфер обмена.'); }
+    catch(_){ tlog('Скопируйте ключ вручную из строки ниже.'); }
+    tlog(token);
+    tlog('Вставьте его в VK_PHOTO_TOKEN.bat на компьютере. Никому не пересылайте.');
+  }catch(e){tlog('ОШИБКА: '+(e&&e.message?e.message:JSON.stringify(e)));}
+  b.disabled=false;
+};
+
+/* ---------- 3. МОСТ ОБНОВЛЕНИЯ ТОКЕНА ---------- */
+let BASE='',KEY='',CFG=null;
+async function call(path,body){
+  const r=await withTimeout(fetch(BASE+path,{method:body?'POST':'GET',headers:{'Content-Type':'application/json','X-ANTKSL-Session':KEY},body:body?JSON.stringify(body):undefined}),30000,'Мост '+path);
   const j=await r.json(); if(!j.ok) throw new Error(j.error||('HTTP '+r.status)); return j;
 }
-function parseBridgeCode(raw){
-  const cut=raw.lastIndexOf('|'); if(cut<0) throw new Error('Код подключения должен содержать символ |.');
+function parseCode(raw){
+  const cut=raw.lastIndexOf('|'); if(cut<0) throw new Error('Код должен содержать символ |.');
   let base=raw.slice(0,cut).trim(), key=raw.slice(cut+1).trim(); while(base.endsWith('/'))base=base.slice(0,-1);
-  const u=new URL(base); if(u.protocol!=='https:'||!u.hostname.endsWith('.trycloudflare.com')||u.pathname!=='/'||u.username||u.password) throw new Error('Ожидается корневой HTTPS-адрес *.trycloudflare.com.');
+  const u=new URL(base); if(u.protocol!=='https:'||!u.hostname.endsWith('.trycloudflare.com')||u.pathname!=='/'||u.username||u.password) throw new Error('Ожидается одноразовый HTTPS-адрес *.trycloudflare.com.');
   if(key.length<20) throw new Error('Секрет сессии неполный.'); return [base,key];
 }
-async function albumAuth(){
-  if(A_USER_TOKEN) return A_USER_TOKEN;
-  if(!A_CFG) throw new Error('Сначала подключитесь к Album Bridge.');
-  await withTimeout(INIT,30000,'VKWebAppInit');
-  const res=await withTimeout(bridge.send('VKWebAppGetAuthToken',{app_id:A_CFG.app_id,scope:A_CFG.scope}),90000,'Запрос права photos');
-  const granted=String(res.scope||'').split(',').map(x=>x.trim()).filter(Boolean);
-  if(!granted.includes('photos')) throw new Error('Право photos не выдано. Без него альбом недоступен.');
-  A_USER_TOKEN=res.access_token; albumLog('Право photos получено. Ключ остаётся только в браузере.'); return A_USER_TOKEN;
-}
-async function albumApi(method,params){
-  const token=await albumAuth();
-  const res=await withTimeout(bridge.send('VKWebAppCallAPIMethod',{method:method,params:Object.assign({v:A_CFG.api_version,access_token:token},params||{})}),90000,method);
-  if(res.error_type) throw new Error(method+': '+JSON.stringify(res.error_data)); return res.response;
-}
-async function listAllAlbums(){
-  const all=[]; let offset=0;
-  for(let page=0;page<20;page++){
-    const part=await albumApi('photos.getAlbums',{owner_id:-A_CFG.group_id,need_system:0,count:1000,offset:offset});
-    const items=(part&&part.items)||[]; all.push(...items);
-    if(!items.length||items.length<1000||(Number(part.count||0)>0&&all.length>=Number(part.count))) break;
-    offset+=items.length;
-  }
-  return all;
-}
-async function ensureAlbum(){
-  const items=await listAllAlbums(); const norm=(s)=>String(s||'').trim().toLocaleLowerCase('ru-RU');
-  if(A_CFG.album_id){
-    const known=items.find(a=>Number(a.id)===Number(A_CFG.album_id));
-    if(!known) throw new Error('Сохранённый album_id не найден в сообществе.');
-    if(norm(known.title)!==norm(A_CFG.album_exact_title)) throw new Error('Сохранённый album_id принадлежит альбому с другим названием.');
-    if(Number(known.owner_id||-A_CFG.group_id)!==-Number(A_CFG.group_id)) throw new Error('Сохранённый album_id принадлежит другому владельцу.');
-    return {id:known.id,owner_id:known.owner_id||-A_CFG.group_id,created:false};
-  }
-  let found=items.find(a=>norm(a.title)===norm(A_CFG.album_exact_title)), reservation='';
-  if(found){albumLog('Альбом найден: '+found.id);} else {
-    const reserved=await albumCall('/album-reserve',{title:A_CFG.album_exact_title});
-    if(reserved.known_album_id) throw new Error('Мост уже знает album_id; переподключитесь.');
-    reservation=reserved.reservation; albumLog('Альбом не найден — создание зарезервировано одной вкладкой.');
-    found=await albumApi('photos.createAlbum',{title:A_CFG.album_exact_title,group_id:A_CFG.group_id,description:A_CFG.album_description,upload_by_admins_only:1}); found.created=true;
-  }
-  const owner=found.owner_id||-A_CFG.group_id;
-  await albumCall('/album',{album_id:found.id,owner_id:owner,title:A_CFG.album_exact_title,created:!!found.created,reservation:reservation});
-  A_CFG.album_id=found.id; return {id:found.id,owner_id:owner,created:!!found.created};
-}
-const A_SAVED={};
-function proofKey(jobId){return 'antksl_album_proof:'+A_CFG.app_id+':'+A_CFG.group_id+':'+jobId;}
-function loadProof(jobId){try{return JSON.parse(localStorage.getItem(proofKey(jobId))||'null');}catch(_){return null;}}
-function saveProof(jobId,proof){A_SAVED[jobId]=proof;localStorage.setItem(proofKey(jobId),JSON.stringify(proof));}
-function clearProof(jobId){delete A_SAVED[jobId];localStorage.removeItem(proofKey(jobId));}
-async function albumPublish(job,button){
-  button.disabled=true; const n=albumNonce();
+document.getElementById('connect').onclick=async()=>{
+  const b=document.getElementById('connect'); b.disabled=true;
   try{
-    const prior=A_SAVED[job.job_id]||loadProof(job.job_id);
-    if(prior){albumLog('Фотография уже сохранена, досылаю результат без повторной загрузки.');await albumCall('/result',Object.assign({job_id:job.job_id,success:true},prior));clearProof(job.job_id);albumLog('ГОТОВО (досыл). photo_id='+prior.photo_id);button.textContent='Загружено';return;}
-    const album=await ensureAlbum();
-    const srv=await albumApi('photos.getUploadServer',{album_id:album.id,group_id:A_CFG.group_id}); albumLog('Сервер загрузки получен.');
-    const up=await albumCall('/upload',{job_id:job.job_id,media_type:'photo',upload_url:srv.upload_url,nonce:n}); albumLog('Файл загружен мостом.');
-    const saved=await albumApi('photos.save',{album_id:album.id,group_id:A_CFG.group_id,server:up.upload.server,photos_list:up.upload.photos_list,hash:up.upload.hash,caption:job.caption});
-    const photo=Array.isArray(saved)?saved[0]:(saved.items||[])[0]; if(!photo||!photo.id) throw new Error('photos.save не вернул фотографию.');
-    const back=await albumApi('photos.getById',{photos:photo.owner_id+'_'+photo.id,extended:0}); const got=Array.isArray(back)?back[0]:(back.items||[])[0];
-    if(!got) throw new Error('photos.getById не нашёл сохранённую фотографию.');
-    const proof={album_id:album.id,owner_id:photo.owner_id,photo_id:photo.id,verified_album_id:got.album_id,verified_owner_id:got.owner_id};
-    saveProof(job.job_id,proof); await albumCall('/result',Object.assign({job_id:job.job_id,success:true,nonce:n},proof)); clearProof(job.job_id);
-    albumLog('ГОТОВО. photo_id='+photo.id+'; альбом подтверждён photos.getById; запись на стене не создавалась.'); button.textContent='Загружено';
-  }catch(e){albumLog('ОШИБКА: '+e.message);try{await albumCall('/result',{job_id:job.job_id,success:false,error:String(e.message),nonce:n});}catch(_){}button.disabled=false;}
-}
-document.getElementById('album_checkauth').onclick=async()=>{try{if(!A_CFG)throw new Error('Сначала подключитесь к Album Bridge.');await albumAuth();const me=await albumApi('photos.getAlbums',{owner_id:-A_CFG.group_id,need_system:0,count:1});albumLog('ПРОВЕРКА ПРОЙДЕНА: право photos действует, альбомы читаются ('+(me.count===undefined?'?':me.count)+' шт.). Ничего не записано.');}catch(e){albumLog('ПРОВЕРКА НЕ ПРОЙДЕНА: '+e.message);}};
-document.getElementById('album_connect').onclick=async()=>{
-  const b=document.getElementById('album_connect'); b.disabled=true;
-  try{
-    [A_BASE,A_KEY]=parseBridgeCode(document.getElementById('album_code').value.trim()); A_CFG=await albumCall('/config');
-    if(A_CFG.token_capture) throw new Error('Подключён сервис обновления USER-token, а не Album Bridge.');
-    albumLog('Мост '+A_CFG.engine_version+'; альбом «'+A_CFG.album_exact_title+'».');
-    const jobs=(await albumCall('/jobs')).jobs||[]; const box=document.getElementById('album_jobs'); box.innerHTML='';
-    if(!jobs.length) albumLog('Заданий в состоянии queued нет.');
-    jobs.forEach(job=>{const d=document.createElement('div');d.className='job';d.innerHTML='<b>'+job.story_id+'</b><br>'+job.media_name+' · '+job.media_size+' байт';const x=document.createElement('button');x.className='albumBtn';x.textContent=A_CFG.probe_only?'Режим проверки: загрузка отключена мостом':'Загрузить в альбом';x.disabled=!!A_CFG.probe_only;x.onclick=()=>albumPublish(job,x);d.appendChild(x);box.appendChild(d);});
-    b.textContent='Album Bridge подключён';
-  }catch(e){albumLog('ОШИБКА: '+e.message);b.disabled=false;}
+    [BASE,KEY]=parseCode(document.getElementById('code').value.trim());
+    CFG=await call('/config');
+    if(!CFG.token_capture) throw new Error('Подключён не сервис обновления токена.');
+    log('Связь с локальным движком установлена. Запрашиваю права VK…');
+    await withTimeout(INIT,30000,'VKWebAppInit');
+    const res=await withTimeout(bridge.send('VKWebAppGetAuthToken',{app_id:CFG.app_id,scope:CFG.scope}),90000,'VKWebAppGetAuthToken');
+    let token=String(res.access_token||''); if(!token) throw new Error('VK не вернул access_token.');
+    const granted=String(res.scope||'').split(',').map(x=>x.trim()).filter(Boolean);
+    for(const need of ['photos','wall']) if(!granted.includes(need)) throw new Error('VK не выдал обязательное право '+need+'. Получено: '+granted.join(','));
+    log('USER token получен. Передаю его только в вашу одноразовую локальную сессию…');
+    const saved=await call('/user-token',{access_token:token});
+    token=''; document.getElementById('code').value='';
+    log('ГОТОВО. USER token для id'+saved.user_id+' проверен и сохранён в vk_token.txt.');
+    b.textContent='Готово — токен обновлён';
+  }catch(e){log('ОШИБКА: '+(e&&e.message?e.message:String(e)));b.disabled=false;}
 };
-
-/* ==================== TOKEN / WALL SERVICE ==================== */
-async function tokenApi(method,params,token){
-  try{const r=await withTimeout(bridge.send('VKWebAppCallAPIMethod',{method:method,params:Object.assign({v:V,access_token:token},params||{})}),30000,method);return {ok:true,response:r.response};}
-  catch(e){const d=(e&&e.error_data)||{};const inner=d.error_data||d;return {ok:false,code:inner.error_code,msg:inner.error_msg||d.error_reason||String(e)};}
-}
-document.getElementById('token_probe').onclick=async()=>{
-  const b=document.getElementById('token_probe');b.disabled=true;
-  try{
-    await withTimeout(INIT,30000,'VKWebAppInit'); tokenPlog('Запрашиваю права у VK…');
-    const res=await withTimeout(bridge.send('VKWebAppGetAuthToken',{app_id:APP_ID,scope:'photos,wall,groups'}),90000,'VKWebAppGetAuthToken'); let token=String(res.access_token||'');
-    if(!token){tokenPlog('ИТОГ: VK не выдал access_token.');b.disabled=false;return;}
-    const granted=String(res.scope||'').split(',').map(x=>x.trim()).filter(Boolean);tokenPlog('Выданные права: '+(granted.join(', ')||'(пусто)'));
-    let uid=''; const a=await tokenApi('account.getProfileInfo',{},token); if(a.ok){uid=String((a.response||{}).id||'');tokenPlog('A. Тип токена: ПОЛЬЗОВАТЕЛЬСКИЙ, id'+uid+' — ОК');}else tokenPlog('A. Тип токена: НЕ пользовательский. VK '+a.code+': '+a.msg);
-    const p=await tokenApi('photos.getWallUploadServer',{},token);tokenPlog(p.ok?'B. photos.getWallUploadServer: ОК':'B. photos.getWallUploadServer: НЕТ. VK '+p.code+': '+p.msg);
-    const w=await tokenApi('wall.post',uid?{owner_id:uid}:{},token);if(w.ok)tokenPlog('C. wall.post: ВНИМАНИЕ — VK принял пустой запрос. Проверьте стену.');else if(w.code===100)tokenPlog('C. wall.post: ПРАВО ЕСТЬ (VK 100).');else tokenPlog('C. wall.post: НЕТ/НЕОДНОЗНАЧНО. VK '+w.code+': '+w.msg);
-    const g=await tokenApi('groups.get',{filter:'admin',extended:0},token);tokenPlog(g.ok?'D. groups.get(admin): ОК, сообществ: '+(((g.response||{}).items)||[]).length:'D. groups.get(admin): НЕТ. VK '+g.code+': '+g.msg);
-    token=''; tokenPlog('Проверка завершена. Ничего не опубликовано.');
-  }catch(e){tokenPlog('ОШИБКА: '+(e&&e.message?e.message:String(e)));}b.disabled=false;
-};
-let T_BASE='',T_KEY='',T_CFG=null;
-async function tokenCall(path,body){const r=await withTimeout(fetch(T_BASE+path,{method:body?'POST':'GET',headers:{'Content-Type':'application/json','X-ANTKSL-Session':T_KEY},body:body?JSON.stringify(body):undefined}),30000,'Мост '+path);const j=await r.json();if(!j.ok)throw new Error(j.error||('HTTP '+r.status));return j;}
-document.getElementById('token_connect').onclick=async()=>{
-  const b=document.getElementById('token_connect');b.disabled=true;
-  try{
-    [T_BASE,T_KEY]=parseBridgeCode(document.getElementById('token_code').value.trim());T_CFG=await tokenCall('/config');if(!T_CFG.token_capture)throw new Error('Подключён не сервис обновления USER-token.');
-    tokenLog('Связь установлена. Запрашиваю права VK…');await withTimeout(INIT,30000,'VKWebAppInit');const res=await withTimeout(bridge.send('VKWebAppGetAuthToken',{app_id:T_CFG.app_id,scope:T_CFG.scope}),90000,'VKWebAppGetAuthToken');let token=String(res.access_token||'');if(!token)throw new Error('VK не вернул access_token.');
-    const granted=String(res.scope||'').split(',').map(x=>x.trim()).filter(Boolean);for(const need of ['photos','wall'])if(!granted.includes(need))throw new Error('VK не выдал обязательное право '+need+'. Получено: '+granted.join(','));
-    tokenLog('USER token получен. Передаю его только в одноразовую локальную сессию…');const saved=await tokenCall('/user-token',{access_token:token});token='';document.getElementById('token_code').value='';tokenLog('ГОТОВО. USER token для id'+saved.user_id+' проверен и сохранён в vk_token.txt.');b.textContent='Готово — токен обновлён';
-  }catch(e){tokenLog('ОШИБКА: '+(e&&e.message?e.message:String(e)));b.disabled=false;}
-};
-INIT.then(()=>{albumLog('VK Bridge готов. Вставьте код Album Bridge.');tokenLog('VK Bridge готов.');tokenPlog('VK Bridge готов.');}).catch(e=>{albumLog('Ошибка VK Bridge: '+e);tokenLog('Ошибка VK Bridge: '+e);tokenPlog('Ошибка VK Bridge: '+e);});
+INIT.then(()=>{log('VK Bridge готов.');plog('VK Bridge готов. Нажмите «Проверить права».');})
+    .catch(e=>{log('Ошибка VK Bridge: '+e);plog('Ошибка VK Bridge: '+e);});
 </script>
 </body>
 </html>
