@@ -1,5 +1,5 @@
 /* ============================================================================
- * ANTKSL — VINYL LABEL ROTATOR (site-covers edition)
+ * ANTKSL — VINYL LABEL ROTATOR (site-covers edition, no-overlap fix)
  *
  * Что делает:
  * 1) Крутит "яблоко" на пластинке в эстетике советской этикетки.
@@ -8,12 +8,13 @@
  * 4) Если DOM ничего не дал — использует labels/labels.json.
  * 5) Если и файла нет — берёт встроенный список ваших релизов.
  *
- * Подключение:
- *   <script src="antksl-labels-site-covers.js" defer></script>
- *
- * Ничего в HTML менять не обязательно, если на странице уже есть:
- *   - контейнер этикетки: .deck .label   или .deck .label-slot
- *   - тонарм:            .arm-body       или .tonearm
+ * Главное исправление:
+ * - убраны опасные тесные зоны;
+ * - обложка используется как мягкий фоновый слой, а не как отдельный квадрат в центре;
+ * - название автоматически раскладывается до 4 строк;
+ * - размер и положение заголовка считаются с ограничением не только по ширине, но и по высоте;
+ * - зона шпинделя всегда остаётся свободной;
+ * - служебный блок опущен ниже и не конфликтует с названием.
  * ==========================================================================*/
 (function () {
   'use strict';
@@ -43,11 +44,11 @@
     ],
     palettes: [
       { bg: '#d9c9a3', ink: '#2b1d10', rule: '#8a6a3a', veil: 'rgba(244,234,208,.82)' },
-      { bg: '#b8452f', ink: '#fbe7cf', rule: '#f0c99a', veil: 'rgba(141,49,34,.70)' },
-      { bg: '#1f4d3d', ink: '#e8dcc0', rule: '#9dbfa8', veil: 'rgba(28,69,56,.72)' },
-      { bg: '#1b2b4d', ink: '#e6e0cf', rule: '#93a8cc', veil: 'rgba(27,43,77,.72)' },
-      { bg: '#e8dcc0', ink: '#3a2a18', rule: '#a8875a', veil: 'rgba(244,238,225,.83)' },
-      { bg: '#5a2740', ink: '#f2dfd2', rule: '#c69bab', veil: 'rgba(86,38,63,.73)' }
+      { bg: '#b8452f', ink: '#fbe7cf', rule: '#f0c99a', veil: 'rgba(141,49,34,.72)' },
+      { bg: '#1f4d3d', ink: '#e8dcc0', rule: '#9dbfa8', veil: 'rgba(28,69,56,.74)' },
+      { bg: '#1b2b4d', ink: '#e6e0cf', rule: '#93a8cc', veil: 'rgba(27,43,77,.75)' },
+      { bg: '#e8dcc0', ink: '#3a2a18', rule: '#a8875a', veil: 'rgba(244,238,225,.84)' },
+      { bg: '#5a2740', ink: '#f2dfd2', rule: '#c69bab', veil: 'rgba(86,38,63,.75)' }
     ],
     hostSelectors: [
       '.deck .label',
@@ -275,25 +276,47 @@
     }
   }
 
-  function bestLines(text, maxLines, maxWidth, startSize, minSize, family, weight, letterSpacing) {
+  function bestBlock(text, options) {
+    options = options || {};
     var words = splitWords(text.toUpperCase());
-    if (!words.length) return { size: startSize, lines: [''] };
+    if (!words.length) return { size: options.startSize || 40, lines: [''], lineHeight: (options.startSize || 40) * 1.04 };
+
+    var maxLines = options.maxLines || 4;
+    var maxWidth = options.maxWidth || 560;
+    var startSize = options.startSize || 54;
+    var minSize = options.minSize || 22;
+    var family = options.family || 'Georgia';
+    var weight = options.weight || '700';
+    var spacing = Number(options.letterSpacing || 0.6);
+    var lineHeightMul = options.lineHeight || 1.04;
+    var maxHeight = options.maxHeight || 160;
 
     for (var size = startSize; size >= minSize; size -= 1) {
-      for (var linesCount = 1; linesCount <= maxLines; linesCount++) {
+      for (var linesCount = 1; linesCount <= Math.min(maxLines, words.length); linesCount++) {
         var all = [];
         composeLines(words, linesCount, 0, [], all);
         var best = null;
 
         all.forEach(function (lines) {
           var widths = lines.map(function (line) {
-            return measureWidth(line, size, family, weight, letterSpacing);
+            return measureWidth(line, size, family, weight, spacing);
           });
           var maxLine = Math.max.apply(Math, widths);
-          if (maxLine <= maxWidth) {
-            var minLine = Math.min.apply(Math, widths);
-            var score = maxLine + (maxLine - minLine) * 0.12 + linesCount * 4;
-            if (!best || score < best.score) best = { size: size, lines: lines, score: score };
+          var minLine = Math.min.apply(Math, widths);
+          var totalHeight = size * lineHeightMul * lines.length;
+
+          if (maxLine <= maxWidth && totalHeight <= maxHeight) {
+            var balancePenalty = (maxLine - minLine) * 0.14;
+            var linePenalty = lines.length * 5;
+            var score = maxLine + balancePenalty + linePenalty;
+            if (!best || score < best.score) {
+              best = {
+                size: size,
+                lines: lines,
+                score: score,
+                lineHeight: size * lineHeightMul
+              };
+            }
           }
         });
 
@@ -301,7 +324,11 @@
       }
     }
 
-    return { size: minSize, lines: [words.join(' ')] };
+    return {
+      size: minSize,
+      lines: [words.join(' ')],
+      lineHeight: minSize * lineHeightMul
+    };
   }
 
   function fitLine(text, size, maxWidth, family, weight, letterSpacing) {
@@ -311,12 +338,35 @@
 
   function drawLabel(item, palette, uniqueId) {
     var hasCover = !!item.cover;
-    var titleBlock = bestLines(item.title, 3, 540, 54, 26, 'Georgia', '700', 0.7);
-    var titleLineHeight = titleBlock.size * 1.04;
-    var titleCenterY = hasCover ? 400 : 410;
-    var titleStartY = titleCenterY - ((titleBlock.lines.length - 1) * titleLineHeight / 2);
     var artistText = (item.artist || CONFIG.artistDefault).toUpperCase();
-    var artistFit = fitLine(artistText, 24, 560, 'Arial', '600', 3.4);
+    var artistFit = fitLine(artistText, 24, 560, 'Arial', '600', 3.2);
+
+    var titleBlock = bestBlock(item.title, {
+      maxLines: 4,
+      maxWidth: 590,
+      maxHeight: 150,
+      startSize: 50,
+      minSize: 22,
+      family: 'Georgia',
+      weight: '700',
+      letterSpacing: 0.6,
+      lineHeight: 1.02
+    });
+
+    var titleTop = 352;
+    var titleStartY = titleTop;
+    var titleTotalHeight = titleBlock.lineHeight * titleBlock.lines.length;
+    if (titleTotalHeight < 140) {
+      titleStartY = titleTop + (140 - titleTotalHeight) / 2 + titleBlock.size * 0.83;
+    } else {
+      titleStartY = titleTop + titleBlock.size * 0.83;
+    }
+
+    var holeY = 505;
+    var ruleY = 604;
+    var metaY1 = 662;
+    var metaY2 = 700;
+    var metaY3 = 738;
 
     var svg = '';
     svg += '<svg class="label-art" viewBox="0 0 1000 1000" aria-hidden="true">';
@@ -328,8 +378,9 @@
     svg += '<g clip-path="url(#clip-' + uniqueId + ')">';
 
     if (hasCover) {
-      svg += '<image href="' + esc(item.cover) + '" x="0" y="0" width="1000" height="1000" preserveAspectRatio="xMidYMid slice"/>';
+      svg += '<image href="' + esc(item.cover) + '" x="0" y="0" width="1000" height="1000" preserveAspectRatio="xMidYMid slice" opacity=".56"/>';
       svg += '<circle cx="500" cy="500" r="500" fill="' + palette.veil + '"/>';
+      svg += '<rect x="190" y="336" width="620" height="176" rx="22" fill="' + palette.bg + '" fill-opacity=".76" stroke="' + palette.rule + '" stroke-opacity=".42" stroke-width="1.6"/>';
     } else {
       svg += '<circle cx="500" cy="500" r="500" fill="' + palette.bg + '"/>';
     }
@@ -354,39 +405,26 @@
     if (artistFit.textLength) svg += ' textLength="' + artistFit.textLength + '" lengthAdjust="spacingAndGlyphs"';
     svg += '>' + esc(artistText) + '</text>';
 
-    if (hasCover) {
-      svg += '<rect x="405" y="336" width="190" height="190" rx="6" fill="rgba(255,255,255,.12)" stroke="' + palette.rule + '" stroke-width="2"/>';
-      svg += '<image href="' + esc(item.cover) + '" x="415" y="346" width="170" height="170" preserveAspectRatio="xMidYMid slice"/>';
-      svg += '<rect x="352" y="540" width="296" height="104" rx="8" fill="' + palette.bg + '" fill-opacity=".88" stroke="' + palette.rule + '" stroke-width="1.5"/>';
-    }
-
     titleBlock.lines.forEach(function (line, i) {
-      var y = titleStartY + i * titleLineHeight + (hasCover ? 150 : 0);
-      if (hasCover) y = 575 + i * titleLineHeight;
-      var fit = fitLine(line, titleBlock.size, hasCover ? 260 : 560, 'Georgia', '700', titleBlock.size >= 38 ? 0.7 : 0.4);
+      var y = titleStartY + i * titleBlock.lineHeight;
+      var fit = fitLine(line, titleBlock.size, 580, 'Georgia', '700', titleBlock.size >= 34 ? 0.55 : 0.3);
       svg += '<text x="500" y="' + y.toFixed(1) + '" fill="' + palette.ink + '" text-anchor="middle" font-family="Georgia,Times New Roman,serif" font-style="italic" font-size="' + titleBlock.size + '" font-weight="700"';
       if (fit.textLength) svg += ' textLength="' + fit.textLength.toFixed(1) + '" lengthAdjust="spacingAndGlyphs"';
       svg += '>' + esc(line) + '</text>';
     });
 
-    var holeY = hasCover ? 690 : 580;
     svg += '<circle cx="500" cy="' + holeY + '" r="39" fill="#090704"/>';
     svg += '<circle cx="500" cy="' + holeY + '" r="51" fill="none" stroke="' + palette.rule + '" stroke-width="2" opacity=".65"/>';
-
-    var ruleY = hasCover ? 754 : 644;
-    var metaY1 = hasCover ? 815 : 705;
-    var metaY2 = metaY1 + 33;
-    var metaY3 = metaY2 + 34;
 
     svg += '<line x1="248" y1="' + ruleY + '" x2="752" y2="' + ruleY + '" stroke="' + palette.rule + '" stroke-width="2"/>';
 
     svg += '<text x="245" y="' + metaY1 + '" fill="' + palette.ink + '" text-anchor="middle" font-family="Courier New,monospace" font-size="22" font-weight="700" letter-spacing="2">' + esc(CONFIG.gost) + '</text>';
-    svg += '<text x="245" y="' + metaY2 + '" fill="' + palette.ink + '" text-anchor="middle" font-family="Courier New,monospace" font-size="20" letter-spacing="1.5">' + esc(item.num || '') + '</text>';
-    svg += '<text x="245" y="' + metaY3 + '" fill="' + palette.ink + '" text-anchor="middle" font-family="Courier New,monospace" font-size="20" letter-spacing="1.5">' + esc(CONFIG.speed) + '</text>';
+    svg += '<text x="245" y="' + metaY2 + '" fill="' + palette.ink + '" text-anchor="middle" font-family="Courier New,monospace" font-size="20" letter-spacing="1.4">' + esc(item.num || '') + '</text>';
+    svg += '<text x="245" y="' + metaY3 + '" fill="' + palette.ink + '" text-anchor="middle" font-family="Courier New,monospace" font-size="20" letter-spacing="1.4">' + esc(CONFIG.speed) + '</text>';
 
     svg += '<text x="755" y="' + metaY1 + '" fill="' + palette.ink + '" text-anchor="middle" font-family="Courier New,monospace" font-size="22" font-weight="700" letter-spacing="2">' + esc((item.side || '1') + ' СТОРОНА') + '</text>';
-    svg += '<text x="755" y="' + metaY2 + '" fill="' + palette.ink + '" text-anchor="middle" font-family="Courier New,monospace" font-size="20" letter-spacing="1.5">' + esc(CONFIG.grade) + '</text>';
-    svg += '<text x="755" y="' + metaY3 + '" fill="' + palette.ink + '" text-anchor="middle" font-family="Courier New,monospace" font-size="20" letter-spacing="1.5">' + esc(item.year || '2026') + '</text>';
+    svg += '<text x="755" y="' + metaY2 + '" fill="' + palette.ink + '" text-anchor="middle" font-family="Courier New,monospace" font-size="20" letter-spacing="1.4">' + esc(CONFIG.grade) + '</text>';
+    svg += '<text x="755" y="' + metaY3 + '" fill="' + palette.ink + '" text-anchor="middle" font-family="Courier New,monospace" font-size="20" letter-spacing="1.4">' + esc(item.year || '2026') + '</text>';
 
     svg += '</g></svg>';
     return svg;
