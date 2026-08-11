@@ -36,13 +36,13 @@ hr{border:0;border-top:1px solid #2a2f3a;margin:24px 0}
 <h2>2. Прямое обновление VK-фото в локальном движке</h2>
 <div class="note good">
 На компьютере запусти <b>VK_PHOTO_BRIDGE.bat</b>. Он создаёт одноразовый защищённый канал
-и кладёт в буфер только <b>код подключения</b> — не VK-токен.
-Вставь этот код ниже. После подключения VK выдаст новый photo token, а страница передаст его
-напрямую в локальный движок. Сам токен на экран не выводится.
+и пытается передать код подключения сюда автоматически через VK app location.
+Ничего копировать и вставлять не нужно. Поле ниже остаётся только аварийным резервом.
+Сам VK access token на экран не выводится и в адрес запуска не попадает.
 </div>
-<input id="code" placeholder="Одноразовый код подключения из VK_PHOTO_BRIDGE.bat" autocomplete="off" spellcheck="false">
+<input id="code" type="password" placeholder="Резерв: одноразовый код подключения" autocomplete="off" spellcheck="false">
 <button id="connect">Подключить и обновить VK-фото</button>
-<pre id="log">Ожидаю одноразовый код подключения.</pre>
+<pre id="log">Ожидаю автоматическое подключение от VK_PHOTO_BRIDGE.bat…</pre>
 
 <script>
 const bridge=window.vkBridge;
@@ -98,7 +98,48 @@ document.getElementById('probe').onclick=async()=>{
 };
 
 /* 2. Прямой мост */
-let BASE='',KEY='',CFG=null;
+let BASE='',KEY='',CFG=null, AUTO_STARTED=false;
+
+function b64urlDecode(s){
+  s=String(s||'').replace(/-/g,'+').replace(/_/g,'/');
+  while(s.length%4)s+='=';
+  try{
+    const bin=atob(s);
+    const bytes=Uint8Array.from(bin,c=>c.charCodeAt(0));
+    return new TextDecoder().decode(bytes);
+  }catch(_){return '';}
+}
+
+function codeFromLocation(raw){
+  raw=String(raw||'').trim();
+  if(raw.startsWith('#'))raw=raw.slice(1);
+  if(raw.startsWith('/'))raw=raw.slice(1);
+  const m=raw.match(/(?:^|[?&])antksl_bridge=([A-Za-z0-9_-]+)/);
+  if(!m)return '';
+  return b64urlDecode(m[1]);
+}
+
+async function maybeAutoConnect(raw){
+  if(AUTO_STARTED)return false;
+  const code=codeFromLocation(raw);
+  if(!code||code.indexOf('|')<0)return false;
+  AUTO_STARTED=true;
+  const field=document.getElementById('code');
+  field.value=code;
+  log('Одноразовый код получен автоматически через VK app location.');
+  try{await bridge.send('VKWebAppSetLocation',{location:''});}catch(_){}
+  connectAndRefresh(true);
+  return true;
+}
+
+try{
+  bridge.subscribe(e=>{
+    if(e&&e.detail&&e.detail.type==='VKWebAppLocationChanged'){
+      maybeAutoConnect((e.detail.data||{}).location||'');
+    }
+  });
+}catch(_){}
+
 
 function parseCode(raw){
   const cut=raw.lastIndexOf('|');
@@ -126,7 +167,7 @@ async function call(path,body){
   return j;
 }
 
-async function connectAndRefresh(){
+async function connectAndRefresh(autoMode=false){
   const b=document.getElementById('connect');
   b.disabled=true;
   try{
@@ -175,9 +216,20 @@ document.getElementById('code').addEventListener('keydown',e=>{
   if(e.key==='Enter'){e.preventDefault();connectAndRefresh();}
 });
 
-INIT.then(()=>{
+INIT.then(async()=>{
   plog('VK Bridge готов.');
-  setTimeout(()=>{try{document.getElementById('code').focus();}catch(_){}},250);
+  const got=await maybeAutoConnect(window.location.hash);
+  if(!got){
+    setTimeout(async()=>{
+      if(!AUTO_STARTED){
+        const late=await maybeAutoConnect(window.location.hash);
+        if(!late){
+          log('Автокод пока не получен. Резерв: Ctrl+V в поле и Enter.');
+          try{document.getElementById('code').focus();}catch(_){}
+        }
+      }
+    },1800);
+  }
 }).catch(e=>{
   plog('Ошибка VK Bridge: '+e);
   log('Ошибка VK Bridge: '+e);
