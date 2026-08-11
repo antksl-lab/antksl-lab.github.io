@@ -38,9 +38,10 @@ hr{border:0;border-top:1px solid #2a2f3a;margin:24px 0}
 <h2>2. Выдать токен движку для VK-альбома</h2>
 <div class="note">
 Публикация в альбом сообщества работает на этом же ключе: <b>photos</b> у
-мини-приложения действует. Ключ показывается один раз, вставьте его в
-<b>VK_PHOTO_TOKEN.bat</b> на компьютере. Никуда, кроме вашего экрана и вашего
-диска, он не уходит: страница не отправляет его на сторонние адреса.
+мини-приложения действует. После нажатия кнопки ключ автоматически копируется
+в системный буфер через VK Bridge; <b>VK_PHOTO_REFRESH_ONECLICK.bat</b> на компьютере
+подхватит его сам. Если автокопирование недоступно, ключ всё равно будет показан
+ниже для ручного резервного сценария. Страница не отправляет ключ на сторонние адреса.
 Никому не пересылайте эту строку.
 </div>
 <button id="issue" class="probe">Выдать токен движку</button>
@@ -152,10 +153,28 @@ document.getElementById('issue').onclick=async()=>{
       tlog('ВНИМАНИЕ: photos.getAlbums вернул VK '+check.code+': '+check.msg+
            '. Ключ выдан, но альбом может не открыться.');
     }
-    try{ await navigator.clipboard.writeText(token); tlog('Ключ скопирован в буфер обмена.'); }
-    catch(_){ tlog('Скопируйте ключ вручную из строки ниже.'); }
+    let copied=false;
+    try{
+      const r=await bridge.send('VKWebAppCopyText',{text:token});
+      copied=!!(r&&r.result);
+    }catch(_){}
+    if(!copied){
+      try{
+        await navigator.clipboard.writeText(token);
+        copied=true;
+      }catch(_){}
+    }
+    tlog(
+      copied
+        ? 'Ключ автоматически скопирован в буфер обмена.'
+        : 'Автокопирование не сработало — скопируйте ключ вручную из строки ниже.'
+    );
     tlog(token);
-    tlog('Вставьте его в VK_PHOTO_TOKEN.bat на компьютере. Никому не пересылайте.');
+    tlog(
+      copied
+        ? 'Вернитесь в окно VK_PHOTO_REFRESH_ONECLICK.bat — он подхватит ключ сам.'
+        : 'Вставьте ключ в VK_PHOTO_TOKEN.bat на компьютере. Никому не пересылайте.'
+    );
   }catch(e){tlog('ОШИБКА: '+(e&&e.message?e.message:JSON.stringify(e)));}
   b.disabled=false;
 };
