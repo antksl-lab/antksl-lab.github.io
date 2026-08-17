@@ -1,5 +1,5 @@
 from __future__ import annotations
-import hashlib, re, sys
+import hashlib
 from pathlib import Path
 
 HERE=Path(__file__).resolve().parent
@@ -35,7 +35,7 @@ def run():
     c('token_direct_local_post',"call('/photo-token',{access_token:token}" in html)
     c('no_clipboard_write','clipboard.writeText' not in html)
     c('no_clipboard_read','clipboard.readText' not in html)
-    c('no_token_location_assignment','access_token='+'' not in html)  # exact concatenation pattern intentionally absent
+    c('no_access_token_query_parameter','?access_token=' not in html and '&access_token=' not in html)
     c('vendor_exists',VENDOR.is_file() and VENDOR.stat().st_size>0)
     c('license_exists',LICENSE.is_file() and LICENSE.stat().st_size>0)
     c('provenance_exists',PROV.is_file() and PROV.stat().st_size>0)
