@@ -1,0 +1,102 @@
+name: Promote Token Helper v1.5
+
+on:
+  push:
+    paths:
+      - '.github/workflows/promote-token-helper-v1-5.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  promote:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Promote Helper to pre-init location subscription
+        shell: python
+        run: |
+          from pathlib import Path
+          p=Path('token-helper/index.html')
+          s=p.read_text(encoding='utf-8')
+
+          checks=[
+              ("const HELPER_BUILD='20260817-v1.4';",'v1.4 build marker'),
+              ('bootstrap-v3-same-origin-first','v1.4 bootstrap marker'),
+              ("BRIDGE_READY=null,BRIDGE_SOURCE='';",'runtime state marker'),
+              ("async function initializeBridge(){\n  bridge=await loadBridge();\n  INIT=withTimeout(bridge.send('VKWebAppInit',{}),30000,'VKWebAppInit');",'init entry'),
+              ("    try{\n      bridge.subscribe(e=>{\n        if(e&&e.detail&&e.detail.type==='VKWebAppLocationChanged'){\n          maybeAutoConnect((e.detail.data||{}).location||'','LOCATION_CHANGED');\n        }\n      });\n    }catch(_){}\n    return bridge;",'old post-init location subscription'),
+          ]
+          for needle,label in checks:
+              if needle not in s:
+                  raise SystemExit(f'Expected {label} not found; refusing blind patch')
+
+          s=s.replace("const HELPER_BUILD='20260817-v1.4';","const HELPER_BUILD='20260818-v1.5';",1)
+          s=s.replace('bootstrap-v3-same-origin-first','bootstrap-v4-pre-init-location-subscribe',1)
+          s=s.replace("BRIDGE_READY=null,BRIDGE_SOURCE='';","BRIDGE_READY=null,BRIDGE_SOURCE='',LOCATION_SUBSCRIBED=false;",1)
+
+          old_init="""async function initializeBridge(){
+  bridge=await loadBridge();
+  INIT=withTimeout(bridge.send('VKWebAppInit',{}),30000,'VKWebAppInit');"""
+          new_init="""function installLocationSubscription(){
+  if(LOCATION_SUBSCRIBED||!bridge)return;
+  bridge.subscribe(e=>{
+    if(e&&e.detail&&e.detail.type==='VKWebAppLocationChanged'){
+      const loc=(e.detail.data||{}).location||'';
+      safeStage('VK_LOCATION_EVENT',{has_location:Boolean(loc)});
+      maybeAutoConnect(loc,'LOCATION_CHANGED_PRE_INIT');
+    }
+  });
+  LOCATION_SUBSCRIBED=true;
+  safeStage('VK_LOCATION_SUBSCRIBED_PRE_INIT');
+  plog('VK location listener установлен до VKWebAppInit.');
+}
+async function initializeBridge(){
+  bridge=await loadBridge();
+  installLocationSubscription();
+  INIT=withTimeout(bridge.send('VKWebAppInit',{}),30000,'VKWebAppInit');"""
+          s=s.replace(old_init,new_init,1)
+
+          old_sub="""    try{
+      bridge.subscribe(e=>{
+        if(e&&e.detail&&e.detail.type==='VKWebAppLocationChanged'){
+          maybeAutoConnect((e.detail.data||{}).location||'','LOCATION_CHANGED');
+        }
+      });
+    }catch(_){}
+    return bridge;"""
+          s=s.replace(old_sub,"    return bridge;",1)
+          p.write_text(s,encoding='utf-8')
+
+      - name: Static ordering and safety invariants
+        shell: python
+        run: |
+          from pathlib import Path
+          s=Path('token-helper/index.html').read_text(encoding='utf-8')
+          assert "HELPER_BUILD='20260818-v1.5'" in s
+          assert 'bootstrap-v4-pre-init-location-subscribe' in s
+          assert "'./vendor/vk-bridge-2.15.0.min.js'" in s
+          assert 'installLocationSubscription();' in s
+          assert "VK_LOCATION_SUBSCRIBED_PRE_INIT" in s
+          assert "VK_LOCATION_EVENT" in s
+          assert "LOCATION_CHANGED_PRE_INIT" in s
+          init=s.index("INIT=withTimeout(bridge.send('VKWebAppInit',{})")
+          subscribe=s.index('installLocationSubscription();')
+          assert subscribe < init
+          assert s.count("e.detail.type==='VKWebAppLocationChanged'")==1
+          assert 'clipboard.writeText' not in s
+          assert 'clipboard.readText' not in s
+          assert '?access_token=' not in s and '&access_token=' not in s
+
+      - name: Commit v1.5
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "antksl-helper-bot"
+          git config user.email "antksl-helper-bot@users.noreply.github.com"
+          git add token-helper/index.html
+          git commit -m "Promote VK Token Helper v1.5 pre-init location subscription"
+          git push
