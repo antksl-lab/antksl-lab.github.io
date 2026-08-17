@@ -1,0 +1,35 @@
+name: Verify Token Helper v1.4
+
+on:
+  push:
+    paths:
+      - 'token-helper/index.html'
+      - 'token-helper/VERIFY_V1_4.py'
+      - 'token-helper/vendor/**'
+      - '.github/workflows/verify-token-helper-v1-4.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Static helper and vendor integrity audit
+        run: python token-helper/VERIFY_V1_4.py | tee TOKEN_HELPER_V1_4_STATIC_AUDIT.txt
+      - name: Assert pass and runtime boundary
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -Fq 'RESULT: PASS_ANTKSL_TOKEN_HELPER_V1_4_STATIC_AUDIT' TOKEN_HELPER_V1_4_STATIC_AUDIT.txt
+          grep -Fq 'RUNTIME E2E TOKEN REFRESH: NOT CLAIMED' TOKEN_HELPER_V1_4_STATIC_AUDIT.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: token-helper-v1-4-static-audit
+          path: TOKEN_HELPER_V1_4_STATIC_AUDIT.txt
+          if-no-files-found: error
