@@ -26,12 +26,12 @@ jobs:
           old_state="let BASE='',KEY='',CFG=null,bridge=null,INIT=null,AUTO_STARTED=false,HELLO_SENT=false,BRIDGE_READY=null,BRIDGE_SOURCE='';"
           new_state="let BASE='',KEY='',CFG=null,bridge=null,INIT=null,AUTO_STARTED=false,HELLO_SENT=false,BRIDGE_READY=null,BRIDGE_SOURCE='',LOCATION_SUBSCRIBED=false;"
           old_post="""    try{
-              bridge.subscribe(e=>{
-                if(e&&e.detail&&e.detail.type==='VKWebAppLocationChanged'){
-                  maybeAutoConnect((e.detail.data||{}).location||'','LOCATION_CHANGED');
-                }
-              });
-            }catch(_){}"""
+            bridge.subscribe(e=>{
+              if(e&&e.detail&&e.detail.type==='VKWebAppLocationChanged'){
+                maybeAutoConnect((e.detail.data||{}).location||'','LOCATION_CHANGED');
+              }
+            });
+          }catch(_){}"""
           new_post="    subscribeLocationEarly();"
           marker="async function loadBridge(){"
           helper="""function subscribeLocationEarly(){
@@ -55,16 +55,16 @@ jobs:
 
           """
           load_success="""      bridge=window.vkBridge;
-                BRIDGE_SOURCE=src;
-                plog('VK Bridge JS загружен: источник '+(i+1)+' · '+(src.startsWith('./')?'SAME_ORIGIN_VENDOR':'EXTERNAL_FALLBACK')+'.');
-                await safeStage('VK_BRIDGE_LOADED',{source:src.startsWith('./')?'SAME_ORIGIN_VENDOR':src});
-                return bridge;"""
+            BRIDGE_SOURCE=src;
+            plog('VK Bridge JS загружен: источник '+(i+1)+' · '+(src.startsWith('./')?'SAME_ORIGIN_VENDOR':'EXTERNAL_FALLBACK')+'.');
+            await safeStage('VK_BRIDGE_LOADED',{source:src.startsWith('./')?'SAME_ORIGIN_VENDOR':src});
+            return bridge;"""
           load_success_new="""      bridge=window.vkBridge;
-                BRIDGE_SOURCE=src;
-                plog('VK Bridge JS загружен: источник '+(i+1)+' · '+(src.startsWith('./')?'SAME_ORIGIN_VENDOR':'EXTERNAL_FALLBACK')+'.');
-                subscribeLocationEarly();
-                await safeStage('VK_BRIDGE_LOADED',{source:src.startsWith('./')?'SAME_ORIGIN_VENDOR':src});
-                return bridge;"""
+            BRIDGE_SOURCE=src;
+            plog('VK Bridge JS загружен: источник '+(i+1)+' · '+(src.startsWith('./')?'SAME_ORIGIN_VENDOR':'EXTERNAL_FALLBACK')+'.');
+            subscribeLocationEarly();
+            await safeStage('VK_BRIDGE_LOADED',{source:src.startsWith('./')?'SAME_ORIGIN_VENDOR':src});
+            return bridge;"""
           for needle,label in [("const HELPER_BUILD='20260817-v1.4';",'v1.4 build'),(old_state,'state marker'),(old_post,'post-init subscription'),(marker,'loadBridge marker'),(load_success,'load success block')]:
             if needle not in s: raise SystemExit('Refusing blind patch; missing '+label)
           s=s.replace("const HELPER_BUILD='20260817-v1.4';","const HELPER_BUILD='20260818-v1.5';",1)
