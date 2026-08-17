@@ -44,20 +44,21 @@ hr{border:0;border-top:1px solid #2a2f3a;margin:24px 0}
 
 <script>
 'use strict';
-const HELPER_BUILD='20260817-v1.3';
+const HELPER_BUILD='20260817-v1.4';
 const BRIDGE_PIN='2.15.0';
 const APP_ID=54704500, GROUP_ID=239543600, V='5.199';
 const BRIDGE_SOURCES=[
+  './vendor/vk-bridge-2.15.0.min.js',
   'https://unpkg.com/@vkontakte/vk-bridge@2.15.0/dist/browser.min.js',
   'https://cdn.jsdelivr.net/npm/@vkontakte/vk-bridge@2.15.0/dist/browser.min.js'
 ];
 
-document.getElementById('build').textContent='helper '+HELPER_BUILD+' · vk-bridge '+BRIDGE_PIN+' · bootstrap-v2';
+document.getElementById('build').textContent='helper '+HELPER_BUILD+' · vk-bridge '+BRIDGE_PIN+' · bootstrap-v3-same-origin-first';
 function mk(el){const e=document.getElementById(el);return m=>{e.textContent=(new Date()).toLocaleTimeString()+'  '+m+'\n'+e.textContent;};}
 const log=mk('log'), plog=mk('plog');
 function withTimeout(p,ms,label){let t;const q=new Promise((_,r)=>t=setTimeout(()=>r(new Error(label+': превышено время ожидания')),ms));return Promise.race([p,q]).finally(()=>clearTimeout(t));}
 
-let BASE='',KEY='',CFG=null,bridge=null,INIT=null,AUTO_STARTED=false,HELLO_SENT=false,BRIDGE_READY=null;
+let BASE='',KEY='',CFG=null,bridge=null,INIT=null,AUTO_STARTED=false,HELLO_SENT=false,BRIDGE_READY=null,BRIDGE_SOURCE='';
 
 function b64urlDecode(s){
   s=String(s||'').replace(/-/g,'+').replace(/_/g,'/');
@@ -136,7 +137,9 @@ async function loadBridge(){
     try{
       await loadScript(src,9000);
       bridge=window.vkBridge;
-      plog('VK Bridge JS загружен: источник '+(i+1)+'.');
+      BRIDGE_SOURCE=src;
+      plog('VK Bridge JS загружен: источник '+(i+1)+' · '+(src.startsWith('./')?'SAME_ORIGIN_VENDOR':'EXTERNAL_FALLBACK')+'.');
+      await safeStage('VK_BRIDGE_LOADED',{source:src.startsWith('./')?'SAME_ORIGIN_VENDOR':src});
       return bridge;
     }catch(e){last=e;plog('Источник '+(i+1)+' не сработал: '+e.message);}
   }
@@ -150,7 +153,7 @@ async function initializeBridge(){
     await INIT;
     let client={};
     try{client=await withTimeout(bridge.send('VKWebAppGetClientVersion',{}),8000,'VKWebAppGetClientVersion');}catch(_){}
-    await safeStage('VK_INIT_OK',{platform:String(client.platform||''),version:String(client.version||'')});
+    await safeStage('VK_INIT_OK',{platform:String(client.platform||''),version:String(client.version||''),bridge_source:(BRIDGE_SOURCE.startsWith('./')?'SAME_ORIGIN_VENDOR':BRIDGE_SOURCE)});
     plog('VKWebAppInit: OK. helper='+HELPER_BUILD+'; bridge='+BRIDGE_PIN);
     document.getElementById('probe').disabled=false;
     document.getElementById('connect').disabled=false;
