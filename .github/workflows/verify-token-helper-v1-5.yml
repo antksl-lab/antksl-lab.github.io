@@ -16,12 +16,15 @@ jobs:
   verify:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
         with:
           python-version: '3.12'
       - name: Static helper and vendor integrity audit
-        run: python token-helper/VERIFY_V1_5.py | tee TOKEN_HELPER_V1_5_STATIC_AUDIT.txt
+        shell: bash
+        run: |
+          set -euo pipefail
+          python token-helper/VERIFY_V1_5.py | tee TOKEN_HELPER_V1_5_STATIC_AUDIT.txt
       - name: Assert pass and runtime boundary
         shell: bash
         run: |
