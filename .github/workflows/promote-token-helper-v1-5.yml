@@ -17,7 +17,7 @@ jobs:
           fetch-depth: 1
 
       - name: Promote Helper to pre-init location subscription
-        shell: python
+        shell: python {0}
         run: |
           from pathlib import Path
           p=Path('token-helper/index.html')
@@ -72,7 +72,7 @@ async function initializeBridge(){
           p.write_text(s,encoding='utf-8')
 
       - name: Static ordering and safety invariants
-        shell: python
+        shell: python {0}
         run: |
           from pathlib import Path
           s=Path('token-helper/index.html').read_text(encoding='utf-8')
