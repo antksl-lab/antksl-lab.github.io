@@ -4,7 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>ANTKSL — VK Token Helper</title>
-<script src="https://unpkg.com/@vkontakte/vk-bridge/dist/browser.min.js"></script>
+<script src="https://unpkg.com/@vkontakte/vk-bridge@2.15.0/dist/browser.min.js"
+        onerror="window.__ANTKSL_VK_BRIDGE_LOAD_ERROR=true"></script>
 <style>
 body{font-family:-apple-system,Segoe UI,Roboto,sans-serif;margin:0;padding:16px;background:#0f1116;color:#e8eaed}
 h1{font-size:20px;margin:0 0 10px}h2{font-size:15px;margin:22px 0 8px;color:#9fb3c8}
@@ -17,11 +18,13 @@ button:disabled{background:#39404d;color:#9aa3ae}
 pre{white-space:pre-wrap;background:#171a21;border-radius:10px;padding:12px;font-size:13px;line-height:1.5;min-height:70px}
 .note{background:#171a21;border-radius:10px;padding:12px;margin:12px 0;color:#cbd1d8;font-size:13px}
 .good{border:1px solid #245a36}
+.build{font:12px ui-monospace,Consolas,monospace;color:#7f8b99;margin:8px 0 18px}
 hr{border:0;border-top:1px solid #2a2f3a;margin:24px 0}
 </style>
 </head>
 <body>
 <h1>ANTKSL · VK-доступ</h1>
+<div id="build" class="build">helper: loading…</div>
 <p>Техническая страница «Студийных историй». VK access token не нужно копировать, вставлять или пересылать вручную.</p>
 
 <h2>1. Проверка прав — ничего не публикует</h2>
@@ -37,24 +40,39 @@ hr{border:0;border-top:1px solid #2a2f3a;margin:24px 0}
 <div class="note good">
 На компьютере запусти <b>VK_PHOTO_BRIDGE.bat</b>. Он создаёт одноразовый защищённый канал
 и пытается передать код подключения сюда автоматически через VK app location.
-Ничего копировать и вставлять не нужно. Поле ниже остаётся только аварийным резервом.
-Сам VK access token на экран не выводится и в адрес запуска не попадает.
+Если автоматическая передача не подтвердится, локальный Bridge сам скажет об этом через несколько секунд:
+тогда достаточно нажать <b>Ctrl+V</b> в резервном поле и <b>Enter</b>.
+Сам VK access token на экран, в clipboard и в адрес запуска не попадает.
 </div>
 <input id="code" type="password" placeholder="Резерв: одноразовый код подключения" autocomplete="off" spellcheck="false">
 <button id="connect">Подключить и обновить VK-фото</button>
 <pre id="log">Ожидаю автоматическое подключение от VK_PHOTO_BRIDGE.bat…</pre>
 
 <script>
-const bridge=window.vkBridge;
-const INIT=bridge.send('VKWebAppInit',{});
-const APP_ID=54704500, GROUP_ID=239543600, V='5.199';
+const HELPER_BUILD='20260817-v1.2';
+const BRIDGE_PIN='2.15.0';
+document.getElementById('build').textContent='helper '+HELPER_BUILD+' · vk-bridge '+BRIDGE_PIN;
 
 function mk(el){const e=document.getElementById(el);
   return (m)=>{e.textContent=(new Date()).toLocaleTimeString()+'  '+m+'\n'+e.textContent;};}
 const log=mk('log'), plog=mk('plog');
 
+const bridge=window.vkBridge;
+if(!bridge){
+  const msg='VK Bridge JS не загрузился. Обновите страницу; helper='+HELPER_BUILD;
+  plog('ОШИБКА: '+msg);
+  log('ОШИБКА: '+msg);
+  document.getElementById('probe').disabled=true;
+  document.getElementById('connect').disabled=true;
+  throw new Error(msg);
+}
+
+const INIT=bridge.send('VKWebAppInit',{});
+const APP_ID=54704500, GROUP_ID=239543600, V='5.199';
+
 function withTimeout(p,ms,label){
-  let t; const q=new Promise((_,r)=>t=setTimeout(()=>r(new Error(label+': превышено время ожидания')),ms));
+  let t;
+  const q=new Promise((_,r)=>t=setTimeout(()=>r(new Error(label+': превышено время ожидания')),ms));
   return Promise.race([p,q]).finally(()=>clearTimeout(t));
 }
 
@@ -64,6 +82,17 @@ function normErr(o){
   return {ok:false,
           code:(inner.error_code!==undefined?inner.error_code:d.error_code),
           msg:inner.error_msg||inner.error_reason||d.error_reason||d.error_msg||JSON.stringify(o)};
+}
+
+function safeErrorCode(e){
+  const m=String(e&&e.message?e.message:e||'');
+  if(m.includes('VKWebAppGetAuthToken'))return 'VK_AUTH_TIMEOUT';
+  if(m.includes('VKWebAppInit'))return 'VK_INIT_TIMEOUT';
+  if(m.includes('Локальный мост /hello'))return 'HELPER_HELLO_FAILED';
+  if(m.includes('Локальный мост /config'))return 'BRIDGE_CONFIG_FAILED';
+  if(m.includes('photos.getAlbums'))return 'PHOTO_PREFLIGHT_FAILED';
+  if(m.includes('Локальный мост /photo-token'))return 'TOKEN_CALLBACK_FAILED';
+  return 'HELPER_ERROR';
 }
 
 async function api(method,params,token){
@@ -76,7 +105,6 @@ async function api(method,params,token){
   }catch(e){return normErr(e);}
 }
 
-/* 1. Неразрушающая проверка */
 document.getElementById('probe').onclick=async()=>{
   const b=document.getElementById('probe'); b.disabled=true;
   try{
@@ -97,8 +125,7 @@ document.getElementById('probe').onclick=async()=>{
   b.disabled=false;
 };
 
-/* 2. Прямой мост */
-let BASE='',KEY='',CFG=null, AUTO_STARTED=false;
+let BASE='',KEY='',CFG=null,AUTO_STARTED=false;
 
 function b64urlDecode(s){
   s=String(s||'').replace(/-/g,'+').replace(/_/g,'/');
@@ -119,27 +146,26 @@ function codeFromLocation(raw){
   return b64urlDecode(m[1]);
 }
 
-async function maybeAutoConnect(raw){
+async function maybeAutoConnect(raw,source='UNKNOWN'){
   if(AUTO_STARTED)return false;
   const code=codeFromLocation(raw);
   if(!code||code.indexOf('|')<0)return false;
   AUTO_STARTED=true;
   const field=document.getElementById('code');
   field.value=code;
-  log('Одноразовый код получен автоматически через VK app location.');
+  log('Одноразовый код получен автоматически через VK app location ('+source+').');
+  connectAndRefresh(true,source);
   try{await bridge.send('VKWebAppSetLocation',{location:''});}catch(_){}
-  connectAndRefresh(true);
   return true;
 }
 
 try{
   bridge.subscribe(e=>{
     if(e&&e.detail&&e.detail.type==='VKWebAppLocationChanged'){
-      maybeAutoConnect((e.detail.data||{}).location||'');
+      maybeAutoConnect((e.detail.data||{}).location||'','LOCATION_CHANGED');
     }
   });
 }catch(_){}
-
 
 function parseCode(raw){
   const cut=raw.lastIndexOf('|');
@@ -154,35 +180,59 @@ function parseCode(raw){
   return [base,key];
 }
 
-async function call(path,body){
+async function call(path,body,timeoutMs=15000){
   const r=await withTimeout(fetch(BASE+path,{
     method:body?'POST':'GET',
     headers:{'Content-Type':'application/json','X-ANTKSL-Session':KEY},
     body:body?JSON.stringify(body):undefined,
     cache:'no-store'
-  }),45000,'Локальный мост '+path);
+  }),timeoutMs,'Локальный мост '+path);
   let j={};
   try{j=await r.json();}catch(_){}
   if(!r.ok||!j.ok)throw new Error(j.error||('HTTP '+r.status));
   return j;
 }
 
-async function connectAndRefresh(autoMode=false){
+async function safeStage(stage,extra={}){
+  if(!BASE||!KEY)return;
+  try{await call('/stage',Object.assign({stage:stage},extra),7000);}catch(_){}
+}
+
+async function connectAndRefresh(autoMode=false,source='MANUAL'){
   const b=document.getElementById('connect');
   b.disabled=true;
   try{
     [BASE,KEY]=parseCode(document.getElementById('code').value.trim());
-    CFG=await call('/config');
+
+    await call('/hello',{
+      helper_build:HELPER_BUILD,
+      bridge_pin:BRIDGE_PIN,
+      source:autoMode?source:'MANUAL'
+    },12000);
+
+    CFG=await call('/config',null,12000);
     if(!CFG.token_capture||CFG.kind!=='vk_photo')
       throw new Error('Подключён не VK photo bridge.');
 
     log('Защищённый канал установлен. Запрашиваю новый photo token у VK…');
-    await withTimeout(INIT,30000,'VKWebAppInit');
 
+    await withTimeout(INIT,30000,'VKWebAppInit');
+    let client={};
+    try{
+      client=await withTimeout(bridge.send('VKWebAppGetClientVersion',{}),8000,'VKWebAppGetClientVersion');
+    }catch(_){}
+    await safeStage('VK_INIT_OK',{
+      platform:String(client.platform||''),
+      version:String(client.version||'')
+    });
+
+    await safeStage('AUTH_REQUESTED');
     const res=await withTimeout(
       bridge.send('VKWebAppGetAuthToken',{app_id:Number(CFG.app_id)||APP_ID,scope:CFG.scope||'photos,groups'}),
       90000,'VKWebAppGetAuthToken'
     );
+    await safeStage('AUTH_RESULT');
+
     let token=String(res.access_token||'');
     if(!token)throw new Error('VK не вернул access_token.');
 
@@ -193,38 +243,45 @@ async function connectAndRefresh(autoMode=false){
     const check=await api('photos.getAlbums',{owner_id:'-'+GROUP_ID,need_system:0,count:1},token);
     if(!check.ok){
       token='';
-      throw new Error('Новый ключ не прошёл photos.getAlbums: VK '+check.code+': '+check.msg);
+      throw new Error('photos.getAlbums: VK '+check.code+': '+check.msg);
     }
 
     log('VK photo token получен и проверен. Передаю напрямую локальному движку…');
-    const saved=await call('/photo-token',{access_token:token});
-    token=''; KEY=''; BASE='';
+    await safeStage('TOKEN_SUBMIT');
+
+    const saved=await call('/photo-token',{access_token:token},60000);
+    token='';
+    KEY='';
+    BASE='';
     document.getElementById('code').value='';
 
     log('ГОТОВО: локальный движок подтвердил альбом «'+
         (saved.album_title||'Студийные истории')+'» и атомарно сохранил новый ключ.');
     b.textContent='Готово — VK-фото обновлено';
   }catch(e){
-    KEY=''; BASE='';
-    log('ОШИБКА: '+(e&&e.message?e.message:String(e)));
+    const code=safeErrorCode(e);
+    await safeStage('HELPER_ERROR',{error_code:code});
+    log('ОШИБКА ['+code+']: '+(e&&e.message?e.message:String(e)));
+    KEY='';
+    BASE='';
     b.disabled=false;
   }
 }
 
-document.getElementById('connect').onclick=connectAndRefresh;
+document.getElementById('connect').onclick=()=>connectAndRefresh(false,'MANUAL');
 document.getElementById('code').addEventListener('keydown',e=>{
-  if(e.key==='Enter'){e.preventDefault();connectAndRefresh();}
+  if(e.key==='Enter'){e.preventDefault();connectAndRefresh(false,'MANUAL');}
 });
 
 INIT.then(async()=>{
-  plog('VK Bridge готов.');
-  const got=await maybeAutoConnect(window.location.hash);
+  plog('VK Bridge готов. helper='+HELPER_BUILD+'; bridge='+BRIDGE_PIN);
+  const got=await maybeAutoConnect(window.location.hash,'INITIAL_HASH');
   if(!got){
     setTimeout(async()=>{
       if(!AUTO_STARTED){
-        const late=await maybeAutoConnect(window.location.hash);
+        const late=await maybeAutoConnect(window.location.hash,'LATE_HASH');
         if(!late){
-          log('Автокод пока не получен. Резерв: Ctrl+V в поле и Enter.');
+          log('Автокод пока не получен. Локальный Bridge через несколько секунд предложит резерв: Ctrl+V и Enter.');
           try{document.getElementById('code').focus();}catch(_){}
         }
       }
