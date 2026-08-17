@@ -1,0 +1,32 @@
+name: LAB Token Helper v1.5 Static Integrity
+
+on:
+  push:
+    branches:
+      - lab-token-helper-v1-5-preinit-location-subscribe-20260818
+    paths:
+      - 'token-helper/**'
+      - '.github/workflows/verify-token-helper-v1-5-lab.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - name: Static verifier
+        run: python token-helper/VERIFY_V1_5.py | tee TOKEN_HELPER_V1_5_STATIC_AUDIT.txt
+      - name: Enforce result and runtime boundary
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -Fq 'RESULT: PASS_ANTKSL_TOKEN_HELPER_V1_5_STATIC_AUDIT' TOKEN_HELPER_V1_5_STATIC_AUDIT.txt
+          grep -Fq 'RUNTIME E2E TOKEN REFRESH: NOT CLAIMED' TOKEN_HELPER_V1_5_STATIC_AUDIT.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: token-helper-v1-5-static-audit
+          path: TOKEN_HELPER_V1_5_STATIC_AUDIT.txt
+          if-no-files-found: error
