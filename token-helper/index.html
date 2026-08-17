@@ -44,7 +44,7 @@ hr{border:0;border-top:1px solid #2a2f3a;margin:24px 0}
 
 <script>
 'use strict';
-const HELPER_BUILD='20260817-v1.4';
+const HELPER_BUILD='20260818-v1.5';
 const BRIDGE_PIN='2.15.0';
 const APP_ID=54704500, GROUP_ID=239543600, V='5.199';
 const BRIDGE_SOURCES=[
@@ -53,12 +53,12 @@ const BRIDGE_SOURCES=[
   'https://cdn.jsdelivr.net/npm/@vkontakte/vk-bridge@2.15.0/dist/browser.min.js'
 ];
 
-document.getElementById('build').textContent='helper '+HELPER_BUILD+' · vk-bridge '+BRIDGE_PIN+' · bootstrap-v3-same-origin-first';
+document.getElementById('build').textContent='helper '+HELPER_BUILD+' · vk-bridge '+BRIDGE_PIN+' · bootstrap-v4-preinit-location-subscribe';
 function mk(el){const e=document.getElementById(el);return m=>{e.textContent=(new Date()).toLocaleTimeString()+'  '+m+'\n'+e.textContent;};}
 const log=mk('log'), plog=mk('plog');
 function withTimeout(p,ms,label){let t;const q=new Promise((_,r)=>t=setTimeout(()=>r(new Error(label+': превышено время ожидания')),ms));return Promise.race([p,q]).finally(()=>clearTimeout(t));}
 
-let BASE='',KEY='',CFG=null,bridge=null,INIT=null,AUTO_STARTED=false,HELLO_SENT=false,BRIDGE_READY=null,BRIDGE_SOURCE='';
+let BASE='',KEY='',CFG=null,bridge=null,INIT=null,AUTO_STARTED=false,HELLO_SENT=false,BRIDGE_READY=null,BRIDGE_SOURCE='',LOCATION_SUBSCRIBED=false;
 
 function b64urlDecode(s){
   s=String(s||'').replace(/-/g,'+').replace(/_/g,'/');
@@ -129,6 +129,25 @@ function loadScript(src,timeoutMs){
     document.head.appendChild(s);
   });
 }
+function subscribeLocationEarly(){
+  if(LOCATION_SUBSCRIBED||!bridge)return LOCATION_SUBSCRIBED;
+  try{
+    bridge.subscribe(e=>{
+      if(e&&e.detail&&e.detail.type==='VKWebAppLocationChanged'){
+        maybeAutoConnect((e.detail.data||{}).location||'','LOCATION_CHANGED');
+      }
+    });
+    LOCATION_SUBSCRIBED=true;
+    plog('VK location listener: SUBSCRIBED_PRE_INIT.');
+    safeStage('LOCATION_SUBSCRIBED_PRE_INIT');
+    return true;
+  }catch(e){
+    plog('VK location listener: PRE_INIT_SUBSCRIBE_FAILED: '+e.message);
+    safeStage('HELPER_ERROR',{error_code:'LOCATION_PREINIT_SUBSCRIBE_FAILED'});
+    return false;
+  }
+}
+
 async function loadBridge(){
   let last=null;
   for(let i=0;i<BRIDGE_SOURCES.length;i++){
@@ -139,6 +158,7 @@ async function loadBridge(){
       bridge=window.vkBridge;
       BRIDGE_SOURCE=src;
       plog('VK Bridge JS загружен: источник '+(i+1)+' · '+(src.startsWith('./')?'SAME_ORIGIN_VENDOR':'EXTERNAL_FALLBACK')+'.');
+      subscribeLocationEarly();
       await safeStage('VK_BRIDGE_LOADED',{source:src.startsWith('./')?'SAME_ORIGIN_VENDOR':src});
       return bridge;
     }catch(e){last=e;plog('Источник '+(i+1)+' не сработал: '+e.message);}
@@ -157,13 +177,7 @@ async function initializeBridge(){
     plog('VKWebAppInit: OK. helper='+HELPER_BUILD+'; bridge='+BRIDGE_PIN);
     document.getElementById('probe').disabled=false;
     document.getElementById('connect').disabled=false;
-    try{
-      bridge.subscribe(e=>{
-        if(e&&e.detail&&e.detail.type==='VKWebAppLocationChanged'){
-          maybeAutoConnect((e.detail.data||{}).location||'','LOCATION_CHANGED');
-        }
-      });
-    }catch(_){}
+    subscribeLocationEarly();
     return bridge;
   }catch(e){
     await safeStage('HELPER_ERROR',{error_code:'VK_INIT_FAILED'});
