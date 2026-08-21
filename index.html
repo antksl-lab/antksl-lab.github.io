@@ -556,6 +556,31 @@ window.antkslSyncThemeColor(document.documentElement.getAttribute('data-skin')||
   .link-pill:hover{background:var(--ink);color:var(--paper);transform:translateY(-2px)}
   .link-pill.amber{border-color:var(--amber);color:var(--amber)}
   .link-pill.amber:hover{background:var(--amber);color:var(--ink)}
+  /* Площадки в нижнем блоке «Слушать»: узнаваемые фирменные палитры */
+  #listen .link-pill{font-weight:700;border-width:1.5px;box-shadow:0 7px 20px rgba(0,0,0,.14);text-shadow:0 1px 1px rgba(0,0,0,.18)}
+  #listen .link-pill:hover{transform:translateY(-3px);box-shadow:0 11px 26px rgba(0,0,0,.24)}
+  #listen .brand-bandlink{
+    background:linear-gradient(135deg,#ff315f 0%,#f21848 55%,#c90f3b 100%);
+    border-color:#ff6684;color:#fff;
+  }
+  #listen .brand-bandlink:hover{background:linear-gradient(135deg,#ff4c73 0%,#ff214f 55%,#dc1242 100%);color:#fff}
+  #listen .brand-yandex{
+    background:#111;color:#ffe45e;border-color:#ffe45e;text-shadow:none;
+  }
+  #listen .brand-yandex:hover{background:#ffe45e;color:#111;border-color:#ffe45e;text-shadow:none}
+  #listen .brand-vk{
+    background:#0077ff;border-color:#5aa7ff;color:#fff;
+  }
+  #listen .brand-vk:hover{background:#006fef;border-color:#83bdff;color:#fff}
+  #listen .brand-telegram{
+    background:linear-gradient(135deg,#2aabee 0%,#229ed9 100%);border-color:#72c8f4;color:#fff;
+  }
+  #listen .brand-telegram:hover{background:linear-gradient(135deg,#35b6f5 0%,#1c91cb 100%);color:#fff}
+  #listen .brand-instagram{
+    background:linear-gradient(135deg,#833ab4 0%,#c13584 34%,#e1306c 60%,#f77737 82%,#fcaf45 100%);
+    border-color:#f38bb2;color:#fff;
+  }
+  #listen .brand-instagram:hover{background:linear-gradient(135deg,#9144c2 0%,#d13d91 34%,#ef3a78 60%,#ff8441 82%,#ffbd55 100%);color:#fff}
   footer{position:relative;z-index:3;border-top:1px solid var(--line);padding:42px 0;text-align:center;font-family:var(--mono);font-size:12px;color:var(--muted);letter-spacing:.04em}
   footer .fname{font-family:var(--display);font-size:26px;color:var(--ink);margin-bottom:8px}
   footer a{color:var(--amber);text-decoration:none}
@@ -1985,11 +2010,11 @@ html[data-skin="editorial_mono"] .reel-badge.out{color:#fff}
 <section id="listen" class="wrap listen">
   <div class="sec-head"><span class="sec-num">04</span><h2 class="sec-title" data-i18n="listen">Слушать</h2><span class="sec-line"></span></div>
   <div class="links">
-    <a class="link-pill amber" href="https://band.link/konstantinzakharov" target="_blank" rel="noopener" data-i18n="allPlatforms">Все площадки · BandLink</a>
-    <a class="link-pill" href="https://music.yandex.ru/artist/26082374" target="_blank" rel="noopener">Яндекс Музыка</a>
-    <a class="link-pill" href="https://vk.com/artist/konstantinzakharov" target="_blank" rel="noopener">ВКонтакте</a>
-    <a class="link-pill" href="https://t.me/+Of8YPr3Z6mdkOGVi" target="_blank" rel="noopener">Telegram</a>
-    <a class="link-pill" href="https://www.instagram.com/serafimnazhdak.music/" target="_blank" rel="noopener">Instagram</a>
+    <a class="link-pill brand-bandlink" href="https://band.link/konstantinzakharov" target="_blank" rel="noopener" data-i18n="allPlatforms">Все площадки · BandLink</a>
+    <a class="link-pill brand-yandex" href="https://music.yandex.ru/artist/26082374" target="_blank" rel="noopener">Яндекс Музыка</a>
+    <a class="link-pill brand-vk" href="https://vk.com/artist/konstantinzakharov" target="_blank" rel="noopener">ВКонтакте</a>
+    <a class="link-pill brand-telegram" href="https://t.me/+Of8YPr3Z6mdkOGVi" target="_blank" rel="noopener">Telegram</a>
+    <a class="link-pill brand-instagram" href="https://www.instagram.com/serafimnazhdak.music/" target="_blank" rel="noopener">Instagram</a>
   </div>
 </section>
 
