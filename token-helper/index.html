@@ -1,1 +1,74 @@
-PLACEHOLDER
+<!DOCTYPE html>
+<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ANTKSL — VK Token Helper</title>
+<style>body{font-family:-apple-system,Segoe UI,Roboto,sans-serif;margin:0;padding:16px;background:#0f1116;color:#e8eaed}h1{font-size:20px;margin:0 0 10px}h2{font-size:15px;margin:22px 0 8px;color:#9fb3c8}p{color:#b9c0ca;line-height:1.45;font-size:14px}input,button{width:100%;box-sizing:border-box;font-size:15px;padding:13px;border-radius:10px;border:1px solid #2a2f3a}input{background:#171a21;color:#e8eaed;margin:12px 0 10px}button{background:#2787f5;color:#fff;border:0;margin-bottom:10px;font-weight:600}button.probe{background:#1f5f8b}button:disabled{background:#39404d;color:#9aa3ae}pre{white-space:pre-wrap;background:#171a21;border-radius:10px;padding:12px;font-size:13px;line-height:1.5;min-height:70px}.note{background:#171a21;border-radius:10px;padding:12px;margin:12px 0;color:#cbd1d8;font-size:13px}.good{border:1px solid #245a36}.build{font:12px ui-monospace,Consolas,monospace;color:#7f8b99;margin:8px 0 18px}hr{border:0;border-top:1px solid #2a2f3a;margin:24px 0}</style>
+<!-- 20260823-v1.8-postbox: v1.7 photo/read lane preserved; adds separate user-confirmed PostBox mode. -->
+<script src="./vendor/vk-bridge-2.15.0.min.js"></script>
+<script>'use strict';window.__ANTKSL_LOCATION_QUEUE=[];window.__ANTKSL_LOCATION_HANDLER=function(e){if(e&&e.detail&&e.detail.type==='VKWebAppLocationChanged'){const loc=(e.detail.data||{}).location||'';window.__ANTKSL_LOCATION_QUEUE.push(loc);if(typeof window.__ANTKSL_ON_LOCATION==='function')window.__ANTKSL_ON_LOCATION(loc);}};if(window.vkBridge){window.vkBridge.subscribe(window.__ANTKSL_LOCATION_HANDLER);window.__ANTKSL_INIT_PROMISE=window.vkBridge.send('VKWebAppInit',{});}else{window.__ANTKSL_INIT_PROMISE=Promise.reject(new Error('same-origin vkBridge did not load'));}</script>
+</head><body>
+<h1>ANTKSL · VK-доступ</h1><div id="build" class="build">helper: loading…</div>
+<p>Техническая страница ANTKSL. VK access token не копируется в URL/clipboard. Режим публикации VK Music использует штатное окно подтверждения VK.</p>
+<h2>1. Проверка прав — ничего не публикует</h2><div class="note">Проверяет пользовательский photo-доступ. Проверка не создаёт публикаций.</div><button id="probe" class="probe" disabled>Проверить права</button><pre id="plog">HTML Helper загружен. VK init уже запущен…</pre>
+<hr><h2>2. Локальный защищённый канал</h2><div class="note good">Обычный VK Photo Bridge сохраняет прежний token + read-only <b>wall.getById</b> контур. Отдельный VK Music PostBox Bridge не получает токен и вызывает только <b>VKWebAppShowWallPostBox</b>, где публикацию подтверждает пользователь.</div>
+<input id="code" type="password" placeholder="Резерв: одноразовый код подключения" autocomplete="off" spellcheck="false"><button id="connect" disabled>Подключить</button><pre id="log">HTML Helper загружен. Проверяю launch location…</pre>
+<script>
+'use strict';
+const HELPER_BUILD='20260823-v1.8.1-postbox-selfwall'; const BRIDGE_PIN='2.15.0'; const APP_ID=54704500,GROUP_ID=239543600,TARGET_OWNER_ID=1095896222,V='5.199'; const bridge=window.vkBridge;
+document.getElementById('build').textContent='helper '+HELPER_BUILD+' · vk-bridge '+BRIDGE_PIN+' · read-v1 + postbox-v1';
+function mk(id){const e=document.getElementById(id);return m=>{e.textContent=(new Date()).toLocaleTimeString()+'  '+m+'\n'+e.textContent;};} const log=mk('log'),plog=mk('plog');
+function withTimeout(p,ms,label){let t;const q=new Promise((_,r)=>t=setTimeout(()=>r(new Error(label+': превышено время ожидания')),ms));return Promise.race([p,q]).finally(()=>clearTimeout(t));}
+let BASE='',KEY='',CFG=null,AUTO_STARTED=false,HELLO_SENT=false; const INIT=withTimeout(window.__ANTKSL_INIT_PROMISE,15000,'VKWebAppInit');
+function b64urlDecode(s){s=String(s||'').replace(/-/g,'+').replace(/_/g,'/');while(s.length%4)s+='=';try{const bin=atob(s);return new TextDecoder().decode(Uint8Array.from(bin,c=>c.charCodeAt(0)));}catch(_){return '';}}
+function codeFromLocation(raw){raw=String(raw||'').trim();if(raw.startsWith('#'))raw=raw.slice(1);if(raw.startsWith('/'))raw=raw.slice(1);const m=raw.match(/(?:^|[?&])antksl_bridge=([A-Za-z0-9_-]+)/);return m?b64urlDecode(m[1]):'';}
+function parseCode(raw){const cut=String(raw||'').lastIndexOf('|');if(cut<0)throw new Error('Код подключения неполный.');let base=raw.slice(0,cut).trim(),key=raw.slice(cut+1).trim();while(base.endsWith('/'))base=base.slice(0,-1);const u=new URL(base);if(u.protocol!=='https:'||!u.hostname.endsWith('.trycloudflare.com')||u.pathname!=='/'||u.username||u.password)throw new Error('Ожидается одноразовый адрес *.trycloudflare.com.');if(key.length<20)throw new Error('Секрет сессии неполный.');return [base,key];}
+async function call(path,body,timeoutMs=15000){const r=await withTimeout(fetch(BASE+path,{method:body?'POST':'GET',headers:{'Content-Type':'application/json','X-ANTKSL-Session':KEY},body:body?JSON.stringify(body):undefined,cache:'no-store'}),timeoutMs,'Локальный мост '+path);let j={};try{j=await r.json();}catch(_){}if(!r.ok||!j.ok)throw new Error(j.error||('HTTP '+r.status));return j;}
+async function safeStage(stage,extra={}){if(!BASE||!KEY)return;try{await call('/stage',Object.assign({stage},extra),7000);}catch(_){} }
+async function ensureHello(source){if(HELLO_SENT)return true;if(!BASE||!KEY)return false;await call('/hello',{helper_build:HELPER_BUILD,bridge_pin:BRIDGE_PIN,source},12000);HELLO_SENT=true;log('Локальный Bridge подтвердил загрузку Helper.');return true;}
+function adoptCode(code,source){if(!code||code.indexOf('|')<0)return false;[BASE,KEY]=parseCode(code);document.getElementById('code').value=code;log('Одноразовый код найден: '+source+'.');return true;}
+async function maybeAutoConnect(raw,source){if(AUTO_STARTED)return false;const code=codeFromLocation(raw);if(!code||code.indexOf('|')<0)return false;AUTO_STARTED=true;try{adoptCode(code,source);await ensureHello(source);await BRIDGE_READY;connectAndRun(true,source);try{await bridge.send('VKWebAppSetLocation',{location:''});}catch(_){}return true;}catch(e){log('AUTO_CONNECT_ERROR: '+e.message);AUTO_STARTED=false;return false;}}
+window.__ANTKSL_ON_LOCATION=loc=>{safeStage('VK_LOCATION_EVENT',{has_location:Boolean(loc)});maybeAutoConnect(loc,'LOCATION_CHANGED_HEAD_CAPTURE');};
+const EARLY_CODE=codeFromLocation(window.location.hash);if(EARLY_CODE){try{adoptCode(EARLY_CODE,'INITIAL_HASH_EARLY');ensureHello('INITIAL_HASH_EARLY').catch(e=>log('EARLY_HELLO_FAILED: '+e.message));}catch(e){log('INITIAL_HASH_INVALID: '+e.message);}}else log('INITIAL_HASH_EMPTY: ожидаю VK location event или ручной резерв.');for(const loc of (window.__ANTKSL_LOCATION_QUEUE||[]).splice(0))window.__ANTKSL_ON_LOCATION(loc);
+const BRIDGE_READY=(async()=>{if(!bridge)throw new Error('VK Bridge JS не загрузился с same-origin vendor.');try{await INIT;let client={};try{client=await withTimeout(bridge.send('VKWebAppGetClientVersion',{}),8000,'VKWebAppGetClientVersion');}catch(_){}await safeStage('VK_INIT_OK',{platform:String(client.platform||''),version:String(client.version||''),bridge_source:'SAME_ORIGIN_VENDOR'});plog('VKWebAppInit: OK. helper='+HELPER_BUILD+'; bridge='+BRIDGE_PIN);document.getElementById('probe').disabled=false;document.getElementById('connect').disabled=false;return bridge;}catch(e){await safeStage('HELPER_ERROR',{error_code:'VK_INIT_FAILED'});plog('ОШИБКА VKWebAppInit: '+e.message);throw e;}})();
+function normErr(o){const d=(o&&o.error_data)||o||{};const inner=d.error_data||d;return {ok:false,code:(inner.error_code!==undefined?inner.error_code:d.error_code),msg:inner.error_msg||inner.error_reason||d.error_reason||d.error_msg||JSON.stringify(o)};}
+async function api(method,params,token){try{const r=await withTimeout(bridge.send('VKWebAppCallAPIMethod',{method,params:Object.assign({v:V,access_token:token},params||{})}),30000,method);if(r&&r.error_type)return normErr(r);if(r&&r.error)return normErr(r.error);return {ok:true,response:r?r.response:undefined};}catch(e){return normErr(e);}}
+function validReadJob(job){if(!job||job.method!=='wall.getById')return false;const p=job.params||{};if(Number(p.extended||0)!==0)return false;const posts=String(p.posts||'').split(',').filter(Boolean);return posts.length>0&&posts.length<=100&&posts.every(x=>/^-?\d+_\d+$/.test(x.trim()));}
+async function readPump(token){let transient=0;log('BRIDGE READ LANE: активен только wall.getById.');while(BASE&&KEY&&token){let poll;try{poll=await call('/read-job',null,22000);transient=0;}catch(e){if(++transient>=3){log('READ_LANE_STOP: '+e.message);break;}await new Promise(r=>setTimeout(r,700));continue;}if(!poll.read_lane_ready||Number(poll.expires_in_sec||0)<=0)break;const job=poll.job;if(!job)continue;if(!validReadJob(job)){try{await call('/read-result',{job_id:String(job.job_id||''),ok:false,error:'READ_JOB_REJECTED'},10000);}catch(_){}continue;}const r=await api('wall.getById',{posts:String(job.params.posts),extended:0},token);try{if(r.ok)await call('/read-result',{job_id:job.job_id,ok:true,response:r.response},30000);else await call('/read-result',{job_id:job.job_id,ok:false,vk_error:{error_code:r.code,error_msg:String(r.msg||'').slice(0,500)}},30000);}catch(e){log('READ_RESULT_ERROR: '+e.message);}}token='';KEY='';BASE='';document.getElementById('code').value='';log('BRIDGE READ LANE: завершён.');}
+function validPostboxJob(job){return !!job&&Number(job.owner_id)===1095896222&&typeof job.message==='string'&&job.message.length>0&&job.message.length<=16384&&/^photo\d+_\d+$/.test(String(job.attachments||''));}
+async function postboxPump(){
+  log('VK MUSIC POSTBOX: жду подготовленный пост. Токен не запрашивается.');
+  const poll=await call('/postbox-job',null,22000); const job=poll.job;
+  if(!validPostboxJob(job)){
+    if(job)try{await call('/postbox-result',{job_id:String(job.job_id||''),ok:false,outcome_unknown:false,error_code:'POSTBOX_JOB_REJECTED',error:'unsafe postbox job'},10000);}catch(_){}
+    throw new Error('POSTBOX_JOB_REJECTED');
+  }
+  let me;
+  try{me=await withTimeout(bridge.send('VKWebAppGetUserInfo',{}),15000,'VKWebAppGetUserInfo');}
+  catch(e){
+    const n=normErr(e);
+    try{await call('/postbox-result',{job_id:job.job_id,ok:false,outcome_unknown:false,error_code:'POSTBOX_IDENTITY_CHECK_FAILED',error:String(n.msg||e.message||e).slice(0,500)},15000);}catch(_){}
+    throw e;
+  }
+  if(Number(me&&me.id)!==TARGET_OWNER_ID || Number(job.owner_id)!==TARGET_OWNER_ID){
+    try{await call('/postbox-result',{job_id:job.job_id,ok:false,outcome_unknown:false,error_code:'POSTBOX_IDENTITY_MISMATCH',error:'logged-in VK user is not the allowed VK Music owner'},15000);}catch(_){}
+    throw new Error('POSTBOX_IDENTITY_MISMATCH');
+  }
+  log('VK MUSIC POSTBOX: личность владельца подтверждена. Сейчас VK покажет штатное окно.');
+  try{
+    const data=await withTimeout(bridge.send('VKWebAppShowWallPostBox',{
+      message:String(job.message), attachments:String(job.attachments)
+    }),180000,'VKWebAppShowWallPostBox');
+    const pid=Number(data&&data.post_id);
+    if(!Number.isInteger(pid)||pid<=0)throw new Error('VK не вернул post_id');
+    await call('/postbox-result',{job_id:job.job_id,ok:true,post_id:pid},15000);
+    log('ГОТОВО: VK подтвердил post_id='+pid+'.');
+  }catch(e){
+    const n=normErr(e);
+    try{await call('/postbox-result',{job_id:job.job_id,ok:false,outcome_unknown:true,error_code:String(n.code||'POSTBOX_REJECTED'),error:String(n.msg||e.message||e).slice(0,500)},15000);}catch(_){}
+    throw e;
+  }finally{document.getElementById('code').value='';KEY='';BASE='';}
+}
+async function connectAndRun(autoMode=false,source='MANUAL'){const b=document.getElementById('connect');b.disabled=true;try{if(!BASE||!KEY)adoptCode(document.getElementById('code').value.trim(),source);await ensureHello(autoMode?source:'MANUAL');await BRIDGE_READY;CFG=await call('/config',null,12000);if(CFG.postbox_only&&CFG.kind==='vk_music_postbox'){b.textContent='VK Music PostBox · ожидаю подтверждение';await postboxPump();b.textContent='VK Music PostBox · завершено';return;}if(!CFG.token_capture||CFG.kind!=='vk_photo')throw new Error('Неизвестный режим локального Bridge.');log('Защищённый канал установлен. Запрашиваю новый photo token у VK…');await safeStage('AUTH_REQUESTED');const res=await withTimeout(bridge.send('VKWebAppGetAuthToken',{app_id:Number(CFG.app_id)||APP_ID,scope:CFG.scope||'photos,groups'}),90000,'VKWebAppGetAuthToken');await safeStage('AUTH_RESULT');let token=String(res.access_token||'');if(!token)throw new Error('VK не вернул access_token.');const granted=String(res.scope||'').split(',').map(x=>x.trim()).filter(Boolean);if(granted.length&&!granted.includes('photos')){token='';throw new Error('VK не выдал право photos.');}const check=await api('photos.getAlbums',{owner_id:'-'+GROUP_ID,need_system:0,count:1},token);if(!check.ok){token='';throw new Error('photos.getAlbums: VK '+check.code+': '+check.msg);}await safeStage('TOKEN_SUBMIT');const saved=await call('/photo-token',{access_token:token},60000);document.getElementById('code').value='';b.textContent='Готово — VK-фото обновлено · read lane';log('ГОТОВО: локальный движок сохранил новый photo token.');await call('/read-ready',{helper_build:HELPER_BUILD,method:'wall.getById'},12000);await safeStage('READ_LANE_READY');await readPump(token);}catch(e){await safeStage('HELPER_ERROR',{error_code:'HELPER_ERROR'});log('ОШИБКА: '+(e&&e.message?e.message:String(e)));b.disabled=false;}}
+document.getElementById('connect').onclick=()=>connectAndRun(false,'MANUAL');document.getElementById('code').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();connectAndRun(false,'MANUAL');}});
+document.getElementById('probe').onclick=async()=>{const b=document.getElementById('probe');b.disabled=true;try{await BRIDGE_READY;const res=await withTimeout(bridge.send('VKWebAppGetAuthToken',{app_id:APP_ID,scope:'photos,groups'}),90000,'VKWebAppGetAuthToken');let token=String(res.access_token||'');if(!token)throw new Error('VK не выдал access_token.');const check=await api('photos.getAlbums',{owner_id:'-'+GROUP_ID,need_system:0,count:1},token);token='';if(!check.ok)throw new Error('photos.getAlbums: VK '+check.code+': '+check.msg);plog('ОК: photo-доступ работает.');}catch(e){plog('ОШИБКА: '+(e&&e.message?e.message:String(e)));}b.disabled=false;};
+BRIDGE_READY.then(async()=>{if(EARLY_CODE&&!AUTO_STARTED){AUTO_STARTED=true;connectAndRun(true,'INITIAL_HASH_EARLY');return;}const now=codeFromLocation(window.location.hash);if(now&&!AUTO_STARTED)await maybeAutoConnect(window.location.hash,'POST_INIT_HASH');if(!AUTO_STARTED){log('Автокод пока не получен. Резерв: Ctrl+V в поле и Enter.');try{document.getElementById('code').focus();}catch(_){}}}).catch(e=>log('BOOTSTRAP_ERROR: '+e.message));
+</script></body></html>
