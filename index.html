@@ -487,26 +487,28 @@ window.antkslSyncThemeColor(document.documentElement.getAttribute('data-skin')||
      Тонарм вращается вокруг опоры (772,150); длина до иглы 595.
      Геометрия посчитана по viewBox 1000×1000: пластинка R=400, этикетка R=132.
        θ = +8°  → игла на радиусе 372 — внешний край, начало записи
-       θ = -27° → игла на радиусе ~155 — вплотную к этикетке, конец записи
-     Дальше -30.2° игла всё равно не уйдёт: расстояние опора→центр (443)
-     короче тонарма (595), поэтому минимальный радиус ограничен физически.
+       θ = -20.45° → игла на радиусе ~175 — граница RUNOUT 43.8%, конец записанной области
+     Дальше внутрь иглу не ведём: после границы записанной области начинается runout/dead-wax.
+     Это визуальный и физический стоп playback-хода; затем тонарм поднимается и возвращается.
      Тень и корпус вращаются синхронно, но при подъёме корпус уходит вверх,
      а тень слабеет и остаётся на пластинке — так читается отрыв иглы. */
   .arm-body,.arm-shadow{transform-box:view-box;transform-origin:772px 150px}
   .arm-body{animation:armPlay 26s linear infinite}
   .arm-shadow{animation:armShadow 26s linear infinite}
 
+  /* V3.1 inner-groove law: playback sweep stops at the visible .vinyl-runout ring
+     (43.8% of record radius => ~175/400 in this viewBox), never over dead wax. */
   @keyframes armPlay{
     0%,1%   {transform:translateY(0)    rotate(8deg);   animation-timing-function:linear}
-    76%     {transform:translateY(0)    rotate(-27deg); animation-timing-function:ease-in-out}
-    80%     {transform:translateY(-20px) rotate(-27deg);animation-timing-function:ease-in-out}
+    76%     {transform:translateY(0)    rotate(-20.45deg); animation-timing-function:ease-in-out}
+    80%     {transform:translateY(-20px) rotate(-20.45deg);animation-timing-function:ease-in-out}
     90%     {transform:translateY(-20px) rotate(8deg);  animation-timing-function:ease-in}
     95%,100%{transform:translateY(0)    rotate(8deg)}
   }
   @keyframes armShadow{
     0%,1%   {transform:rotate(8deg);opacity:.22;  animation-timing-function:linear}
-    76%     {transform:rotate(-27deg);opacity:.22;animation-timing-function:ease-in-out}
-    80%     {transform:rotate(-27deg);opacity:.07;animation-timing-function:ease-in-out}
+    76%     {transform:rotate(-20.45deg);opacity:.22;animation-timing-function:ease-in-out}
+    80%     {transform:rotate(-20.45deg);opacity:.07;animation-timing-function:ease-in-out}
     90%     {transform:rotate(8deg);opacity:.07;  animation-timing-function:ease-in}
     95%,100%{transform:rotate(8deg);opacity:.22}
   }
