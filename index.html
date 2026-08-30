@@ -1319,10 +1319,17 @@ html[data-skin="editorial_mono"] .reel-badge.out{color:#fff}
 <style id="antksl-v3-product-layer">
 /* ANTKSL SITE v3 — ARTIST FIRST / MUSIC SECOND / TECHNOLOGY INVISIBLE */
 :root{--v3-radius:18px}
-/* Design-lab controls remain in code for testing, but leave primary visitor UX. */
+/* Visitor appearance control: keep the unified ✦ View menu on desktop, hide it on mobile.
+   Legacy standalone skin/mode/hero bars stay hidden; their controls already live inside .viewbar. */
 .viewbar,.skinbar,.modebar,.herobar{display:none!important}
-/* One dominant hero motion: suppress secondary ambient competition. */
+@media(min-width:761px){.viewbar{display:flex!important}}
+@media(max-width:760px){.viewbar{display:none!important}}
+/* Keep the studio EQ as a quieter desktop decoration; mobile remains clean. */
 html:not([data-motion="full"]) .studiofx .eq{display:none!important}
+@media(min-width:761px){
+  html:not([data-motion="full"]) .studiofx .eq{display:flex!important;height:clamp(26px,4.2vh,44px);opacity:.40}
+}
+@media(max-width:760px){.studiofx .eq{display:none!important}}
 html:not([data-motion="full"]) .skinfx b{animation-duration:70s!important;opacity:.22!important}
 .v3-kicker{font-family:var(--mono);text-transform:uppercase;letter-spacing:.16em;font-size:11px;color:var(--amber)}
 .v3-release{padding-top:28px!important}
@@ -1574,7 +1581,7 @@ html:not([data-motion="full"]) .skinfx b{animation-duration:70s!important;opacit
 <section id="featured-film" class="wrap v3-film" aria-labelledby="v3FilmTitle">
   <div class="v3-film-grid">
     <div class="v3-film-frame"><iframe id="v3FilmFrame" title="Музыкальная визуальная история" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>
-    <div class="v3-film-copy"><div class="v3-kicker">Песня как маленький фильм</div><h2 id="v3FilmTitle">Визуальная история</h2><p id="v3FilmCopy">Музыка, образ и история — в одном кадре.</p><div class="v3-actions"><a class="btn btn-solid" id="v3FilmListen" target="_blank" rel="noopener" href="#">Слушать песню</a><a class="btn btn-ghost" href="#reels">Все истории</a></div></div>
+    <div class="v3-film-copy"><div class="v3-kicker">Песня как маленький фильм</div><h2 id="v3FilmTitle">Визуальная история</h2><p id="v3FilmCopy">Музыка, образ и история — в одном кадре.</p><div class="v3-actions"><a class="btn btn-solid" id="v3FilmListen" target="_blank" rel="noopener" href="#">Слушать песню</a><a class="btn btn-ghost" id="v3FilmVK" target="_blank" rel="noopener" href="#">VK Видео ↗</a><a class="btn btn-ghost" href="#reels">Все истории</a></div></div>
   </div>
 </section>
 
@@ -3252,22 +3259,22 @@ var g=document.getElementById('grid');if(g)new MutationObserver(apply).observe(g
 'use strict';
 function lang(){return (document.documentElement.lang||'ru').slice(0,2)}
 var COPY={
- ru:{now:'Сейчас',out:'Уже вышел',soon:'Новый сингл',listen:'▶ Слушать релиз',pre:'Сохранить заранее',film:'Смотреть фильм',all:'Все истории',filmK:'Песня как маленький фильм'},
- uk:{now:'Зараз',out:'Вже вийшов',soon:'Новий сингл',listen:'▶ Слухати реліз',pre:'Зберегти заздалегідь',film:'Дивитися фільм',all:'Усі історії',filmK:'Пісня як маленький фільм'},
- en:{now:'Now',out:'Out now',soon:'New single',listen:'▶ Listen now',pre:'Pre-save release',film:'Watch film',all:'All stories',filmK:'A song as a short film'},
- de:{now:'Jetzt',out:'Jetzt erschienen',soon:'Neue Single',listen:'▶ Jetzt hören',pre:'Release vormerken',film:'Film ansehen',all:'Alle Geschichten',filmK:'Ein Song als Kurzfilm'},
- ja:{now:'いま',out:'配信中',soon:'ニューシングル',listen:'▶ 聴く',pre:'事前保存する',film:'映像を見る',all:'すべての物語',filmK:'歌を小さな映画に'},
- zh:{now:'此刻',out:'现已发行',soon:'新单曲',listen:'▶ 立即收听',pre:'预先保存',film:'观看影片',all:'全部故事',filmK:'把歌曲变成一部小电影'}
+ ru:{now:'Сейчас',out:'Уже вышел',soon:'Новый сингл',listen:'▶ Слушать релиз',pre:'Сохранить заранее',film:'Смотреть фильм',all:'Все истории',filmK:'Песня как маленький фильм',vk:'VK Видео ↗'},
+ uk:{now:'Зараз',out:'Вже вийшов',soon:'Новий сингл',listen:'▶ Слухати реліз',pre:'Зберегти заздалегідь',film:'Дивитися фільм',all:'Усі історії',filmK:'Пісня як маленький фільм',vk:'VK Відео ↗'},
+ en:{now:'Now',out:'Out now',soon:'New single',listen:'▶ Listen now',pre:'Pre-save release',film:'Watch film',all:'All stories',filmK:'A song as a short film',vk:'VK Video ↗'},
+ de:{now:'Jetzt',out:'Jetzt erschienen',soon:'Neue Single',listen:'▶ Jetzt hören',pre:'Release vormerken',film:'Film ansehen',all:'Alle Geschichten',filmK:'Ein Song als Kurzfilm',vk:'VK Video ↗'},
+ ja:{now:'いま',out:'配信中',soon:'ニューシングル',listen:'▶ 聴く',pre:'事前保存する',film:'映像を見る',all:'すべての物語',filmK:'歌を小さな映画に',vk:'VK Video ↗'},
+ zh:{now:'此刻',out:'现已发行',soon:'新单曲',listen:'▶ 立即收听',pre:'预先保存',film:'观看影片',all:'全部故事',filmK:'把歌曲变成一部小电影',vk:'VK Video ↗'}
 };
 function trk(type,release,detail){try{if(window.__ANTKSL_BOT||!window.ANTKSL_ANALYTICS||!window.ANTKSL_ANALYTICS.allowed())return;var SB='https://qhxhdzwtcjzdinbicjxl.supabase.co',K='sb_publishable_6giNbAp4HJTGo_FQCLV6AA_WtwMQlFP';fetch(SB+'/rest/v1/events',{method:'POST',keepalive:true,credentials:'omit',referrerPolicy:'no-referrer',headers:{'Content-Type':'application/json','apikey':K,'Authorization':'Bearer '+K,'Prefer':'return=minimal'},body:JSON.stringify({type:type,release:release||'',detail:detail||'',path:location.pathname})}).catch(function(){})}catch(e){}}
 function choose(){var d=new Date(),today=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');var sorted=tracks.slice().sort(function(a,b){return a.date.localeCompare(b.date)}),future=sorted.filter(function(r){return r.date>today}),past=sorted.filter(function(r){return r.date<=today});return {r:future[0]||past[past.length-1],future:future.length>0,today:today}}
 function render(){if(typeof tracks==='undefined'||typeof COVERS==='undefined')return;var c=choose(),r=c.r;if(!r)return;var l=lang(),t=COPY[l]||COPY.ru,title=(typeof TITLES!=='undefined'&&TITLES[r.t]&&TITLES[r.t][l])||r.t,desc=(typeof DESCS!=='undefined'&&DESCS[r.t]&&DESCS[r.t][l])||(typeof DESCS!=='undefined'&&DESCS[r.t]&&DESCS[r.t].ru)||'';var cover=COVERS[r.t]||'';
  document.getElementById('v3ReleaseCover').src=cover;document.getElementById('v3ReleaseCover').alt=title+' — '+((typeof ARTIST_NAME!=='undefined'&&ARTIST_NAME[l])||'Константин Захаров');document.getElementById('v3ReleaseKicker').textContent=t.now;document.getElementById('v3ReleaseTitle').textContent=title;document.getElementById('v3ReleaseStatus').textContent=(c.future?t.soon:t.out)+' · '+human(r.date);document.getElementById('v3ReleaseCopy').textContent=desc;var a=document.getElementById('v3ReleaseListen');a.href=r.url;a.textContent=c.future?t.pre:t.listen;document.getElementById('v3ReleaseFilm').textContent=t.film;
  // Film follows the featured release when a matching reel exists; otherwise newest released reel.
- var cards=[].slice.call(document.querySelectorAll('.reel-card[data-release-date][data-yt]')),match=cards.find(function(x){return x.getAttribute('data-release-date')===r.date}),released=cards.filter(function(x){return x.getAttribute('data-release-date')<=c.today});var fc=match||released[0]||cards[0];if(fc){var yt=fc.getAttribute('data-yt'),ft=(fc.querySelector('.vt')||{}).textContent||title,cap=(fc.querySelector('.reel-cap')||{}).textContent||'';document.getElementById('v3FilmFrame').src='https://www.youtube-nocookie.com/embed/'+encodeURIComponent(yt)+'?rel=0';document.getElementById('v3FilmTitle').textContent=ft;document.getElementById('v3FilmCopy').textContent=cap;document.getElementById('v3FilmListen').href=r.url;}
+ var cards=[].slice.call(document.querySelectorAll('.reel-card[data-release-date][data-yt]')),match=cards.find(function(x){return x.getAttribute('data-release-date')===r.date}),released=cards.filter(function(x){return x.getAttribute('data-release-date')<=c.today});var fc=match||released[0]||cards[0];if(fc){var yt=fc.getAttribute('data-yt'),vkOid=fc.getAttribute('data-vk-oid'),vkId=fc.getAttribute('data-vk-id'),ft=(fc.querySelector('.vt')||{}).textContent||title,cap=(fc.querySelector('.reel-cap')||{}).textContent||'';document.getElementById('v3FilmFrame').src='https://www.youtube-nocookie.com/embed/'+encodeURIComponent(yt)+'?rel=0';document.getElementById('v3FilmTitle').textContent=ft;document.getElementById('v3FilmCopy').textContent=cap;document.getElementById('v3FilmListen').href=r.url;var vk=document.getElementById('v3FilmVK');if(vk){if(vkOid&&vkId){vk.href='https://vkvideo.ru/video-'+encodeURIComponent(vkOid)+'_'+encodeURIComponent(vkId);vk.style.display='inline-flex';vk.textContent=t.vk||'VK Video ↗';}else{vk.removeAttribute('href');vk.style.display='none';}}}
  document.querySelector('#featured-film .v3-kicker').textContent=t.filmK;document.querySelector('#featured-film a[href="#reels"]').textContent=t.all;
  }
- document.getElementById('v3ReleaseListen').addEventListener('click',function(){trk('listen_click',document.getElementById('v3ReleaseTitle').textContent,'placement=featured_release')});document.getElementById('v3FilmListen').addEventListener('click',function(){trk('listen_click',document.getElementById('v3FilmTitle').textContent,'placement=featured_film')});document.getElementById('v3FilmFrame').addEventListener('load',function(){trk('featured_film_load',document.getElementById('v3FilmTitle').textContent,'youtube-nocookie')},{once:true});
+ document.getElementById('v3ReleaseListen').addEventListener('click',function(){trk('listen_click',document.getElementById('v3ReleaseTitle').textContent,'placement=featured_release')});document.getElementById('v3FilmListen').addEventListener('click',function(){trk('listen_click',document.getElementById('v3FilmTitle').textContent,'placement=featured_film')});document.getElementById('v3FilmVK').addEventListener('click',function(){trk('video_click',document.getElementById('v3FilmTitle').textContent,'placement=featured_film;source=vk')});document.getElementById('v3FilmFrame').addEventListener('load',function(){trk('featured_film_load',document.getElementById('v3FilmTitle').textContent,'youtube-nocookie')},{once:true});
  new MutationObserver(render).observe(document.documentElement,{attributes:true,attributeFilter:['lang']});render();
 })();
 </script>
