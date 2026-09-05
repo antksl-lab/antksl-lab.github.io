@@ -1634,24 +1634,9 @@ nav.is-scrolled{
   }
 }
 </style>
-<style id="antksl-secondary-release-v2">
-/* Keep the earlier September single visible as a full secondary feature.
-   Geometry law: secondary feature uses the SAME wrap edges as the featured-film block. */
-.v3-release-secondary{padding-top:28px!important}
-.v3-release-secondary .v3-release-card{
-  grid-template-columns:minmax(180px,300px) 1fr;
-  width:100%;max-width:none;margin:0;
-  background:color-mix(in oklab,var(--card) 82%,transparent);
-  box-shadow:0 18px 54px rgba(0,0,0,.15)
-}
-.v3-release-secondary .v3-cover{max-width:300px}
-.v3-release-secondary h2{font-family:var(--display);font-size:clamp(30px,4vw,50px);line-height:1.03;margin:.35em 0 .25em;text-wrap:balance}
-.v3-release-secondary .v3-release-copy{font-size:clamp(16px,1.7vw,19px)}
-@media(max-width:760px){
-  .v3-release-secondary{padding-top:18px!important}
-  .v3-release-secondary .v3-release-card{grid-template-columns:1fr}
-  .v3-release-secondary .v3-cover{max-width:none}
-}
+<style id="antksl-secondary-release-v3">
+/* Созвездие любви deliberately reuses the SAME v3-release + v3-film primitives
+   as the primary spotlight. No narrower card, no alternate geometry. */
 </style>
 </head>
 <body>
@@ -1947,7 +1932,7 @@ nav.is-scrolled{
   </div>
 </section>
 
-<section id="secondary-release" class="wrap v3-release v3-release-secondary" aria-labelledby="v3SecondaryTitle">
+<section id="secondary-release" class="wrap v3-release" aria-labelledby="v3SecondaryTitle">
   <div class="v3-release-card">
     <img id="v3SecondaryCover" class="v3-cover" width="1000" height="1000" src="assets/covers/sozvezdie-lyubvi.webp" alt="Созвездие любви — Константин Захаров — обложка сингла" loading="lazy" decoding="async">
     <div>
@@ -1957,10 +1942,15 @@ nav.is-scrolled{
       <p class="v3-release-copy" id="v3SecondaryCopy">Любовь, которая не гаснет, — вырастает в семью: муж, жена и две маленькие звёздочки дома.</p>
       <div class="v3-actions">
         <a class="btn btn-solid" id="v3SecondaryListen" target="_blank" rel="noopener" href="https://band.link/sozvezdielubvi">Сохранить заранее</a>
-        <a class="btn btn-ghost" id="v3SecondaryReelYT" target="_blank" rel="noopener" href="https://www.youtube.com/watch?v=DIOP_Wl3HYU">YouTube рилз ↗</a>
-        <a class="btn btn-ghost" id="v3SecondaryReelVK" target="_blank" rel="noopener" href="https://vkvideo.ru/video-239543600_456239067">VK рилз ↗</a>
+        <a class="btn btn-ghost" id="v3SecondaryFilm" href="#secondary-featured-film">Смотреть фильм</a>
       </div>
     </div>
+  </div>
+</section>
+<section id="secondary-featured-film" class="wrap v3-film" aria-labelledby="v3SecondaryFilmTitle">
+  <div class="v3-film-grid">
+    <div class="v3-film-frame"><iframe id="v3SecondaryFilmFrame" title="Созвездие любви — музыкальная визуальная история" src="https://www.youtube-nocookie.com/embed/DIOP_Wl3HYU?rel=0" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>
+    <div class="v3-film-copy"><div class="v3-kicker" id="v3SecondaryFilmKicker">Песня как маленький фильм</div><h2 id="v3SecondaryFilmTitle">Созвездие любви</h2><p id="v3SecondaryFilmCopy">Любовь, которая не гаснет, — вырастает в семью: муж, жена и две маленькие звёздочки дома.</p><div class="v3-actions"><a class="btn btn-solid" id="v3SecondaryFilmListen" target="_blank" rel="noopener" href="https://band.link/sozvezdielubvi">Сохранить заранее</a><a class="btn btn-ghost" id="v3SecondaryFilmVK" target="_blank" rel="noopener" href="https://vkvideo.ru/video-239543600_456239067">VK Видео ↗</a><a class="btn btn-ghost" id="v3SecondaryAllStories" href="#reels">Все истории</a></div></div>
   </div>
 </section>
 
@@ -3706,12 +3696,12 @@ function render(){if(typeof tracks==='undefined'||typeof COVERS==='undefined')re
 'use strict';
 var ITEM={t:'Созвездие любви',date:'2026-09-17',url:'https://band.link/sozvezdielubvi',cover:'assets/covers/sozvezdie-lyubvi.webp'};
 var COPY={
- ru:{k:'Ещё в сентябре',soon:'Новый сингл',out:'Уже вышел',pre:'Сохранить заранее',listen:'▶ Слушать релиз',yt:'YouTube рилз ↗',vk:'VK рилз ↗'},
- uk:{k:'Також у вересні',soon:'Новий сингл',out:'Вже вийшов',pre:'Зберегти заздалегідь',listen:'▶ Слухати реліз',yt:'YouTube рілз ↗',vk:'VK рілз ↗'},
- en:{k:'Also this September',soon:'New single',out:'Out now',pre:'Pre-save release',listen:'▶ Listen now',yt:'YouTube reel ↗',vk:'VK reel ↗'},
- de:{k:'Ebenfalls im September',soon:'Neue Single',out:'Jetzt erschienen',pre:'Release vormerken',listen:'▶ Jetzt hören',yt:'YouTube-Reel ↗',vk:'VK-Reel ↗'},
- ja:{k:'9月のもう一曲',soon:'ニューシングル',out:'配信中',pre:'事前保存する',listen:'▶ 聴く',yt:'YouTube リール ↗',vk:'VK リール ↗'},
- zh:{k:'九月另一首新作',soon:'新单曲',out:'现已发行',pre:'预先保存',listen:'▶ 立即收听',yt:'YouTube 短片 ↗',vk:'VK 短片 ↗'}
+ ru:{k:'Ещё в сентябре',soon:'Новый сингл',out:'Уже вышел',pre:'Сохранить заранее',listen:'▶ Слушать релиз',film:'Смотреть фильм',filmK:'Песня как маленький фильм',vk:'VK Видео ↗',all:'Все истории'},
+ uk:{k:'Також у вересні',soon:'Новий сингл',out:'Вже вийшов',pre:'Зберегти заздалегідь',listen:'▶ Слухати реліз',film:'Дивитися фільм',filmK:'Пісня як маленький фільм',vk:'VK Відео ↗',all:'Усі історії'},
+ en:{k:'Also this September',soon:'New single',out:'Out now',pre:'Pre-save release',listen:'▶ Listen now',film:'Watch film',filmK:'A song as a short film',vk:'VK Video ↗',all:'All stories'},
+ de:{k:'Ebenfalls im September',soon:'Neue Single',out:'Jetzt erschienen',pre:'Release vormerken',listen:'▶ Jetzt hören',film:'Film ansehen',filmK:'Ein Song als Kurzfilm',vk:'VK Video ↗',all:'Alle Geschichten'},
+ ja:{k:'9月のもう一曲',soon:'ニューシングル',out:'配信中',pre:'事前保存する',listen:'▶ 聴く',film:'映像を見る',filmK:'歌を小さな映画に',vk:'VK Video ↗',all:'すべての物語'},
+ zh:{k:'九月另一首新作',soon:'新单曲',out:'现已发行',pre:'预先保存',listen:'▶ 立即收听',film:'观看影片',filmK:'把歌曲变成一部小电影',vk:'VK Video ↗',all:'全部故事'}
 };
 function lang(){return (document.documentElement.lang||'ru').slice(0,2)}
 function human(d){var p=String(d).split('-');return p.length===3?p[2]+'.'+p[1]+'.'+p[0]:d}
@@ -3720,13 +3710,20 @@ function render(){
  var title=ITEM.t,desc='';
  try{if(typeof TITLES!=='undefined'&&TITLES[ITEM.t]&&TITLES[ITEM.t][l])title=TITLES[ITEM.t][l]}catch(e){}
  try{if(typeof DESCS!=='undefined'&&DESCS[ITEM.t])desc=DESCS[ITEM.t][l]||DESCS[ITEM.t].ru||''}catch(e){}
- var img=document.getElementById('v3SecondaryCover');if(img){img.src=ITEM.cover;img.alt=title+' — '+((typeof ARTIST_NAME!=='undefined'&&ARTIST_NAME[l])||'Константин Захаров')}
+ var artist='Константин Захаров';try{if(typeof ARTIST_NAME!=='undefined'&&ARTIST_NAME[l])artist=ARTIST_NAME[l]}catch(e){}
+ var img=document.getElementById('v3SecondaryCover');if(img){img.src=ITEM.cover;img.alt=title+' — '+artist+' — обложка сингла'}
  var k=document.getElementById('v3SecondaryKicker');if(k)k.textContent=c.k;
  var h=document.getElementById('v3SecondaryTitle');if(h)h.textContent=title;
  var st=document.getElementById('v3SecondaryStatus');if(st)st.textContent=(future?c.soon:c.out)+' · '+human(ITEM.date);
  var cp=document.getElementById('v3SecondaryCopy');if(cp&&desc)cp.textContent=desc;
  var a=document.getElementById('v3SecondaryListen');if(a){a.href=ITEM.url;a.textContent=future?c.pre:c.listen}
- var y=document.getElementById('v3SecondaryReelYT');if(y)y.textContent=c.yt; var v=document.getElementById('v3SecondaryReelVK');if(v)v.textContent=c.vk;
+ var film=document.getElementById('v3SecondaryFilm');if(film)film.textContent=c.film;
+ var fk=document.getElementById('v3SecondaryFilmKicker');if(fk)fk.textContent=c.filmK;
+ var fh=document.getElementById('v3SecondaryFilmTitle');if(fh)fh.textContent=title;
+ var fcp=document.getElementById('v3SecondaryFilmCopy');if(fcp&&desc)fcp.textContent=desc;
+ var fla=document.getElementById('v3SecondaryFilmListen');if(fla){fla.href=ITEM.url;fla.textContent=future?c.pre:c.listen}
+ var fvk=document.getElementById('v3SecondaryFilmVK');if(fvk)fvk.textContent=c.vk;
+ var all=document.getElementById('v3SecondaryAllStories');if(all)all.textContent=c.all;
 }
 new MutationObserver(render).observe(document.documentElement,{attributes:true,attributeFilter:['lang']});render();
 })();
