@@ -1606,6 +1606,51 @@ nav.is-scrolled{
   .tonearm .stylus-tip-v3{filter:drop-shadow(0 0 1px rgba(255,235,205,.55))}
 }
 </style>
+
+<style id="antksl-hero-cta-placement-v18">
+/* Desktop composition lock: keep the CTA beside the second line of the artist name,
+   high in the hero, so the studio console / booth remain visually open below.
+   Tablet and mobile keep the normal stacked flow. */
+@media(min-width:1180px){
+  header.hero{position:relative!important}
+  header.hero>.hero-cta{
+    position:absolute!important;
+    left:clamp(360px,34%,420px)!important;
+    top:clamp(120px,9vw,150px)!important;
+    right:auto!important;bottom:auto!important;
+    display:flex!important;flex-wrap:nowrap!important;
+    width:auto!important;max-width:520px!important;
+    margin:0!important;gap:12px!important;
+    transform:none!important;float:none!important;
+    z-index:8!important
+  }
+  header.hero>.hero-cta .btn{white-space:nowrap!important}
+}
+@media(min-width:769px) and (max-width:1179px){
+  header.hero>.hero-cta{
+    position:relative!important;left:auto!important;right:auto!important;top:auto!important;bottom:auto!important;
+    display:flex!important;flex-wrap:wrap!important;width:auto!important;max-width:100%!important;
+    margin-top:20px!important;gap:12px!important;transform:none!important;float:none!important;align-self:flex-start!important
+  }
+}
+</style>
+<style id="antksl-secondary-release-v1">
+/* Keep the earlier September single visible as a full secondary feature, not only a grid card. */
+.v3-release-secondary{padding-top:28px!important}
+.v3-release-secondary .v3-release-card{
+  grid-template-columns:minmax(180px,300px) 1fr;max-width:1040px;margin:0 auto;
+  background:color-mix(in oklab,var(--card) 82%,transparent);
+  box-shadow:0 18px 54px rgba(0,0,0,.15)
+}
+.v3-release-secondary .v3-cover{max-width:300px}
+.v3-release-secondary h2{font-family:var(--display);font-size:clamp(30px,4vw,50px);line-height:1.03;margin:.35em 0 .25em;text-wrap:balance}
+.v3-release-secondary .v3-release-copy{font-size:clamp(16px,1.7vw,19px)}
+@media(max-width:760px){
+  .v3-release-secondary{padding-top:18px!important}
+  .v3-release-secondary .v3-release-card{grid-template-columns:1fr}
+  .v3-release-secondary .v3-cover{max-width:none}
+}
+</style>
 </head>
 <body>
 <div class="viewbar">
@@ -1900,6 +1945,22 @@ nav.is-scrolled{
   </div>
 </section>
 
+<section id="secondary-release" class="wrap v3-release v3-release-secondary" aria-labelledby="v3SecondaryTitle">
+  <div class="v3-release-card">
+    <img id="v3SecondaryCover" class="v3-cover" width="1000" height="1000" src="assets/covers/sozvezdie-lyubvi.webp" alt="Созвездие любви — Константин Захаров — обложка сингла" loading="lazy" decoding="async">
+    <div>
+      <div class="v3-kicker" id="v3SecondaryKicker">Ещё в сентябре</div>
+      <h2 id="v3SecondaryTitle">Созвездие любви</h2>
+      <div class="v3-status" id="v3SecondaryStatus">Новый сингл · 17.09.2026</div>
+      <p class="v3-release-copy" id="v3SecondaryCopy">Любовь, которая не гаснет, — вырастает в семью: муж, жена и две маленькие звёздочки дома.</p>
+      <div class="v3-actions">
+        <a class="btn btn-solid" id="v3SecondaryListen" target="_blank" rel="noopener" href="https://band.link/sozvezdielubvi">Сохранить заранее</a>
+        <a class="btn btn-ghost" id="v3SecondaryReel" href="#reel-r16">Смотреть рилз</a>
+      </div>
+    </div>
+  </div>
+</section>
+
 <section id="releases" class="wrap">
   <div class="sec-head"><span class="sec-num">01</span><h2 class="sec-title" data-i18n="discog">Дискография</h2><span class="sec-line"></span></div>
   <div class="grid" id="grid">
@@ -2019,7 +2080,7 @@ nav.is-scrolled{
     </div>
   </div>
 
-  <div class="video-card reel-card" data-clip="r16" data-release-date="2026-09-17" data-yt="DIOP_Wl3HYU" data-vk-oid="239543600" data-vk-id="456239067">
+  <div class="video-card reel-card" id="reel-r16" data-clip="r16" data-release-date="2026-09-17" data-yt="DIOP_Wl3HYU" data-vk-oid="239543600" data-vk-id="456239067">
     <div class="video-frame">
       <button type="button" class="video-poster" aria-label="Смотреть рилз «Созвездие любви»"><span class="play"></span></button>
     </div>
@@ -3636,5 +3697,36 @@ function render(){if(typeof tracks==='undefined'||typeof COVERS==='undefined')re
 })();
 </script>
 
+
+<script id="antksl-v3-secondary-release-i18n">
+(function(){
+'use strict';
+var ITEM={t:'Созвездие любви',date:'2026-09-17',url:'https://band.link/sozvezdielubvi',cover:'assets/covers/sozvezdie-lyubvi.webp'};
+var COPY={
+ ru:{k:'Ещё в сентябре',soon:'Новый сингл',out:'Уже вышел',pre:'Сохранить заранее',listen:'▶ Слушать релиз',reel:'Смотреть рилз'},
+ uk:{k:'Також у вересні',soon:'Новий сингл',out:'Вже вийшов',pre:'Зберегти заздалегідь',listen:'▶ Слухати реліз',reel:'Дивитися рілз'},
+ en:{k:'Also this September',soon:'New single',out:'Out now',pre:'Pre-save release',listen:'▶ Listen now',reel:'Watch reel'},
+ de:{k:'Ebenfalls im September',soon:'Neue Single',out:'Jetzt erschienen',pre:'Release vormerken',listen:'▶ Jetzt hören',reel:'Reel ansehen'},
+ ja:{k:'9月のもう一曲',soon:'ニューシングル',out:'配信中',pre:'事前保存する',listen:'▶ 聴く',reel:'リールを見る'},
+ zh:{k:'九月另一首新作',soon:'新单曲',out:'现已发行',pre:'预先保存',listen:'▶ 立即收听',reel:'观看短片'}
+};
+function lang(){return (document.documentElement.lang||'ru').slice(0,2)}
+function human(d){var p=String(d).split('-');return p.length===3?p[2]+'.'+p[1]+'.'+p[0]:d}
+function render(){
+ var l=lang(),c=COPY[l]||COPY.ru,d=new Date(),today=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'),future=ITEM.date>today;
+ var title=ITEM.t,desc='';
+ try{if(typeof TITLES!=='undefined'&&TITLES[ITEM.t]&&TITLES[ITEM.t][l])title=TITLES[ITEM.t][l]}catch(e){}
+ try{if(typeof DESCS!=='undefined'&&DESCS[ITEM.t])desc=DESCS[ITEM.t][l]||DESCS[ITEM.t].ru||''}catch(e){}
+ var img=document.getElementById('v3SecondaryCover');if(img){img.src=ITEM.cover;img.alt=title+' — '+((typeof ARTIST_NAME!=='undefined'&&ARTIST_NAME[l])||'Константин Захаров')}
+ var k=document.getElementById('v3SecondaryKicker');if(k)k.textContent=c.k;
+ var h=document.getElementById('v3SecondaryTitle');if(h)h.textContent=title;
+ var st=document.getElementById('v3SecondaryStatus');if(st)st.textContent=(future?c.soon:c.out)+' · '+human(ITEM.date);
+ var cp=document.getElementById('v3SecondaryCopy');if(cp&&desc)cp.textContent=desc;
+ var a=document.getElementById('v3SecondaryListen');if(a){a.href=ITEM.url;a.textContent=future?c.pre:c.listen}
+ var r=document.getElementById('v3SecondaryReel');if(r)r.textContent=c.reel;
+}
+new MutationObserver(render).observe(document.documentElement,{attributes:true,attributeFilter:['lang']});render();
+})();
+</script>
 </body>
 </html>
