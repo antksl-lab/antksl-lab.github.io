@@ -1634,11 +1634,13 @@ nav.is-scrolled{
   }
 }
 </style>
-<style id="antksl-secondary-release-v1">
-/* Keep the earlier September single visible as a full secondary feature, not only a grid card. */
+<style id="antksl-secondary-release-v2">
+/* Keep the earlier September single visible as a full secondary feature.
+   Geometry law: secondary feature uses the SAME wrap edges as the featured-film block. */
 .v3-release-secondary{padding-top:28px!important}
 .v3-release-secondary .v3-release-card{
-  grid-template-columns:minmax(180px,300px) 1fr;max-width:1040px;margin:0 auto;
+  grid-template-columns:minmax(180px,300px) 1fr;
+  width:100%;max-width:none;margin:0;
   background:color-mix(in oklab,var(--card) 82%,transparent);
   box-shadow:0 18px 54px rgba(0,0,0,.15)
 }
@@ -1955,7 +1957,8 @@ nav.is-scrolled{
       <p class="v3-release-copy" id="v3SecondaryCopy">Любовь, которая не гаснет, — вырастает в семью: муж, жена и две маленькие звёздочки дома.</p>
       <div class="v3-actions">
         <a class="btn btn-solid" id="v3SecondaryListen" target="_blank" rel="noopener" href="https://band.link/sozvezdielubvi">Сохранить заранее</a>
-        <a class="btn btn-ghost" id="v3SecondaryReel" href="#reel-r16">Смотреть рилз</a>
+        <a class="btn btn-ghost" id="v3SecondaryReelYT" target="_blank" rel="noopener" href="https://www.youtube.com/watch?v=DIOP_Wl3HYU">YouTube рилз ↗</a>
+        <a class="btn btn-ghost" id="v3SecondaryReelVK" target="_blank" rel="noopener" href="https://vkvideo.ru/video-239543600_456239067">VK рилз ↗</a>
       </div>
     </div>
   </div>
@@ -3703,12 +3706,12 @@ function render(){if(typeof tracks==='undefined'||typeof COVERS==='undefined')re
 'use strict';
 var ITEM={t:'Созвездие любви',date:'2026-09-17',url:'https://band.link/sozvezdielubvi',cover:'assets/covers/sozvezdie-lyubvi.webp'};
 var COPY={
- ru:{k:'Ещё в сентябре',soon:'Новый сингл',out:'Уже вышел',pre:'Сохранить заранее',listen:'▶ Слушать релиз',reel:'Смотреть рилз'},
- uk:{k:'Також у вересні',soon:'Новий сингл',out:'Вже вийшов',pre:'Зберегти заздалегідь',listen:'▶ Слухати реліз',reel:'Дивитися рілз'},
- en:{k:'Also this September',soon:'New single',out:'Out now',pre:'Pre-save release',listen:'▶ Listen now',reel:'Watch reel'},
- de:{k:'Ebenfalls im September',soon:'Neue Single',out:'Jetzt erschienen',pre:'Release vormerken',listen:'▶ Jetzt hören',reel:'Reel ansehen'},
- ja:{k:'9月のもう一曲',soon:'ニューシングル',out:'配信中',pre:'事前保存する',listen:'▶ 聴く',reel:'リールを見る'},
- zh:{k:'九月另一首新作',soon:'新单曲',out:'现已发行',pre:'预先保存',listen:'▶ 立即收听',reel:'观看短片'}
+ ru:{k:'Ещё в сентябре',soon:'Новый сингл',out:'Уже вышел',pre:'Сохранить заранее',listen:'▶ Слушать релиз',yt:'YouTube рилз ↗',vk:'VK рилз ↗'},
+ uk:{k:'Також у вересні',soon:'Новий сингл',out:'Вже вийшов',pre:'Зберегти заздалегідь',listen:'▶ Слухати реліз',yt:'YouTube рілз ↗',vk:'VK рілз ↗'},
+ en:{k:'Also this September',soon:'New single',out:'Out now',pre:'Pre-save release',listen:'▶ Listen now',yt:'YouTube reel ↗',vk:'VK reel ↗'},
+ de:{k:'Ebenfalls im September',soon:'Neue Single',out:'Jetzt erschienen',pre:'Release vormerken',listen:'▶ Jetzt hören',yt:'YouTube-Reel ↗',vk:'VK-Reel ↗'},
+ ja:{k:'9月のもう一曲',soon:'ニューシングル',out:'配信中',pre:'事前保存する',listen:'▶ 聴く',yt:'YouTube リール ↗',vk:'VK リール ↗'},
+ zh:{k:'九月另一首新作',soon:'新单曲',out:'现已发行',pre:'预先保存',listen:'▶ 立即收听',yt:'YouTube 短片 ↗',vk:'VK 短片 ↗'}
 };
 function lang(){return (document.documentElement.lang||'ru').slice(0,2)}
 function human(d){var p=String(d).split('-');return p.length===3?p[2]+'.'+p[1]+'.'+p[0]:d}
@@ -3723,7 +3726,7 @@ function render(){
  var st=document.getElementById('v3SecondaryStatus');if(st)st.textContent=(future?c.soon:c.out)+' · '+human(ITEM.date);
  var cp=document.getElementById('v3SecondaryCopy');if(cp&&desc)cp.textContent=desc;
  var a=document.getElementById('v3SecondaryListen');if(a){a.href=ITEM.url;a.textContent=future?c.pre:c.listen}
- var r=document.getElementById('v3SecondaryReel');if(r)r.textContent=c.reel;
+ var y=document.getElementById('v3SecondaryReelYT');if(y)y.textContent=c.yt; var v=document.getElementById('v3SecondaryReelVK');if(v)v.textContent=c.vk;
 }
 new MutationObserver(render).observe(document.documentElement,{attributes:true,attributeFilter:['lang']});render();
 })();
