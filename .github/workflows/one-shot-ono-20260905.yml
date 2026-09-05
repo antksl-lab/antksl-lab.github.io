@@ -30,6 +30,8 @@ jobs:
           cat .antksl_site_update/cover.part*.b64 | base64 -d > assets/covers/ono-vnutri.webp
           echo '4dd68137898d708a1fd4ed491359a3629e582ecb5a1198b3a55cc404e84a136e  assets/covers/ono-vnutri.webp' | sha256sum -c -
           python .antksl_site_update/patch_ono_site.py index.html
+          test "$(sed -n '1980p' index.html)" = '  '
+          sed -i '1980s/[[:blank:]]*$//' index.html
           grep -Fq 'Оно уже не сверху, а внутри' index.html
           grep -Fq '"numberOfItems": 18' index.html
           grep -Fq 'https://antksl.band.link/onovnutri' index.html
