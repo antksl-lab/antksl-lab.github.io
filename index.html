@@ -61,7 +61,7 @@ window.antkslVT=function(update){
   try{document.startViewTransition(update);}catch(e){update();}
 };</script>
 <title>Константин Захаров — официальный сайт</title>
-<meta name="site-fix-version" content="2026-09-26-v3.3.1-ono-featured-yesenin-catalog">
+<meta name="site-fix-version" content="2026-09-26-v3.3.2-sticky-ono-featured">
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
 <meta name="description" content="Константин Захаров — городской романс, лирический поп и R&amp;B. Превращаю стихи в песни, а песни — в маленькие фильмы. Музыка, клипы, визуальные истории.">
 <meta name="color-scheme" content="dark light">
@@ -3735,7 +3735,7 @@ var COPY={
  zh:{now:'此刻',out:'现已发行',soon:'新单曲',listen:'▶ 立即收听',pre:'预先保存',film:'观看影片',all:'全部故事',filmK:'把歌曲变成一部小电影',vk:'VK Video ↗'}
 };
 function trk(type,release,detail){try{if(window.__ANTKSL_BOT||!window.ANTKSL_ANALYTICS||!window.ANTKSL_ANALYTICS.allowed())return;var SB='https://qhxhdzwtcjzdinbicjxl.supabase.co',K='sb_publishable_6giNbAp4HJTGo_FQCLV6AA_WtwMQlFP';fetch(SB+'/rest/v1/events',{method:'POST',keepalive:true,credentials:'omit',referrerPolicy:'no-referrer',headers:{'Content-Type':'application/json','apikey':K,'Authorization':'Bearer '+K,'Prefer':'return=minimal'},body:JSON.stringify({type:type,release:release||'',detail:detail||'',path:location.pathname})}).catch(function(){})}catch(e){}}
-function choose(){var d=new Date(),today=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');var sorted=tracks.slice().sort(function(a,b){return a.date.localeCompare(b.date)}),future=sorted.filter(function(r){return r.date>today}),past=sorted.filter(function(r){return r.date<=today}),spot=sorted.find(function(r){return r.spotlight&&r.date>=today}),r=spot||future[0]||past[past.length-1];return {r:r,future:!!(r&&r.date>today),today:today}}
+function choose(){var d=new Date(),today=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');var sorted=tracks.slice().sort(function(a,b){return a.date.localeCompare(b.date)}),future=sorted.filter(function(r){return r.date>today}),past=sorted.filter(function(r){return r.date<=today}),spot=sorted.find(function(r){return r.spotlight}),r=spot||future[0]||past[past.length-1];return {r:r,future:!!(r&&r.date>today),today:today}}
 function render(){if(typeof tracks==='undefined'||typeof COVERS==='undefined')return;var c=choose(),r=c.r;if(!r)return;var l=lang(),t=COPY[l]||COPY.ru,title=(typeof TITLES!=='undefined'&&TITLES[r.t]&&TITLES[r.t][l])||r.t,desc=(typeof DESCS!=='undefined'&&DESCS[r.t]&&DESCS[r.t][l])||(typeof DESCS!=='undefined'&&DESCS[r.t]&&DESCS[r.t].ru)||'';var cover=COVERS[r.t]||'';
  document.getElementById('v3ReleaseCover').src=cover;document.getElementById('v3ReleaseCover').alt=title+' — '+((typeof ARTIST_NAME!=='undefined'&&ARTIST_NAME[l])||'Константин Захаров');document.getElementById('v3ReleaseKicker').textContent=t.now;document.getElementById('v3ReleaseTitle').textContent=title;document.getElementById('v3ReleaseStatus').textContent=(c.future?t.soon:t.out)+' · '+human(r.date);document.getElementById('v3ReleaseCopy').textContent=desc;var a=document.getElementById('v3ReleaseListen');a.href=r.url;a.textContent=c.future?t.pre:t.listen;document.getElementById('v3ReleaseFilm').textContent=t.film;
  // Film follows the featured release when a matching reel exists; otherwise newest released reel.
