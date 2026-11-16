@@ -1,0 +1,36 @@
+{
+  "schema": "STUDIO_V791_VK_NATIVE_HOSTING_PREP_1",
+  "class": "DO_NOT_RUN",
+  "source": {
+    "repo": "antksl-lab/antksl-lab.github.io",
+    "branch": "main",
+    "head": "3d2ccd7c8b52cc898ff06a6f41f6d0856de59075",
+    "tree": "50eb395b71d737cc009e2e10baebaf0017e40ab9",
+    "app_id": 54704500
+  },
+  "files": [
+    {
+      "path": "V791_VK_HOSTING_CANDIDATE/build/index.html",
+      "git_blob_sha1": "7b2ab94f86e334f509f4247b7cf771e008b372eb",
+      "bytes": 18245
+    },
+    {
+      "path": "V791_VK_HOSTING_CANDIDATE/build/vendor/vk-bridge-2.15.0.min.js",
+      "git_blob_sha1": "df90b1daec34ced2144924a004c0de3ff535370d",
+      "bytes": 7849
+    },
+    {
+      "path": "V791_VK_HOSTING_CANDIDATE/build/vendor/VK_BRIDGE_LICENSE.txt",
+      "git_blob_sha1": "434cb317747493a87a213c22d27bf5c95b1c098e",
+      "bytes": 1086
+    },
+    {
+      "path": "V791_VK_HOSTING_CANDIDATE/build/vendor/VK_BRIDGE_2_15_0_PROVENANCE.md",
+      "git_blob_sha1": "ea01d8f2eb29ed2f23f9efdcbfc3979268c49999",
+      "bytes": 707
+    }
+  ],
+  "publisher": false,
+  "deploy": false,
+  "owner_approval": false
+}

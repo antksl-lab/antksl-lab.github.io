@@ -1,0 +1,12 @@
+{
+  "name": "antksl-token-helper-vk-hosting",
+  "version": "0.0.0-v791-candidate",
+  "private": true,
+  "homepage": "./",
+  "scripts": {
+    "deploy": "vk-miniapps-deploy"
+  },
+  "devDependencies": {
+    "@vkontakte/vk-miniapps-deploy": "1.0.3"
+  }
+}

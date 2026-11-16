@@ -1,0 +1,4 @@
+DO_NOT_RUN — ONLY CANDIDATE / NO VK HOSTING DEPLOY AUTHORIZATION.
+One action now: review DEPLOY_PLAN.md and grant an exact separate permission for a limited VK Hosting DEV deployment only.
+APP_ID=54704500; SOURCE_MAIN_HEAD=3d2ccd7c8b52cc898ff06a6f41f6d0856de59075; this branch does not modify main, existing VK settings, token, engine or VK posting.
+Source files are pinned Git blob copies under build/. VK_HOSTING URL is UNKNOWN until deploy and must never be guessed.
